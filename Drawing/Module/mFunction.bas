@@ -4,58 +4,6 @@ Public Declare Sub CopyMemory Lib "kernel32" Alias "RtlMoveMemory" (Destination 
 Public Declare Function BitBlt Lib "gdi32" (ByVal hDestDC As Long, ByVal X As Long, ByVal Y As Long, ByVal nWidth As Long, ByVal nHeight As Long, ByVal hSrcDC As Long, ByVal xSrc As Long, ByVal ySrc As Long, ByVal dwRop As Long) As Long
 Public Declare Function CLSIDFromString Lib "ole32.dll" (ByVal lpszProgID As Long, pCLSID As CLSID) As Long
 
-Public Function GetErrorDescription(ByVal ErrorNumber As Long) As String
-    Dim Description As String
-    
-    Select Case ErrorNumber
-        Case GpStatus.Ok
-            Description = "???"
-        Case GpStatus.GenericError
-            Description = "????????"
-        Case GpStatus.InvalidParameter
-            Description = "?????????"
-        Case GpStatus.OutOfMemory
-            Description = "??????"
-        Case GpStatus.ObjectBusy
-            Description = "????¶ƒ???"
-        Case GpStatus.InsufficientBuffer
-            Description = "???÷Œ??"
-        Case GpStatus.NotImplemented
-            Description = "????¶ƒ???"
-        Case GpStatus.Win32Error
-            Description = "??????"
-        Case GpStatus.WrongState
-            Description = "??????"
-        Case GpStatus.Aborted
-            Description = "???????"
-        Case GpStatus.FileNotFound
-            Description = "???¶ƒ???"
-        Case GpStatus.ValueOverflow
-            Description = "?????????¶∂"
-        Case GpStatus.AccessDenied
-            Description = "???????"
-        Case GpStatus.UnknownImageFormat
-            Description = "¶ƒ????????"
-        Case GpStatus.FontFamilyNotFound
-            Description = "????¶ƒ???"
-        Case GpStatus.FontStyleNotFound
-            Description = "???¶ƒ???"
-        Case GpStatus.NotTrueTypeFont
-            Description = "?????çI??TrueType"
-        Case GpStatus.UnsupportedGdiplusVersion
-            Description = "??????GDI+?∑⁄"
-        Case GpStatus.GdiplusNotInitialized
-            Description = "GDI+¶ƒ?????"
-        Case GpStatus.PropertyNotFound
-            Description = "????¶ƒ???"
-        Case GpStatus.PropertyNotSupported
-            Description = "????????"
-        Case GpStatus.ProfileNotFound
-            Description = "???????¶ƒ???"
-    End Select
-    GetErrorDescription = Description
-End Function
-
 Public Sub GdipCreateEffect2(ByVal EffectType As GdipEffectType, Effect As Long)
     Select Case EffectType
         Case GdipEffectType.Blur:                   GdipCreateEffect &H633C80A4, &H482B1843, &H28BEF29E, &HD4FDC534, Effect
