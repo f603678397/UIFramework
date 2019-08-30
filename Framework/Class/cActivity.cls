@@ -15,7 +15,7 @@ Option Explicit
 
 Private Graphics        As cGraphics
 Private PreFunc         As Long
-Private mHWND           As Long
+Private mhWnd           As Long
 Private mWidth          As Long
 Private mHeight         As Long
 Private SrcDC           As Long
@@ -31,10 +31,11 @@ Private bLeaveTrack         As Boolean
 Private bHoverTrack         As Boolean
 
 Private Layout              As cLayout
+Private bCreated            As Boolean
 
 Private Sub Class_Terminate(): Release: End Sub
 
-Public Property Get hWnd() As Long: hWnd = mHWND: End Property
+Public Property Get hWnd() As Long: hWnd = mhWnd: End Property
 'Friend Property Get PreWndProc() As Long: PreWndProc = PreFunc: End Property
 
 Public Property Get Width() As Long: Width = mWidth: End Property
@@ -42,7 +43,7 @@ Public Property Get Height() As Long: Height = mHeight: End Property
 
 Public Function CreateLayout() As cLayout
     Dim mLayout As New cLayout
-    mLayout.Create mWidth, mHeight
+    mLayout.Create Me, mWidth, mHeight
     Set CreateLayout = mLayout
 End Function
 
@@ -51,9 +52,9 @@ Public Sub SetLayout(NewLayout As cLayout): Set Layout = NewLayout: Refresh: End
 
 Public Sub Refresh()
     Graphics.Clear cColor.Transparent
-    Graphics.DrawImage Layout.GetImage, 0, 0
+    If Not Layout Is Nothing Then Graphics.DrawImage Layout.GetImage, 0, 0
     If mbLayer Then
-        UpdateLayeredWindow mHWND, SrcDC, ByVal 0&, winSize, DstDC, srcPoint, 0, BlendFunc32bpp, ULW_ALPHA
+        UpdateLayeredWindow mhWnd, SrcDC, ByVal 0&, winSize, DstDC, srcPoint, 0, BlendFunc32bpp, ULW_ALPHA
     Else
         BitBlt SrcDC, 0, 0, mWidth, mHeight, DstDC, 0, 0, vbSrcCopy
     End If
@@ -62,17 +63,21 @@ End Sub
 Friend Sub Create(ByVal hWnd As Long, ByVal bLayer As Boolean)
     mbLayer = bLayer
     PreFunc = SetWindowLongA(hWnd, GWL_WNDPROC, AddressOf WndProc)
-    GetWindowSize mHWND
-    SrcDC = GetDC(mHWND)
+    GetWindowSize mhWnd
+    SrcDC = GetDC(mhWnd)
     CreateMemoryDC
     Set Graphics = Drawing.CreateGraphicsFromHWND(DstDC)
+    bCreated = True
 End Sub
 
 Friend Sub Release()
+    If Not bCreated Then Exit Sub
     Graphics.Release
     Set Graphics = Nothing
     DestroyMemoryDC
-    SetWindowLongA mHWND, GWL_WNDPROC, PreFunc
+    SetWindowLongA mhWnd, GWL_WNDPROC, PreFunc
+    ActivityList.RemoveObject Me
+    bCreated = False
 End Sub
 
 Friend Function HandleMessage(ByVal uMsg As Long, ByVal wParam As Long, ByVal lParam As Long) As Long
@@ -84,6 +89,7 @@ Friend Function HandleMessage(ByVal uMsg As Long, ByVal wParam As Long, ByVal lP
             onSize wParam, lParam
         Case WM_MOUSEMOVE
             onMouseMove wParam, lParam
+            Layout.HandleMessage uMsg, wParam, lParam, 0
         Case WM_MOUSEHOVER
             onMouseHover wParam, lParam
         Case WM_MOUSELEAVE
@@ -92,7 +98,7 @@ Friend Function HandleMessage(ByVal uMsg As Long, ByVal wParam As Long, ByVal lP
             If Layout.HandleMessage(uMsg, wParam, lParam, Result) Then
                 HandleMessage = Result
             Else
-                HandleMessage = CallWindowProcA(PreFunc, mHWND, uMsg, wParam, lParam)
+                HandleMessage = CallWindowProcA(PreFunc, mhWnd, uMsg, wParam, lParam)
             End If
     End Select
 End Function
@@ -139,20 +145,21 @@ End Sub
 
 Private Sub onPaint()
     Dim PS As PAINTSTRUCT
-    BeginPaint mHWND, PS
+    BeginPaint mhWnd, PS
     Refresh
-    EndPaint mHWND, PS
+    EndPaint mhWnd, PS
 End Sub
 
 Private Sub onSize(ByVal wParam As Long, ByVal lParam As Long)
     If wParam = SIZE_RESTORED Or SIZE_MAXIMIZED Then
         DestroyMemoryDC
-        GetWindowSize mHWND
-        SrcDC = GetDC(mHWND)
+        GetWindowSize mhWnd
+        SrcDC = GetDC(mhWnd)
         CreateMemoryDC
         Graphics.Release
         Set Graphics = Nothing
         Set Graphics = cDrawing.CreateGraphicsFromHDC(DstDC)
+        If Not Layout Is Nothing Then Layout.ChangeSize mWidth, mHeight
     End If
 End Sub
 
@@ -171,12 +178,11 @@ Private Sub onMouseMove(ByVal wParam As Long, ByVal lParam As Long)
     
     With TME
         .cbSize = LenB(TME)
-        .hWndTrack = mHWND
+        .hWndTrack = mhWnd
         .dwFlags = Flags
     End With
     
     Call TRACKMOUSEEVENT(TME)
-    '// TODO: 触发鼠标移动事件
 End Sub
 
 Private Sub onMouseHover(ByVal wParam As Long, ByVal lParam As Long)
