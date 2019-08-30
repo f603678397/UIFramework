@@ -16,6 +16,10 @@ Attribute VB_Ext_KEY = "Top_Level" ,"Yes"
 Private ObjectList()        As Object
 Private ObjectCount         As Long
 
+Private Sub Class_Terminate()
+    Clear
+End Sub
+
 Public Sub Add(T As Object, Optional Position As Long = -1)
     If T Is Nothing Then Exit Sub
     ObjectCount = ObjectCount + 1
@@ -43,6 +47,10 @@ Public Sub AddList(List As cObjectList)
         Add Obj
         Set Obj = Nothing
     Next
+End Sub
+
+Public Sub RemoveObject(T As Object)
+    Remove Find(T)
 End Sub
 
 Public Sub Remove(Position As Long)

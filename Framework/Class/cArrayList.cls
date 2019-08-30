@@ -16,6 +16,10 @@ Attribute VB_Ext_KEY = "Top_Level" ,"Yes"
 Private ArrayList()     As Variant
 Private ArrayCount      As Long
 
+Private Sub Class_Terminate()
+    Clear
+End Sub
+
 Public Sub Add(T As Variant, Optional Position As Long = -1)
     ArrayCount = ArrayCount + 1
     ReDim Preserve ArrayList(ArrayCount - 1) As Variant

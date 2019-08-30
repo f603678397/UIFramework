@@ -9,6 +9,7 @@ Class=cTimer; Class\cTimer.cls
 Class=cArrayList; Class\cArrayList.cls
 Class=cObjectList; Class\cObjectList.cls
 Class=cLayout; Class\cLayout.cls
+Class=cView; Class\cView.cls
 Startup="(None)"
 HelpFile=""
 ExeName32="Framework.dll"

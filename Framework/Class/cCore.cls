@@ -17,6 +17,11 @@ Public Sub Initialize()
     Drawing.Init
 End Sub
 
+Public Sub Terminate()
+    ActivityList.Clear
+    Drawing.Shutdown
+End Sub
+
 Public Function CreateActivity(ByVal hWnd As Long, Optional ByVal bLayer As Boolean = False) As cActivity
     Dim Activity As cActivity
     Dim i As Long
@@ -36,3 +41,6 @@ Public Function CreateActivity(ByVal hWnd As Long, Optional ByVal bLayer As Bool
     Set CreateActivity = Activity
 End Function
 
+Public Sub DestroyActivity(Activity As cActivity)
+    Activity.Release
+End Sub
