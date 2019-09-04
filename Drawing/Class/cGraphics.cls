@@ -431,7 +431,7 @@ Public Sub FillPie(Brush As cBrush, ByVal X As Single, ByVal Y As Single, ByVal 
     GdipFillPie mHandle, Brush.Handle, X, Y, Width, Height, startAngle, sweepAngle
 End Sub
 
-Public Sub FillPath(Brush As cBrush, Path As cPath)
+Public Sub fillPath(Brush As cBrush, Path As cPath)
     GdipFillPath mHandle, Brush.Handle, Path.Handle
 End Sub
 
@@ -443,9 +443,9 @@ Public Sub DrawChachedBitmap(Cached As cCachedBitmap, ByVal X As Long, ByVal Y A
     GdipDrawCachedBitmap mHandle, Cached.Handle, X, Y
 End Sub
 
-Public Sub DrawImage(Img As cImage, ByVal X As Single, ByVal Y As Single)
-    GdipDrawImage mHandle, Img.Handle, X, Y
-End Sub
+Public Function DrawImage(Img As cImage, ByVal X As Single, ByVal Y As Single) As Long
+    DrawImage = GdipDrawImage(mHandle, Img.Handle, X, Y)
+End Function
 
 Public Sub DrawImageRect(Img As cImage, ByVal X As Single, ByVal Y As Single, ByVal Width As Single, ByVal Height As Single)
     GdipDrawImageRect mHandle, Img.Handle, X, Y, Width, Height
