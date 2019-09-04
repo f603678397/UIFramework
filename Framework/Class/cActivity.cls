@@ -36,7 +36,6 @@ Private bCreated            As Boolean
 Private Sub Class_Terminate(): Release: End Sub
 
 Public Property Get hWnd() As Long: hWnd = mhWnd: End Property
-'Friend Property Get PreWndProc() As Long: PreWndProc = PreFunc: End Property
 
 Public Property Get Width() As Long: Width = mWidth: End Property
 Public Property Get Height() As Long: Height = mHeight: End Property
@@ -60,22 +59,43 @@ Public Sub Refresh()
     End If
 End Sub
 
+Friend Sub RefreshRect(ByVal L As Integer, ByVal T As Integer, ByVal W As Integer, ByVal H As Integer)
+    If Not Layout Is Nothing Then
+        Graphics.SetClip L, T, W, H, CombineModeReplace
+        Graphics.Clear cColor.Transparent
+        Graphics.DrawImagePointRect Layout.GetImage, L, T, cDrawing.NewRectF(L, T, W, H)
+        Graphics.ResetClip
+    Else
+        Exit Sub
+    End If
+    
+    If mbLayer Then
+        UpdateLayeredWindow mhWnd, SrcDC, ByVal 0&, winSize, DstDC, srcPoint, 0, BlendFunc32bpp, ULW_ALPHA
+    Else
+        BitBlt SrcDC, 0, 0, mWidth, mHeight, DstDC, 0, 0, vbSrcCopy
+    End If
+End Sub
+
 Friend Sub Create(ByVal hWnd As Long, ByVal bLayer As Boolean)
     mbLayer = bLayer
+    mhWnd = hWnd
     PreFunc = SetWindowLongA(hWnd, GWL_WNDPROC, AddressOf WndProc)
     GetWindowSize mhWnd
     SrcDC = GetDC(mhWnd)
     CreateMemoryDC
     Set Graphics = Drawing.CreateGraphicsFromHWND(DstDC)
+    bHoverTrack = True
     bCreated = True
 End Sub
 
 Friend Sub Release()
     If Not bCreated Then Exit Sub
-    Graphics.Release
-    Set Graphics = Nothing
-    DestroyMemoryDC
     SetWindowLongA mhWnd, GWL_WNDPROC, PreFunc
+    Graphics.Release
+    Layout.Release
+    Set Graphics = Nothing
+    Set Layout = Nothing
+    DestroyMemoryDC
     ActivityList.RemoveObject Me
     bCreated = False
 End Sub
@@ -89,14 +109,17 @@ Friend Function HandleMessage(ByVal uMsg As Long, ByVal wParam As Long, ByVal lP
             onSize wParam, lParam
         Case WM_MOUSEMOVE
             onMouseMove wParam, lParam
-            Layout.HandleMessage uMsg, wParam, lParam, 0
         Case WM_MOUSEHOVER
             onMouseHover wParam, lParam
         Case WM_MOUSELEAVE
             onMouseLeave
         Case Else
-            If Layout.HandleMessage(uMsg, wParam, lParam, Result) Then
-                HandleMessage = Result
+            If Not Layout Is Nothing Then
+                If Layout.HandleMessage(uMsg, wParam, lParam, Result) Then
+                    HandleMessage = Result
+                Else
+                    HandleMessage = CallWindowProcA(PreFunc, mhWnd, uMsg, wParam, lParam)
+                End If
             Else
                 HandleMessage = CallWindowProcA(PreFunc, mhWnd, uMsg, wParam, lParam)
             End If
@@ -107,7 +130,7 @@ Private Sub GetWindowSize(ByVal hWnd As Long)
     Dim mRect As RECT
     GetClientRect hWnd, mRect
     mWidth = mRect.Right - mRect.Left
-    mHeight = mRect.Bottom - mRect.Top
+    mHeight = mRect.bottom - mRect.Top
     
     srcPoint.X = 0
     srcPoint.Y = 0
@@ -153,7 +176,14 @@ End Sub
 Private Sub onSize(ByVal wParam As Long, ByVal lParam As Long)
     If wParam = SIZE_RESTORED Or SIZE_MAXIMIZED Then
         DestroyMemoryDC
-        GetWindowSize mhWnd
+'        GetWindowSize mhWnd
+        
+        mWidth = LowWord(lParam)
+        mHeight = HighWord(lParam)
+
+        winSize.cx = mWidth
+        winSize.cy = mHeight
+    
         SrcDC = GetDC(mhWnd)
         CreateMemoryDC
         Graphics.Release
@@ -166,30 +196,41 @@ End Sub
 Private Sub onMouseMove(ByVal wParam As Long, ByVal lParam As Long)
     Dim TME As TRACKMOUSEEVENT
     Dim Flags As Long
-    
-    If Not bLeaveTrack Then
+
+    If bLeaveTrack Then
         Flags = TME_LEAVE
-        bLeaveTrack = True
     End If
-    
-    If Not bHoverTrack Then
+
+    If bHoverTrack Then
         Flags = Flags Or TME_HOVER
     End If
-    
+
     With TME
         .cbSize = LenB(TME)
         .hWndTrack = mhWnd
         .dwFlags = Flags
+        .dwHoverTime = HOVER_DEFAULT
     End With
-    
+
     Call TRACKMOUSEEVENT(TME)
+    
+    If Not Layout Is Nothing Then
+        Layout.HandleMessage WM_MOUSEMOVE, wParam, lParam, 0
+    End If
 End Sub
 
 Private Sub onMouseHover(ByVal wParam As Long, ByVal lParam As Long)
-    bHoverTrack = True
+    bHoverTrack = False
+    bLeaveTrack = True
+    If Not Layout Is Nothing Then
+        Layout.HandleMessage WM_MOUSEHOVER, 0, 0, 0
+    End If
 End Sub
 
 Private Sub onMouseLeave()
     bLeaveTrack = False
-    bHoverTrack = False
+    bHoverTrack = True
+    If Not Layout Is Nothing Then
+        Layout.HandleMessage WM_MOUSELEAVE, 0, 0, 0
+    End If
 End Sub

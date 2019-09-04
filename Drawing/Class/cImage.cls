@@ -81,10 +81,10 @@ Public Function GetBounds(Optional Unit As GpUnit) As RECTF
 End Function
 
 Public Function GetDimension() As SIZEF
-    Dim W As Single, h As Single
-    GdipGetImageDimension mHandle, W, h
-    GetDimension.cx = W
-    GetDimension.cy = h
+    Dim w As Single, H As Single
+    GdipGetImageDimension mHandle, w, H
+    GetDimension.cx = w
+    GetDimension.cy = H
 End Function
 
 Public Function GetType() As Image_Type
@@ -136,6 +136,8 @@ End Sub
 
 Public Function ToBitmap() As cBitmap
     Dim Bmp As New cBitmap
-    Bmp.Handle = mHandle
+    Dim H As Long
+    GdipCloneImage mHandle, H
+    Bmp.Handle = H
     Set ToBitmap = Bmp
 End Function

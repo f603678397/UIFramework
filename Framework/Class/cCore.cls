@@ -18,8 +18,15 @@ Public Sub Initialize()
 End Sub
 
 Public Sub Terminate()
-    ActivityList.Clear
-    Drawing.Shutdown
+    Dim i As Long
+    Dim Activity As cActivity
+    For i = 0 To ActivityList.GetCount - 1
+        Set Activity = ActivityList.GetObject(i)
+            Activity.Release
+        Set Activity = Nothing
+    Next
+    Set ActivityList = Nothing
+    Drawing.SHUTDOWN
 End Sub
 
 Public Function CreateActivity(ByVal hWnd As Long, Optional ByVal bLayer As Boolean = False) As cActivity

@@ -19,7 +19,7 @@ Public Function WndProc(ByVal hWnd As Long, ByVal uMsg As Long, ByVal wParam As 
         Set Activity = Nothing
     Next
     
-    'WndProc = DefWindowProcA(hWnd, uMsg, wParam, lParam)
+    WndProc = DefWindowProcA(hWnd, uMsg, wParam, lParam)
 End Function
 
 Public Function GetTimerID() As Long
@@ -74,21 +74,21 @@ Public Function HighWord(ByVal inDWord As Long) As Integer
     HighWord = LowWord(((inDWord And &HFFFF0000) \ &H10000) And &HFFFF&)
 End Function
 
-Public Function GetButton(ByVal N As Long) As Integer
+Public Function GetButton(ByVal n As Long) As Integer
     Dim Button As Integer
     
-    If (N And MK_LBUTTON) = MK_LBUTTON Then Button = Button Or vbLeftButton
-    If (N And MK_RBUTTON) = MK_RBUTTON Then Button = Button Or vbRightButton
-    If (N And MK_MBUTTON) = MK_MBUTTON Then Button = Button Or vbMiddleButton
+    If (n And MK_LBUTTON) = MK_LBUTTON Then Button = Button Or vbLeftButton
+    If (n And MK_RBUTTON) = MK_RBUTTON Then Button = Button Or vbRightButton
+    If (n And MK_MBUTTON) = MK_MBUTTON Then Button = Button Or vbMiddleButton
     
     GetButton = Button
 End Function
 
-Public Function GetShift(ByVal N As Long) As Integer
+Public Function GetShift(ByVal n As Long) As Integer
     Dim Shift As Integer
     
-    If (N And MK_SHIFT) = MK_SHIFT Then Shift = Shift Or &H1
-    If (N And MK_CONTROL) = MK_CONTROL Then Shift = Shift Or &H2
+    If (n And MK_SHIFT) = MK_SHIFT Then Shift = Shift Or &H1
+    If (n And MK_CONTROL) = MK_CONTROL Then Shift = Shift Or &H2
     
     GetShift = Shift
 End Function

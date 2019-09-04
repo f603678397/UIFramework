@@ -40,7 +40,7 @@ Public Event GotFocus()
 Public Event LostFocus()
 Public Event Paint(Canvas As cGraphics)
 
-'Private Sub Class_Terminate(): Set Bitmap = Nothing: End Sub
+Private Sub Class_Terminate(): Release: End Sub
 
 Public Property Get Left() As Integer: Left = mLeft: End Property
 Public Property Let Left(ByVal nLeft As Integer): mLeft = nLeft: Notify: End Property
@@ -65,6 +65,7 @@ Public Property Let BackgroundColor(ByVal nColor As Long): mBKColor = nColor: Ra
 
 Friend Sub Create(Root As cLayout, ParentView As cView, ByVal L As Integer, ByVal T As Integer, ByVal W As Integer, ByVal H As Integer)
     Set Bitmap = New cBitmap
+    Set ResultBMP = New cBitmap
     mLeft = L: mTop = T
     mWidth = W: mHeight = H
     Bitmap.CreateEmptyBitmap W, H
@@ -76,6 +77,24 @@ Friend Sub Create(Root As cLayout, ParentView As cView, ByVal L As Integer, ByVa
     Set Layout = Root
     Set mParent = ParentView
     RaisePaint
+End Sub
+
+Friend Sub Release()
+    Dim i As Long
+    Dim View As cView
+    
+    Set Graphics = Nothing
+    Set Canvas = Nothing
+    Set Bitmap = Nothing
+    Set ResultBMP = Nothing
+    
+    For i = 0 To ViewList.GetCount - 1
+        Set View = ViewList.GetObject(i)
+            View.Release
+        Set View = Nothing
+    Next
+    
+    Set ViewList = Nothing
 End Sub
 
 Friend Function GetImage() As cImage: Set GetImage = ResultBMP.ToImage: End Function
@@ -112,7 +131,7 @@ Friend Sub RaiseMouseMove(ByVal Button As Integer, ByVal Shift As Integer, ByVal
         Set View = Nothing
     Next
     Layout.SetHoverView Me
-    RaiseEvent MouseMove(Button, Shift, X, Y)
+    RaiseEvent MouseMove(Button, Shift, X - mLeft, Y - mTop)
 End Sub
 
 Friend Sub RaiseMouseDown(ByVal Button As Integer, ByVal Shift As Integer, ByVal X As Integer, ByVal Y As Integer)
@@ -128,11 +147,11 @@ Friend Sub RaiseMouseDown(ByVal Button As Integer, ByVal Shift As Integer, ByVal
         Set View = Nothing
     Next
     Layout.SetFocusView Me
-    RaiseEvent MouseDown(Button, Shift, X, Y)
+    RaiseEvent MouseDown(Button, Shift, X - mLeft, Y - mTop)
 End Sub
 
 Friend Sub RaiseMouseUp(ByVal Button As Integer, ByVal Shift As Integer, ByVal X As Integer, ByVal Y As Integer)
-    RaiseEvent MouseUp(Button, Shift, X, Y)
+    RaiseEvent MouseUp(Button, Shift, X - mLeft, Y - mTop)
 End Sub
 
 Friend Sub RaiseMouseWheel(ByVal Forward As Boolean)
@@ -142,7 +161,7 @@ End Sub
 Friend Sub RaisePaint()
     Graphics.Clear mBKColor
     RaiseEvent Paint(Graphics)
-    MergeImage
+    MergeImageSelf
     Notify
 End Sub
 
@@ -211,6 +230,22 @@ Friend Sub RefreshRect(ByVal L As Integer, ByVal T As Integer, ByVal W As Intege
     Canvas.ResetClip
 End Sub
 
+Friend Sub MergeImageSelf()
+    Dim i As Long
+    Dim View As cView
+    
+    Canvas.Clear
+    Canvas.DrawImage Bitmap.ToImage, 0, 0
+    
+    For i = 0 To ViewList.GetCount - 1
+        Set View = ViewList.GetObject(i)
+            If View.Visible Then
+                Canvas.DrawImage View.GetImage, View.Left, View.Top
+            End If
+        Set View = Nothing
+    Next
+End Sub
+
 Friend Sub MergeImage()
     Dim i As Long
     Dim View As cView
@@ -232,6 +267,10 @@ Public Function GetParent() As cView: Set GetParent = mParent: End Function
 'Public Sub SetParent(NewParent As cView)
 
 'End Sub
+
+Public Sub Refresh()
+    RaisePaint
+End Sub
 
 Public Sub Move(ByVal L As Integer, Optional ByVal T, Optional ByVal W, Optional ByVal H)
     Dim bReDraw As Boolean

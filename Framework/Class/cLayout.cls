@@ -27,8 +27,10 @@ Public Event MouseMove(ByVal Button As Integer, ByVal Shift As Integer, ByVal X 
 Public Event MouseDown(ByVal Button As Integer, ByVal Shift As Integer, ByVal X As Integer, ByVal Y As Integer)
 Public Event MouseUp(ByVal Button As Integer, ByVal Shift As Integer, ByVal X As Integer, ByVal Y As Integer)
 Public Event MouseWheel(ByVal Forward As Boolean)
+Public Event MouseHover()
+Public Event MouseLeave()
 
-'Private Sub Class_Terminate(): Set Bitmap = Nothing: ViewList.Clear: End Sub
+Private Sub Class_Terminate(): Release: End Sub
 
 Friend Sub Create(Root As cActivity, ByVal nWidth As Long, ByVal nHeight As Long)
     Set Bitmap = New cBitmap
@@ -37,7 +39,24 @@ Friend Sub Create(Root As cActivity, ByVal nWidth As Long, ByVal nHeight As Long
     Set Activity = Root
 End Sub
 
+Friend Sub Release()
+    Dim i As Long
+    Dim View As cView
+    
+    Set Graphics = Nothing
+    Set Bitmap = Nothing
+    
+    For i = 0 To ViewList.GetCount - 1
+        Set View = ViewList.GetObject(i)
+            View.Release
+        Set View = Nothing
+    Next
+    Set ViewList = Nothing
+'    ViewList.Clear
+End Sub
+
 Friend Property Get IsFirstDone() As Boolean: IsFirstDone = FirstDone: End Property
+Public Property Get ViewCount(): ViewCount = ViewList.GetCount: End Property
 
 Public Property Get BackgroundColor() As Long: BackgroundColor = mBKColor: End Property
 Public Property Let BackgroundColor(ByVal nColor As Long)
@@ -66,46 +85,53 @@ Friend Function HandleMessage(ByVal uMsg As Long, ByVal wParam As Long, ByVal lP
     ElseIf uMsg = WM_RBUTTONUP Then
         wParam = MK_RBUTTON
         OnMouseEvent uMsg, wParam, lParam
+    ElseIf uMsg = WM_MOUSEHOVER Then
+        RaiseEvent MouseHover
+    ElseIf uMsg = WM_MOUSELEAVE Then
+        RaiseEvent MouseLeave
     Else
-        GoTo Default
+        HandleMessage = False
+        Exit Function
     End If
     
     HandleMessage = True
-    Exit Function
-Default:
-    HandleMessage = False
 End Function
 
 Friend Sub SetHoverView(View As cView)
     If Not View Is HoverView Then
-        HoverView.RaiseMouseLeave
+        If Not HoverView Is Nothing Then
+            HoverView.RaiseMouseLeave
+        End If
         Set HoverView = View
-        If View Is Nothing Then Exit Sub
         HoverView.RaiseMouseHover
     End If
 End Sub
 
 Friend Sub SetFocusView(View As cView)
     If Not View Is FocusView Then
-        FocusView.RaiseLostFocus
+        If Not FocusView Is Nothing Then
+            FocusView.RaiseLostFocus
+        End If
         Set FocusView = View
-        If View Is Nothing Then Exit Sub
         FocusView.RaiseGotFocus
     End If
 End Sub
 
-Friend Sub Refresh()
+Public Sub Refresh()
     Dim i As Long
     Dim View As cView
     
     Graphics.Clear mBKColor
     For i = 0 To ViewList.GetCount - 1
         Set View = ViewList.GetObject(i)
-            View.MergeImage
-            Graphics.DrawImage View.GetImage, View.Left, View.Top
+            If View.Visible Then
+                View.MergeImage
+                Graphics.DrawImage View.GetImage, View.Left, View.Top
+            End If
         Set View = Nothing
     Next
     FirstDone = True
+    Activity.Refresh
 End Sub
 
 Friend Sub RefreshRect(ByVal L As Integer, ByVal T As Integer, ByVal W As Integer, ByVal H As Integer)
@@ -123,6 +149,7 @@ Friend Sub RefreshRect(ByVal L As Integer, ByVal T As Integer, ByVal W As Intege
         Set View = Nothing
     Next
     Graphics.ResetClip
+    Activity.RefreshRect L, T, W, H
 End Sub
 
 Private Sub OnMouseEvent(ByVal uMsg As Long, ByVal wParam As Long, ByVal lParam As Long)
@@ -151,6 +178,10 @@ Private Sub OnMouseEvent(ByVal uMsg As Long, ByVal wParam As Long, ByVal lParam 
                 End If
             Set View = Nothing
         Next
+        If Not HoverView Is Nothing Then
+            HoverView.RaiseMouseLeave
+            Set HoverView = Nothing
+        End If
         RaiseEvent MouseMove(Button, Shift, X, Y)
     ElseIf uMsg = WM_LBUTTONDOWN Or uMsg = WM_RBUTTONDOWN Or uMsg = WM_MBUTTONDOWN Then
         For i = ViewList.GetCount - 1 To 0 Step -1
@@ -164,16 +195,22 @@ Private Sub OnMouseEvent(ByVal uMsg As Long, ByVal wParam As Long, ByVal lParam 
                 End If
             Set View = Nothing
         Next
+        If Not FocusView Is Nothing Then
+            FocusView.RaiseLostFocus
+            Set FocusView = Nothing
+        End If
         RaiseEvent MouseDown(Button, Shift, X, Y)
     ElseIf uMsg = WM_LBUTTONUP Or uMsg = WM_RBUTTONUP Or uMsg = WM_MBUTTONUP Then
         If Not FocusView Is Nothing Then
-            Set View = FocusView.GetParent
-            Do While Not View Is Nothing
-                X = X - View.Left
-                Y = Y - View.Top
-                Set View = View.GetParent
-            Loop
-            FocusView.RaiseMouseUp Button, Shift, X, Y
+            If FocusView.Visible Then
+                Set View = FocusView.GetParent
+                Do While Not View Is Nothing
+                    X = X - View.Left
+                    Y = Y - View.Top
+                    Set View = View.GetParent
+                Loop
+                FocusView.RaiseMouseUp Button, Shift, X, Y
+            End If
         Else
             RaiseEvent MouseUp(Button, Shift, X, Y)
         End If
@@ -183,6 +220,10 @@ Private Sub OnMouseEvent(ByVal uMsg As Long, ByVal wParam As Long, ByVal lParam 
         Else
             RaiseEvent MouseWheel(IIf(wParam > 0, True, False))
         End If
+    ElseIf uMsg = WM_MOUSEHOVER Then
+        RaiseEvent MouseHover
+    ElseIf uMsg = WM_MOUSELEAVE Then
+        RaiseEvent MouseLeave
     End If
 End Sub
 

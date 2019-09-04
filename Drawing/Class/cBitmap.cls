@@ -53,9 +53,9 @@ Public Function Clone() As cBitmap
     Set Clone = Bitmap
 End Function
 
-Public Function CloneArea(ByVal X As Single, ByVal Y As Single, ByVal W As Single, ByVal H As Single) As cBitmap
+Public Function CloneArea(ByVal X As Single, ByVal Y As Single, ByVal w As Single, ByVal H As Single) As cBitmap
     Dim Bitmap As New cBitmap
-    GdipCloneBitmapArea X, Y, W, H, Me.PixelFormat, mHandle, Bitmap.Handle
+    GdipCloneBitmapArea X, Y, w, H, Me.PixelFormat, mHandle, Bitmap.Handle
     Set CloneArea = Bitmap
 End Function
 
@@ -157,12 +157,16 @@ End Function
 
 Public Function GetGraphics() As cGraphics
     Dim Graphics As New cGraphics
-    GdipGetImageGraphicsContext mHandle, Graphics.Handle
+    Dim H As Long
+    GdipGetImageGraphicsContext mHandle, H
+    Graphics.Handle = H
     Set GetGraphics = Graphics
 End Function
 
 Public Function ToImage() As cImage
     Dim Img As New cImage
-    Img.Handle = mHandle
+    Dim H As Long
+    GdipCloneImage mHandle, H
+    Img.Handle = H
     Set ToImage = Img
 End Function
