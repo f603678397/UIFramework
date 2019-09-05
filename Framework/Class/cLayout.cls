@@ -22,6 +22,7 @@ Private Activity        As cActivity
 
 Private mBKColor        As Long
 Private FirstDone       As Boolean
+Private bForeground     As Boolean
 
 Public Event MouseMove(ByVal Button As Integer, ByVal Shift As Integer, ByVal X As Integer, ByVal Y As Integer)
 Public Event MouseDown(ByVal Button As Integer, ByVal Shift As Integer, ByVal X As Integer, ByVal Y As Integer)
@@ -52,16 +53,16 @@ Friend Sub Release()
         Set View = Nothing
     Next
     Set ViewList = Nothing
-'    ViewList.Clear
 End Sub
 
 Friend Property Get IsFirstDone() As Boolean: IsFirstDone = FirstDone: End Property
 Public Property Get ViewCount(): ViewCount = ViewList.GetCount: End Property
 
+Public Property Get IsForeground() As Boolean: IsForeground = bForeground: End Property
+Friend Property Let IsForeground(ByVal B As Boolean): bForeground = B: End Property
+
 Public Property Get BackgroundColor() As Long: BackgroundColor = mBKColor: End Property
-Public Property Let BackgroundColor(ByVal nColor As Long)
-    mBKColor = nColor
-End Property
+Public Property Let BackgroundColor(ByVal nColor As Long): mBKColor = nColor: Refresh: End Property
 
 Friend Function GetImage() As cImage: Set GetImage = Bitmap.ToImage: End Function
 Friend Sub ChangeSize(ByVal nWidth As Long, ByVal nHeight As Long)
@@ -125,19 +126,22 @@ Public Sub Refresh()
     For i = 0 To ViewList.GetCount - 1
         Set View = ViewList.GetObject(i)
             If View.Visible Then
+                If Not FirstDone Then View.ReDraw
                 View.MergeImage
                 Graphics.DrawImage View.GetImage, View.Left, View.Top
             End If
         Set View = Nothing
     Next
-    FirstDone = True
-    Activity.Refresh
+    
+    If ViewList.GetCount > 0 Then FirstDone = True
+    
+    If bForeground Then Activity.Refresh
 End Sub
 
 Friend Sub RefreshRect(ByVal L As Integer, ByVal T As Integer, ByVal W As Integer, ByVal H As Integer)
     Dim i As Long
     Dim View As cView
-    
+
     Graphics.SetClip L, T, W, H, CombineModeReplace
     Graphics.Clear mBKColor
     For i = 0 To ViewList.GetCount - 1
@@ -148,8 +152,15 @@ Friend Sub RefreshRect(ByVal L As Integer, ByVal T As Integer, ByVal W As Intege
             End If
         Set View = Nothing
     Next
+    
+    If bShowRedrawRgn Then
+        Dim Brush As New cSolidBrush
+        Brush.Color = cColor.FromARGB(100, 255, 0, 0)
+        Graphics.FillRectangle Brush.GetBaseBrush, 0, 0, Bitmap.Width, Bitmap.Height
+    End If
+    
     Graphics.ResetClip
-    Activity.RefreshRect L, T, W, H
+    If bForeground Then Activity.RefreshRect L, T, W, H
 End Sub
 
 Private Sub OnMouseEvent(ByVal uMsg As Long, ByVal wParam As Long, ByVal lParam As Long)

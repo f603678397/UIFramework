@@ -49,6 +49,29 @@ Public Sub AddList(List As cObjectList)
     Next
 End Sub
 
+Public Sub MoveObject(T As Object, ByVal NewPosition As Long)
+    Dim Position As Long
+    Dim S As Long, E As Long
+    
+    Position = Find(T)
+    If Position = -1 Then Exit Sub
+    If Position = NewPosition Then Exit Sub
+    If NewPosition < 0 Or NewPosition > ObjectCount - 1 Then Exit Sub
+    
+    If NewPosition < Position Then
+        S = NewPosition
+        E = Position
+    Else
+        S = Position
+        E = NewPosition
+    End If
+    
+    For i = E To S + 1 Step -1
+        Set ObjectList(i) = ObjectList(i - 1)
+    Next
+    Set ObjectList(S) = T
+End Sub
+
 Public Sub RemoveObject(T As Object)
     Remove Find(T)
 End Sub

@@ -47,7 +47,15 @@ Public Function CreateLayout() As cLayout
 End Function
 
 Public Function GetLayout() As cLayout: Set GetLayout = Layout: End Function
-Public Sub SetLayout(NewLayout As cLayout): Set Layout = NewLayout: Refresh: End Sub
+Public Sub SetLayout(NewLayout As cLayout)
+    If NewLayout Is Nothing Then Exit Sub
+    If Not Layout Is Nothing Then
+        Layout.IsForeground = False
+    End If
+    Set Layout = NewLayout
+    Layout.IsForeground = True
+    Refresh
+End Sub
 
 Public Sub Refresh()
     Graphics.Clear cColor.Transparent
@@ -60,10 +68,13 @@ Public Sub Refresh()
 End Sub
 
 Friend Sub RefreshRect(ByVal L As Integer, ByVal T As Integer, ByVal W As Integer, ByVal H As Integer)
+    Dim RECT As Drawing2D.RECTF
+
     If Not Layout Is Nothing Then
+        RECT.Left = L: RECT.Top = T: RECT.Right = W: RECT.bottom = H
         Graphics.SetClip L, T, W, H, CombineModeReplace
         Graphics.Clear cColor.Transparent
-        Graphics.DrawImagePointRect Layout.GetImage, L, T, cDrawing.NewRectF(L, T, W, H)
+        Graphics.DrawImagePointRect Layout.GetImage, L, T, RECT
         Graphics.ResetClip
     Else
         Exit Sub
@@ -92,7 +103,7 @@ Friend Sub Release()
     If Not bCreated Then Exit Sub
     SetWindowLongA mhWnd, GWL_WNDPROC, PreFunc
     Graphics.Release
-    Layout.Release
+    If Not Layout Is Nothing Then Layout.Release
     Set Graphics = Nothing
     Set Layout = Nothing
     DestroyMemoryDC

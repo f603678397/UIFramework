@@ -51,3 +51,7 @@ End Function
 Public Sub DestroyActivity(Activity As cActivity)
     Activity.Release
 End Sub
+
+Public Sub ShowRedrawRgn(ByVal bShow As Boolean)
+    bShowRedrawRgn = bShow
+End Sub
