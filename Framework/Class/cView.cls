@@ -29,6 +29,8 @@ Private Layout          As cLayout
 Private isHover         As Boolean
 Private isFocus         As Boolean
 Private mBKColor        As Long
+Private ReDrawRect      As RECTI
+Private FirstDraw       As Boolean
 
 Public Event MouseMove(ByVal Button As Integer, ByVal Shift As Integer, ByVal X As Integer, ByVal Y As Integer)
 Public Event MouseDown(ByVal Button As Integer, ByVal Shift As Integer, ByVal X As Integer, ByVal Y As Integer)
@@ -36,6 +38,8 @@ Public Event MouseUp(ByVal Button As Integer, ByVal Shift As Integer, ByVal X As
 Public Event MouseWheel(ByVal Forward As Boolean)
 Public Event MouseHover()
 Public Event MouseLeave()
+Public Event Click()
+Public Event DblClick()
 Public Event GotFocus()
 Public Event LostFocus()
 Public Event Paint(Canvas As cGraphics)
@@ -43,25 +47,77 @@ Public Event Paint(Canvas As cGraphics)
 Private Sub Class_Terminate(): Release: End Sub
 
 Public Property Get Left() As Integer: Left = mLeft: End Property
-Public Property Let Left(ByVal nLeft As Integer): mLeft = nLeft: Notify: End Property
+Public Property Let Left(ByVal nLeft As Integer)
+    If nLeft = mLeft Then Exit Property
+    With ReDrawRect
+        .Left = IIf(mLeft < nLeft, mLeft, nLeft)
+        .Top = mTop
+        .Width = mWidth + Abs(nLeft - mLeft)
+        .Height = mHeight
+    End With
+    mLeft = nLeft
+    Notify True
+End Property
 
 Public Property Get Top() As Integer: Top = mTop: End Property
-Public Property Let Top(ByVal nTop As Integer): mTop = nTop: Notify: End Property
+Public Property Let Top(ByVal nTop As Integer)
+    If nTop = mTop Then Exit Property
+    With ReDrawRect
+        .Left = mLeft
+        .Top = IIf(mTop < nTop, mTop, nTop)
+        .Width = mWidth
+        .Height = mHeight + Abs(nTop - mTop)
+    End With
+    mTop = nTop
+    Notify True
+End Property
 
 Public Property Get Width() As Integer: Width = mWidth: End Property
-Public Property Let Width(ByVal nWidth As Integer): mWidth = nWidth: RaisePaint: End Property
+Public Property Let Width(ByVal nWidth As Integer)
+    If nWidth = mWidth Then Exit Property
+    With ReDrawRect
+        .Left = mLeft
+        .Top = mTop
+        .Width = IIf(nWidth < mWidth, mWidth, nWidth)
+        .Height = mHeight
+    End With
+    mWidth = nWidth
+    ChangeSize
+    ReDraw
+    MergeImageSelf
+    Notify True
+End Property
 
 Public Property Get Height() As Integer: Height = mHeight: End Property
-Public Property Let Height(ByVal nHeight As Integer): mHeight = nHeight: RaisePaint: End Property
+Public Property Let Height(ByVal nHeight As Integer)
+    If nHeight = mHeight Then Exit Property
+    With ReDrawRect
+        .Left = mLeft
+        .Top = mTop
+        .Width = mWidth
+        .Height = IIf(nHeight < mHeight, mHeight, nHeight)
+    End With
+    mHeight = nHeight
+    ChangeSize
+    ReDraw
+    MergeImageSelf
+    Notify True
+End Property
 
 Public Property Get Visible() As Boolean: Visible = mVisible: End Property
-Public Property Let Visible(ByVal bVisible As Boolean): mVisible = bVisible: RaisePaint: End Property
+Public Property Let Visible(ByVal bVisible As Boolean): mVisible = bVisible: Notify: End Property
 
 Public Property Get Name() As String: Name = mName: End Property
 Public Property Let Name(ByVal sName As String): mName = sName: End Property
 
 Public Property Get BackgroundColor() As Long: BackgroundColor = mBKColor: End Property
-Public Property Let BackgroundColor(ByVal nColor As Long): mBKColor = nColor: RaisePaint: End Property
+Public Property Let BackgroundColor(ByVal nColor As Long): mBKColor = nColor: ReDraw: MergeImageSelf: Notify: End Property
+
+Public Property Get ZOrder() As Long: ZOrder = mParent.GetChildZOrder(Me): End Property
+Public Property Let ZOrder(ByVal nOrder As Long)
+    mParent.ChangeChildZOrder Me, nOrder
+    Notify
+End Property
 
 Friend Sub Create(Root As cLayout, ParentView As cView, ByVal L As Integer, ByVal T As Integer, ByVal W As Integer, ByVal H As Integer)
     Set Bitmap = New cBitmap
@@ -76,7 +132,19 @@ Friend Sub Create(Root As cLayout, ParentView As cView, ByVal L As Integer, ByVa
     mVisible = True
     Set Layout = Root
     Set mParent = ParentView
-    RaisePaint
+End Sub
+
+Friend Function GetChildZOrder(View As cView) As Long: GetChildZOrder = ViewList.Find(View): End Function
+Friend Sub ChangeChildZOrder(View As cView, ByVal Position As Long): ViewList.MoveObject View, Position: End Sub
+
+Private Sub ChangeSize()
+    Set Graphics = Nothing
+    Set Canvas = Nothing
+    
+    Bitmap.CreateEmptyBitmap mWidth, mHeight
+    Set Graphics = Bitmap.GetGraphics
+    ResultBMP.CreateEmptyBitmap mWidth, mHeight
+    Set Canvas = ResultBMP.GetGraphics
 End Sub
 
 Friend Sub Release()
@@ -151,7 +219,23 @@ Friend Sub RaiseMouseDown(ByVal Button As Integer, ByVal Shift As Integer, ByVal
 End Sub
 
 Friend Sub RaiseMouseUp(ByVal Button As Integer, ByVal Shift As Integer, ByVal X As Integer, ByVal Y As Integer)
-    RaiseEvent MouseUp(Button, Shift, X - mLeft, Y - mTop)
+    Dim mX As Integer, mY As Integer
+    Dim CurrTime As Long
+    Static LastTime As Long
+    
+    mX = X - mLeft: mY = Y - mTop
+    RaiseEvent MouseUp(Button, Shift, mX, mY)
+    
+    If mX >= 0 And mX <= mWidth And mY >= 0 And mY <= mHeight Then
+        CurrTime = GetTickCount
+        If CurrTime - LastTime < GetDoubleClickTime Then
+            RaiseEvent DblClick
+            LastTime = 0
+        Else
+            RaiseEvent Click
+            LastTime = CurrTime
+        End If
+    End If
 End Sub
 
 Friend Sub RaiseMouseWheel(ByVal Forward As Boolean)
@@ -159,18 +243,25 @@ Friend Sub RaiseMouseWheel(ByVal Forward As Boolean)
 End Sub
 
 Friend Sub RaisePaint()
-    Graphics.Clear mBKColor
-    RaiseEvent Paint(Graphics)
+    ReDraw
     MergeImageSelf
     Notify
 End Sub
 
-Private Sub Notify()
+Private Sub Notify(Optional ByVal NewRgn As Boolean = False)
     If Layout.IsFirstDone Then
         If Not mParent Is Nothing Then
-            mParent.NotifyRefesh mLeft, mTop, mWidth, mHeight
+            If Not NewRgn Then
+                mParent.NotifyRefesh mLeft, mTop, mWidth, mHeight
+            Else
+                mParent.NotifyRefesh ReDrawRect.Left, ReDrawRect.Top, ReDrawRect.Width, ReDrawRect.Height
+            End If
         Else
-            Layout.RefreshRect mLeft, mTop, mWidth, mHeight
+            If Not NewRgn Then
+                Layout.RefreshRect mLeft, mTop, mWidth, mHeight
+            Else
+                Layout.RefreshRect ReDrawRect.Left, ReDrawRect.Top, ReDrawRect.Width, ReDrawRect.Height
+            End If
         End If
     End If
 End Sub
@@ -183,7 +274,7 @@ Friend Sub NotifyRefesh(ByVal L As Integer, ByVal T As Integer, ByVal W As Integ
     If Not mParent Is Nothing Then
         mParent.NotifyRefesh L + mLeft, T + mTop, W, H
     Else
-        Layout.RefreshRect L, T, W, H
+        Layout.RefreshRect L + mLeft, T + mTop, W, H
     End If
 End Sub
 
@@ -213,6 +304,8 @@ Friend Sub RefreshRect(ByVal L As Integer, ByVal T As Integer, ByVal W As Intege
     Dim i As Long
     Dim View As cView
     
+    If Not FirstDraw Then ReDraw
+    
     Canvas.SetClip L, T, W, H, CombineModeReplace
     Canvas.Clear
     Canvas.DrawImage Bitmap.ToImage, 0, 0
@@ -228,6 +321,12 @@ Friend Sub RefreshRect(ByVal L As Integer, ByVal T As Integer, ByVal W As Intege
         Set View = Nothing
     Next
     Canvas.ResetClip
+End Sub
+
+Friend Sub ReDraw()
+    Graphics.Clear mBKColor
+    RaiseEvent Paint(Graphics)
+    FirstDraw = True
 End Sub
 
 Friend Sub MergeImageSelf()
@@ -256,6 +355,7 @@ Friend Sub MergeImage()
     For i = 0 To ViewList.GetCount - 1
         Set View = ViewList.GetObject(i)
             If View.Visible Then
+                If Not Layout.IsFirstDone Then View.ReDraw
                 View.MergeImage
                 Canvas.DrawImage View.GetImage, View.Left, View.Top
             End If
@@ -273,13 +373,28 @@ Public Sub Refresh()
 End Sub
 
 Public Sub Move(ByVal L As Integer, Optional ByVal T, Optional ByVal W, Optional ByVal H)
-    Dim bReDraw As Boolean
-    mLeft = L
-    mTop = IIf(IsMissing(T), mTop, T)
-    If Not IsMissing(W) And mWidth <> W Then: mWidth = W: bReDraw = True
-    If Not IsMissing(H) And mHeight <> H Then mHeight = H: bReDraw = True
+    Dim mL As Integer, mT As Integer, mW As Integer, mH As Integer
+    Dim bReDraw As Boolean, bMove As Boolean
     
-    If bReDraw Then RaisePaint
+    mL = L
+    mT = IIf(IsMissing(T), mTop, T)
+    mW = IIf(IsMissing(W), mWidth, W)
+    mH = IIf(IsMissing(H), mHeight, H)
+    
+    If mL <> mLeft Or mT <> mTop Then bMove = True
+    If mW <> mWidth Or mH <> mHeight Then bReDraw = True
+    
+    With ReDrawRect
+        .Left = IIf(mL < mLeft, mL, mLeft)
+        .Top = IIf(mT < mTop, mT, mTop)
+        .Width = IIf(mLeft + mWidth > mL + mW, mLeft + mWidth - .Left, mL + mW - .Left)
+        .Height = IIf(mTop + mHeight > mT + mH, mTop + mHeight - .Top, mT + mH - .Top)
+    End With
+    
+    mLeft = mL: mTop = mT: mWidth = mW: mHeight = mH
+    
+    If bReDraw Then ChangeSize: ReDraw: MergeImageSelf
+    Notify bMove
 End Sub
 
 Public Function CreateView(ByVal L As Integer, ByVal T As Integer, ByVal W As Integer, ByVal H As Integer)
@@ -287,6 +402,7 @@ Public Function CreateView(ByVal L As Integer, ByVal T As Integer, ByVal W As In
     View.Create Layout, Me, L, T, W, H
     ViewList.Add View
     Set CreateView = View
+    View.ReDraw
 End Function
 
 Public Sub RemoveView(View As cView): ViewList.RemoveObject View: End Sub

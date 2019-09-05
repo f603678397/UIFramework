@@ -1,9 +1,19 @@
 Attribute VB_Name = "mGlobal"
 Option Explicit
 
-Public Drawing As New cDrawing
-Public TimerList As New cObjectList
-Public ActivityList As New cObjectList
+Public Drawing              As New cDrawing
+Public TimerList            As New cObjectList
+Public ActivityList         As New cObjectList
+
+' Debug ¿ª¹Ø
+Public bShowRedrawRgn       As Boolean
+
+Public Type RECTI
+    Left    As Integer
+    Top     As Integer
+    Width   As Integer
+    Height  As Integer
+End Type
 
 Public Function WndProc(ByVal hWnd As Long, ByVal uMsg As Long, ByVal wParam As Long, ByVal lParam As Long) As Long
     Dim Activity As cActivity
