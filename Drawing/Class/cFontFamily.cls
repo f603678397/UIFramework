@@ -30,7 +30,9 @@ End Sub
 
 Public Function Clone() As cFontFamily
     Dim Fam As New cFontFamily
-    GdipCloneFontFamily mHandle, Fam.Handle
+    Dim h As Long
+    GdipCloneFontFamily mHandle, h
+    Fam.Handle = h
     Set Clone = Fam
 End Function
 

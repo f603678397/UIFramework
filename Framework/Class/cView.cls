@@ -22,6 +22,7 @@ Private mTop            As Integer
 Private mLeft           As Integer
 Private mWidth          As Integer
 Private mHeight         As Integer
+Private mOpacity        As Single
 Private mParent         As cView
 Private mVisible        As Boolean
 Private ViewList        As New cObjectList
@@ -40,6 +41,9 @@ Public Event MouseHover()
 Public Event MouseLeave()
 Public Event Click()
 Public Event DblClick()
+Public Event KeyDown(ByVal KeyCode As Integer)
+Public Event KeyUp(ByVal KeyCode As Integer)
+Public Event KeyPress(ByVal KeyAscii As Long)
 Public Event GotFocus()
 Public Event LostFocus()
 Public Event Paint(Canvas As cGraphics)
@@ -114,10 +118,10 @@ Public Property Get BackgroundColor() As Long: BackgroundColor = mBKColor: End P
 Public Property Let BackgroundColor(ByVal nColor As Long): mBKColor = nColor: ReDraw: MergeImageSelf: Notify: End Property
 
 Public Property Get ZOrder() As Long: ZOrder = mParent.GetChildZOrder(Me): End Property
-Public Property Let ZOrder(ByVal nOrder As Long)
-    mParent.ChangeChildZOrder Me, nOrder
-    Notify
-End Property
+Public Property Let ZOrder(ByVal nOrder As Long): mParent.ChangeChildZOrder Me, nOrder: Notify: End Property
+
+Public Property Get Opacity() As Single: Opacity = mOpacity: End Property
+Public Property Let Opacity(ByVal fOpacity As Single): mOpacity = fOpacity: Notify: End Property
 
 Friend Sub Create(Root As cLayout, ParentView As cView, ByVal L As Integer, ByVal T As Integer, ByVal W As Integer, ByVal H As Integer)
     Set Bitmap = New cBitmap
@@ -130,6 +134,7 @@ Friend Sub Create(Root As cLayout, ParentView As cView, ByVal L As Integer, ByVa
     Set Canvas = ResultBMP.GetGraphics
     
     mVisible = True
+    mOpacity = 1
     Set Layout = Root
     Set mParent = ParentView
 End Sub
@@ -155,6 +160,8 @@ Friend Sub Release()
     Set Canvas = Nothing
     Set Bitmap = Nothing
     Set ResultBMP = Nothing
+    Set Layout = Nothing
+    Set mParent = Nothing
     
     For i = 0 To ViewList.GetCount - 1
         Set View = ViewList.GetObject(i)
@@ -238,9 +245,12 @@ Friend Sub RaiseMouseUp(ByVal Button As Integer, ByVal Shift As Integer, ByVal X
     End If
 End Sub
 
-Friend Sub RaiseMouseWheel(ByVal Forward As Boolean)
-    RaiseEvent MouseWheel(Forward)
-End Sub
+Friend Sub RaiseMouseWheel(ByVal Forward As Boolean): RaiseEvent MouseWheel(Forward): End Sub
+
+Friend Sub RaiseKeyUp(ByVal KeyCode As Integer): RaiseEvent KeyUp(KeyCode): End Sub
+Friend Sub RaiseKeyDown(ByVal KeyCode As Integer): RaiseEvent KeyDown(KeyCode): End Sub
+
+Friend Sub RaiseChar(ByVal Ascii As Long): RaiseEvent KeyPress(Ascii): End Sub
 
 Friend Sub RaisePaint()
     ReDraw
@@ -303,6 +313,16 @@ End Function
 Friend Sub RefreshRect(ByVal L As Integer, ByVal T As Integer, ByVal W As Integer, ByVal H As Integer)
     Dim i As Long
     Dim View As cView
+    Dim Attr As New cImageAttributes
+    Dim CM As Drawing2D.ColorMatrix
+    
+    With CM
+        .m(0, 0) = 1
+        .m(1, 1) = 1
+        .m(2, 2) = 1
+        .m(3, 3) = 1
+        .m(4, 4) = 1
+    End With
     
     If Not FirstDraw Then ReDraw
     
@@ -315,7 +335,11 @@ Friend Sub RefreshRect(ByVal L As Integer, ByVal T As Integer, ByVal W As Intege
             If View.Visible Then
                 If View.CheckInRect(L, T, W, H) Then
                     View.RefreshRect L - View.Left, T - View.Top, W, H
-                    Canvas.DrawImage View.GetImage, View.Left, View.Top
+                    CM.m(3, 3) = View.Opacity
+                    Attr.SetColorMatrix CM, ColorAdjustTypeBitmap
+                    Canvas.DrawImageRectRect View.GetImage, _
+                                        NewRectF(View.Left, View.Top, View.Width, View.Height), _
+                                        NewRectF(0, 0, View.Width, View.Height), Attr
                 End If
             End If
         Set View = Nothing
@@ -332,6 +356,16 @@ End Sub
 Friend Sub MergeImageSelf()
     Dim i As Long
     Dim View As cView
+    Dim Attr As New cImageAttributes
+    Dim CM As Drawing2D.ColorMatrix
+    
+    With CM
+        .m(0, 0) = 1
+        .m(1, 1) = 1
+        .m(2, 2) = 1
+        .m(3, 3) = 1
+        .m(4, 4) = 1
+    End With
     
     Canvas.Clear
     Canvas.DrawImage Bitmap.ToImage, 0, 0
@@ -339,7 +373,11 @@ Friend Sub MergeImageSelf()
     For i = 0 To ViewList.GetCount - 1
         Set View = ViewList.GetObject(i)
             If View.Visible Then
-                Canvas.DrawImage View.GetImage, View.Left, View.Top
+                CM.m(3, 3) = View.Opacity
+                Attr.SetColorMatrix CM, ColorAdjustTypeBitmap
+                Canvas.DrawImageRectRect View.GetImage, _
+                                    NewRectF(View.Left, View.Top, View.Width, View.Height), _
+                                    NewRectF(0, 0, View.Width, View.Height), Attr
             End If
         Set View = Nothing
     Next
@@ -348,6 +386,16 @@ End Sub
 Friend Sub MergeImage()
     Dim i As Long
     Dim View As cView
+    Dim Attr As New cImageAttributes
+    Dim CM As Drawing2D.ColorMatrix
+    
+    With CM
+        .m(0, 0) = 1
+        .m(1, 1) = 1
+        .m(2, 2) = 1
+        .m(3, 3) = 1
+        .m(4, 4) = 1
+    End With
     
     Canvas.Clear
     Canvas.DrawImage Bitmap.ToImage, 0, 0
@@ -357,16 +405,18 @@ Friend Sub MergeImage()
             If View.Visible Then
                 If Not Layout.IsFirstDone Then View.ReDraw
                 View.MergeImage
-                Canvas.DrawImage View.GetImage, View.Left, View.Top
+                CM.m(3, 3) = View.Opacity
+                Attr.SetColorMatrix CM, ColorAdjustTypeBitmap
+                Canvas.DrawImageRectRect View.GetImage, _
+                                    NewRectF(View.Left, View.Top, View.Width, View.Height), _
+                                    NewRectF(0, 0, View.Width, View.Height), Attr
             End If
         Set View = Nothing
     Next
 End Sub
 
 Public Function GetParent() As cView: Set GetParent = mParent: End Function
-'Public Sub SetParent(NewParent As cView)
-
-'End Sub
+'Public Sub SetParent(NewParent As cView): End Sub
 
 Public Sub Refresh()
     RaisePaint
@@ -404,6 +454,15 @@ Public Function CreateView(ByVal L As Integer, ByVal T As Integer, ByVal W As In
     Set CreateView = View
     View.ReDraw
 End Function
+
+'Public Sub AddView(View As cView, Optional ByVal Order As Long = -1)
+'    If View.GetParent Is mParent Then Exit Sub
+'
+''    If Not View.GetParent Is Nothing Then Exit Sub
+''    If Not View.GetRoot Is Layout Then Exit Sub
+'
+'    ViewList.Add View, Order
+'End Sub
 
 Public Sub RemoveView(View As cView): ViewList.RemoveObject View: End Sub
 

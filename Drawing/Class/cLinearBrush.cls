@@ -32,10 +32,10 @@ Friend Property Let Handle(ByVal nHandle As Long)
     Dim mRect As RECTF
     mHandle = nHandle
     mRect = GetRect()
-    P1.x = mRect.Left
-    P1.y = mRect.Top
-    P2.x = mRect.Left + mRect.Right
-    P2.y = mRect.Top + mRect.Bottom
+    P1.X = mRect.Left
+    P1.Y = mRect.Top
+    P2.X = mRect.Left + mRect.Right
+    P2.Y = mRect.Top + mRect.Bottom
     mColor1 = StartColor
     mColor2 = EndColor
     mWrap = FillWrapMode
@@ -87,8 +87,10 @@ End Sub
 
 Public Function Clone() As cLinearBrush
     Dim Brush As New cLinearBrush
+    Dim h As Long
     Brush.Release
-    GdipCloneBrush mHandle, Brush.Handle
+    GdipCloneBrush mHandle, h
+    Brush.Handle = h
     Set Clone = Brush
 End Function
 
@@ -98,14 +100,14 @@ Public Function GetRect() As RECTF
     GetRect = mRect
 End Function
 
-Public Sub SetStartPoint(ByVal x As Single, ByVal y As Single)
-    P1.x = x: P1.y = y
+Public Sub SetStartPoint(ByVal X As Single, ByVal Y As Single)
+    P1.X = X: P1.Y = Y
     Release
     Create
 End Sub
 
-Public Sub SetEndPoint(ByVal x As Single, ByVal y As Single)
-    P2.x = x: P2.y = y
+Public Sub SetEndPoint(ByVal X As Single, ByVal Y As Single)
+    P2.X = X: P2.Y = Y
     Release
     Create
 End Sub
@@ -188,8 +190,10 @@ End Sub
 
 Public Function GetTransform() As cMatrix
     Dim Matrix As New cMatrix
+    Dim h As Long
     Matrix.Release
-    GdipGetLineTransform mHandle, Matrix.Handle
+    GdipGetLineTransform mHandle, h
+    Matrix.Handle = h
     Set GetTransform = Matrix
 End Function
 

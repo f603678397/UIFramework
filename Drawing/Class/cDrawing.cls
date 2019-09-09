@@ -55,7 +55,7 @@ Public Function CreateGraphicsFromHDC(ByVal hdc As Long) As cGraphics
     Set CreateGraphicsFromHDC = Graphics
 End Function
 
-Public Function NewRectF(ByVal nLeft As Single, ByVal nTop As Single, ByVal nRight As Single, ByVal nBottom As Single) As RECTF
+Public Function NewRectF(ByVal nLeft As Single, ByVal nTop As Single, ByVal nRight As Single, ByVal nBottom As Single) As Drawing2D.RECTF
     With NewRectF
         .Left = nLeft
         .Top = nTop
@@ -64,14 +64,14 @@ Public Function NewRectF(ByVal nLeft As Single, ByVal nTop As Single, ByVal nRig
     End With
 End Function
 
-Public Function NewPointF(ByVal X As Single, ByVal Y As Single) As POINTF
+Public Function NewPointF(ByVal X As Single, ByVal Y As Single) As Drawing2D.POINTF
     With NewPointF
         .X = X
         .Y = Y
     End With
 End Function
 
-Public Function NewPointFArray(ParamArray xy()) As POINTF()
+Public Function NewPointFArray(ParamArray xy()) As Drawing2D.POINTF()
     Dim Count As Long
     Dim pts() As POINTF
     Count = Int((UBound(xy) + 1) / 2)

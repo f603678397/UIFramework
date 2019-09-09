@@ -40,8 +40,10 @@ End Sub
 
 Public Function Clone() As cStringFormat
     Dim sf As New cStringFormat
+    Dim h As Long
     sf.Release
-    GdipCloneStringFormat mHandle, sf.Handle
+    GdipCloneStringFormat mHandle, h
+    sf.Handle = h
     Set Clone = sf
 End Function
 

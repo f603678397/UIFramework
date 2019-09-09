@@ -40,8 +40,10 @@ End Sub
 
 Public Function Clone() As cCustomLineCap
     Dim Cap As New cCustomLineCap
+    Dim h As Long
     Cap.Release
-    GdipCloneCustomLineCap mHandle, Cap.Handle
+    GdipCloneCustomLineCap mHandle, h
+    Cap.Handle = h
     Set Clone = Cap
 End Function
 

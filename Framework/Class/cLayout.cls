@@ -30,6 +30,8 @@ Public Event MouseUp(ByVal Button As Integer, ByVal Shift As Integer, ByVal X As
 Public Event MouseWheel(ByVal Forward As Boolean)
 Public Event MouseHover()
 Public Event MouseLeave()
+Public Event KeyDown(ByVal KeyCode As Integer)
+Public Event KeyUp(ByVal KeyCode As Integer)
 
 Private Sub Class_Terminate(): Release: End Sub
 
@@ -46,6 +48,8 @@ Friend Sub Release()
     
     Set Graphics = Nothing
     Set Bitmap = Nothing
+    Set FocusView = Nothing
+    Set HoverView = Nothing
     
     For i = 0 To ViewList.GetCount - 1
         Set View = ViewList.GetObject(i)
@@ -90,6 +94,10 @@ Friend Function HandleMessage(ByVal uMsg As Long, ByVal wParam As Long, ByVal lP
         RaiseEvent MouseHover
     ElseIf uMsg = WM_MOUSELEAVE Then
         RaiseEvent MouseLeave
+    ElseIf uMsg = WM_KEYDOWN Or uMsg = WM_KEYUP Then
+        OnKeyEvent uMsg, wParam, lParam
+    ElseIf uMsg = WM_CHAR Then
+        OnCharEvent uMsg, wParam, lParam
     Else
         HandleMessage = False
         Exit Function
@@ -121,6 +129,16 @@ End Sub
 Public Sub Refresh()
     Dim i As Long
     Dim View As cView
+    Dim Attr As New cImageAttributes
+    Dim CM As Drawing2D.ColorMatrix
+    
+    With CM
+        .m(0, 0) = 1
+        .m(1, 1) = 1
+        .m(2, 2) = 1
+        .m(3, 3) = 1
+        .m(4, 4) = 1
+    End With
     
     Graphics.Clear mBKColor
     For i = 0 To ViewList.GetCount - 1
@@ -128,7 +146,12 @@ Public Sub Refresh()
             If View.Visible Then
                 If Not FirstDone Then View.ReDraw
                 View.MergeImage
-                Graphics.DrawImage View.GetImage, View.Left, View.Top
+                CM.m(3, 3) = View.Opacity
+                Attr.SetColorMatrix CM, ColorAdjustTypeBitmap
+                Graphics.DrawImageRectRect View.GetImage, _
+                                        NewRectF(View.Left, View.Top, View.Width, View.Height), _
+                                        NewRectF(0, 0, View.Width, View.Height), Attr
+
             End If
         Set View = Nothing
     Next
@@ -141,6 +164,16 @@ End Sub
 Friend Sub RefreshRect(ByVal L As Integer, ByVal T As Integer, ByVal W As Integer, ByVal H As Integer)
     Dim i As Long
     Dim View As cView
+    Dim Attr As New cImageAttributes
+    Dim CM As Drawing2D.ColorMatrix
+    
+    With CM
+        .m(0, 0) = 1
+        .m(1, 1) = 1
+        .m(2, 2) = 1
+        .m(3, 3) = 1
+        .m(4, 4) = 1
+    End With
 
     Graphics.SetClip L, T, W, H, CombineModeReplace
     Graphics.Clear mBKColor
@@ -148,7 +181,11 @@ Friend Sub RefreshRect(ByVal L As Integer, ByVal T As Integer, ByVal W As Intege
         Set View = ViewList.GetObject(i)
             If View.CheckInRect(L, T, W, H) Then
                 View.RefreshRect L - View.Left, T - View.Top, W, H
-                Graphics.DrawImage View.GetImage, View.Left, View.Top
+                CM.m(3, 3) = View.Opacity
+                Attr.SetColorMatrix CM, ColorAdjustTypeBitmap
+                Graphics.DrawImageRectRect View.GetImage, _
+                                        NewRectF(View.Left, View.Top, View.Width, View.Height), _
+                                        NewRectF(0, 0, View.Width, View.Height), Attr
             End If
         Set View = Nothing
     Next
@@ -235,6 +272,37 @@ Private Sub OnMouseEvent(ByVal uMsg As Long, ByVal wParam As Long, ByVal lParam 
         RaiseEvent MouseHover
     ElseIf uMsg = WM_MOUSELEAVE Then
         RaiseEvent MouseLeave
+    End If
+End Sub
+
+Public Sub OnKeyEvent(ByVal uMsg As Long, ByVal wParam As Long, ByVal lParam As Long)
+    If Not FocusView Is Nothing Then
+        If uMsg = WM_KEYDOWN Then FocusView.RaiseKeyDown wParam
+        If uMsg = WM_KEYUP Then FocusView.RaiseKeyUp wParam
+    Else
+        If uMsg = WM_KEYDOWN Then RaiseEvent KeyDown(wParam)
+        If uMsg = WM_KEYUP Then RaiseEvent KeyUp(wParam)
+    End If
+End Sub
+
+Public Sub OnCharEvent(ByVal uMsg As Long, ByVal wParam As Long, ByVal lParam As Long)
+    Dim Ascii As Long
+    Static LastChar As Long
+    
+    If wParam <= 127 Then
+        LastChar = 0
+    Else
+        If LastChar = 0 Then
+        LastChar = wParam
+        Exit Sub
+        End If
+    End If
+    
+    Ascii = CLng(LastChar) * 256 + wParam
+    LastChar = 0
+    
+    If Not FocusView Is Nothing Then
+        FocusView.RaiseChar Ascii
     End If
 End Sub
 

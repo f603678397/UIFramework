@@ -29,8 +29,10 @@ End Sub
 
 Public Function Clone() As cMatrix
     Dim Matrix As New cMatrix
+    Dim h As Long
     Matrix.Release
-    Matrix.Handle = mHandle
+    GdipCloneMatrix mHandle, h
+    Matrix.Handle = h
     Set Clone = Matrix
 End Function
 
