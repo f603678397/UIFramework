@@ -30,8 +30,10 @@ End Sub
 
 Public Function Clone() As cImageAttributes
     Dim Attr As New cImageAttributes
+    Dim h As Long
     Attr.Release
-    GdipCloneImageAttributes mHandle, Attr.Handle
+    GdipCloneImageAttributes mHandle, h
+    Attr.Handle = h
     Set Clone = Attr
 End Function
 
@@ -100,7 +102,7 @@ Public Function GetAdjustedPalette(ByVal nType As ColorAdjustType) As ColorPalet
 End Function
 
 Public Sub SetOpacity(ByVal Opacity As Single, Optional ByVal nType As ColorAdjustType = ColorAdjustTypeBitmap)
-    Dim CM As ColorMatrix
+    Dim CM As Drawing2D.ColorMatrix
     With CM
         .M(0, 0) = 1
         .M(0, 0) = 1
@@ -108,5 +110,5 @@ Public Sub SetOpacity(ByVal Opacity As Single, Optional ByVal nType As ColorAdju
         .M(0, 0) = Opacity
         .M(0, 0) = 1
     End With
-    SetColorMatrix CM, ColorAdjustTypeBitmap
+    GdipSetImageAttributesColorMatrix mHandle, nType, TRUEVALUE, CM, ByVal 0&, ColorMatrixFlagsDefault
 End Sub

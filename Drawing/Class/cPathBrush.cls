@@ -92,7 +92,9 @@ End Sub
 
 Public Function Clone() As cPathBrush
     Dim Brush As New cPathBrush
-    GdipCloneBrush mHandle, Brush.Handle
+    Dim h As Long
+    GdipCloneBrush mHandle, h
+    Brush.Handle = h
     Set Clone = Brush
 End Function
 
@@ -102,8 +104,10 @@ End Sub
 
 Public Function GetPath() As cPath
     Dim Path As New cPath
+    Dim h As Long
     Path.Release
-    GdipGetPathGradientPath mHandle, Path.Handle
+    GdipGetPathGradientPath mHandle, h
+    Path.Handle = h
     Set GetPath = Path
 End Function
 
@@ -111,9 +115,9 @@ Public Function GetCenterPoint() As POINTF
     GdipGetPathGradientCenterPoint mHandle, GetCenterPoint
 End Function
 
-Public Sub SetCenterPoint(ByVal x As Single, ByVal y As Single)
+Public Sub SetCenterPoint(ByVal X As Single, ByVal Y As Single)
     Dim pt As POINTF
-    pt.x = x: pt.y = y
+    pt.X = X: pt.Y = Y
     GdipSetPathGradientCenterPoint mHandle, pt
 End Sub
 
@@ -127,8 +131,10 @@ End Function
 
 Public Function GetTransform() As cMatrix
     Dim Matrix As New cMatrix
+    Dim h As Long
     Matrix.Release
-    GdipGetPathGradientTransform mHandle, Matrix.Handle
+    GdipGetPathGradientTransform mHandle, h
+    Matrix.Handle = h
     Set GetTransform = Matrix
 End Function
 

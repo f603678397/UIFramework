@@ -153,8 +153,10 @@ End Sub
 
 Public Function GetWorldTransform() As cMatrix
     Dim Matrix As New cMatrix
+    Dim h As Long
     Matrix.Release
-    GdipGetWorldTransform mHandle, Matrix.Handle
+    GdipGetWorldTransform mHandle, h
+    Matrix.Handle = h
     Set GetWorldTransform = Matrix
 End Function
 
@@ -234,8 +236,8 @@ Public Function GetHalftonePalette() As Long    '???????????
     GetHalftonePalette = GdipCreateHalftonePalette()
 End Function
 
-Public Sub DrawArc(Pen As cPen, ByVal X As Single, ByVal Y As Single, ByVal W As Single, ByVal h As Single, ByVal startAngle As Single, ByVal sweepAngle As Single)
-    GdipDrawArc mHandle, Pen.Handle, X, Y, W, h, startAngle, sweepAngle
+Public Sub DrawArc(Pen As cPen, ByVal X As Single, ByVal Y As Single, ByVal w As Single, ByVal h As Single, ByVal startAngle As Single, ByVal sweepAngle As Single)
+    GdipDrawArc mHandle, Pen.Handle, X, Y, w, h, startAngle, sweepAngle
 End Sub
 
 Public Sub DrawBezier(Pen As cPen, ByVal x1 As Single, ByVal y1 As Single, ByVal x2 As Single, ByVal y2 As Single, ByVal x3 As Single, ByVal y3 As Single, ByVal x4 As Single, ByVal y4 As Single)
@@ -336,8 +338,8 @@ Public Function MeasureCharacterRanges(ByVal sText As String, Font As cFont, Lay
     MeasureCharacterRanges = objRgn
 End Function
 
-Public Sub DrawEllipse(Pen As cPen, ByVal X As Single, ByVal Y As Single, ByVal W As Single, ByVal h As Single)
-    GdipDrawEllipse mHandle, Pen.Handle, X, Y, W, h
+Public Sub DrawEllipse(Pen As cPen, ByVal X As Single, ByVal Y As Single, ByVal w As Single, ByVal h As Single)
+    GdipDrawEllipse mHandle, Pen.Handle, X, Y, w, h
 End Sub
 
 Public Sub DrawLine(Pen As cPen, ByVal x1 As Single, ByVal y1 As Single, ByVal x2 As Single, ByVal y2 As Single)
@@ -443,9 +445,9 @@ Public Sub DrawChachedBitmap(Cached As cCachedBitmap, ByVal X As Long, ByVal Y A
     GdipDrawCachedBitmap mHandle, Cached.Handle, X, Y
 End Sub
 
-Public Function DrawImage(Img As cImage, ByVal X As Single, ByVal Y As Single) As Long
-    DrawImage = GdipDrawImage(mHandle, Img.Handle, X, Y)
-End Function
+Public Sub DrawImage(Img As cImage, ByVal X As Single, ByVal Y As Single)
+     GdipDrawImage mHandle, Img.Handle, X, Y
+End Sub
 
 Public Sub DrawImageRect(Img As cImage, ByVal X As Single, ByVal Y As Single, ByVal Width As Single, ByVal Height As Single)
     GdipDrawImageRect mHandle, Img.Handle, X, Y, Width, Height

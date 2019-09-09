@@ -51,8 +51,10 @@ Friend Sub Release(): GdipDeletePen mHandle: mHandle = 0: End Sub
 
 Public Function Clone() As cPen
     Dim Pen As New cPen
+    Dim h As Long
     Pen.Release
-    GdipClonePen mHandle, Pen.Handle
+    GdipClonePen mHandle, h
+    Pen.Handle = h
     Set Clone = Pen
 End Function
 
@@ -67,8 +69,9 @@ End Sub
 
 Public Function GetBrush() As cBrush
     Dim Brush As New cBrush
-    'Brush.Release
-    GdipGetPenBrushFill mHandle, Brush.Handle
+    Dim h As Long
+    GdipGetPenBrushFill mHandle, h
+    Brush.Handle = h
     Set GetBrush = Brush
 End Function
 
@@ -116,8 +119,10 @@ End Sub
 
 Public Function GetCustomStartCap() As cCustomLineCap
     Dim Cap As New cCustomLineCap
+    Dim h As Long
     Cap.Release
-    GdipGetPenCustomStartCap mHandle, Cap.Handle
+    GdipGetPenCustomStartCap mHandle, h
+    Cap.Handle = h
     Set GetCustomStartCap = Cap
 End Function
 
@@ -127,8 +132,10 @@ End Sub
 
 Public Function GetCustomEndCap() As cCustomLineCap
     Dim Cap As New cCustomLineCap
+    Dim h As Long
     Cap.Release
-    GdipGetPenCustomEndCap mHandle, Cap.Handle
+    GdipGetPenCustomEndCap mHandle, h
+    Cap.Handle = h
     Set GetCustomEndCap = Cap
 End Function
 
@@ -142,8 +149,10 @@ End Sub
 
 Public Function GetTransform() As cMatrix
     Dim Matrix As New cMatrix
+    Dim h As Long
     Matrix.Release
-    GdipGetPenTransform mHandle, Matrix.Handle
+    GdipGetPenTransform mHandle, h
+    Matrix.Handle = h
     Set GetTransform = Matrix
 End Function
 

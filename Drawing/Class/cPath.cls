@@ -28,8 +28,10 @@ Friend Sub Release(): GdipDeletePath mHandle: mHandle = 0: End Sub
 
 Public Function Clone() As cPath
     Dim Path As New cPath
+    Dim h As Long
     Path.Release
-    GdipClonePath mHandle, Path.Handle
+    GdipClonePath mHandle, h
+    Path.Handle = h
     Set Clone = Path
 End Function
 
@@ -45,7 +47,7 @@ Public Sub CloseAllFigures()
     GdipClosePathFigures mHandle
 End Sub
 
-Public Sub Reset()
+Public Sub ReSet()
     GdipResetPath mHandle
 End Sub
 
@@ -125,19 +127,19 @@ Public Function GetData() As PathData
     GdipGetPathData mHandle, GetData
 End Function
 
-Public Function IsPointVisible(ByVal x As Single, ByVal y As Single, Graphics As cGraphics) As Boolean
+Public Function IsPointVisible(ByVal X As Single, ByVal Y As Single, Graphics As cGraphics) As Boolean
     Dim Result As Long
     Dim G As Long
     If Not Graphics Is Nothing Then G = Graphics.Handle
-    GdipIsVisiblePathPoint mHandle, x, y, G, Result
+    GdipIsVisiblePathPoint mHandle, X, Y, G, Result
     IsPointVisible = Result
 End Function
 
-Public Function IsOutLineVisible(Pen As cPen, ByVal x As Single, ByVal y As Single, Graphics As cGraphics)
+Public Function IsOutLineVisible(Pen As cPen, ByVal X As Single, ByVal Y As Single, Graphics As cGraphics)
     Dim Result As Long
     Dim G As Long
     If Not Graphics Is Nothing Then G = Graphics.Handle
-    GdipIsOutlineVisiblePathPoint mHandle, x, y, Pen.Handle, G, Result
+    GdipIsOutlineVisiblePathPoint mHandle, X, Y, Pen.Handle, G, Result
     IsOutLineVisible = Result
 End Function
 
@@ -152,8 +154,8 @@ Public Sub AddLines(Ps() As POINTF)
     GdipAddPathLine2 mHandle, Ps(LBound(Ps)), Count
 End Sub
 
-Public Sub AddArc(ByVal x As Single, ByVal y As Single, ByVal w As Single, ByVal h As Single, ByVal startAngle As Single, ByVal sweepAngle As Single)
-    GdipAddPathArc mHandle, x, y, w, h, startAngle, sweepAngle
+Public Sub AddArc(ByVal X As Single, ByVal Y As Single, ByVal w As Single, ByVal h As Single, ByVal startAngle As Single, ByVal sweepAngle As Single)
+    GdipAddPathArc mHandle, X, Y, w, h, startAngle, sweepAngle
 End Sub
 
 Public Sub AddBezier(ByVal x1 As Single, ByVal y1 As Single, ByVal x2 As Single, ByVal y2 As Single, ByVal x3 As Single, ByVal y3 As Single, ByVal x4 As Single, ByVal y4 As Single)
@@ -202,16 +204,16 @@ Public Sub AddClosedCurve2(Ps() As POINTF, ByVal tension As Single)
     GdipAddPathClosedCurve2 mHandle, Ps(LBound(Ps)), Count, tension
 End Sub
 
-Public Sub AddEllipse(ByVal x As Single, ByVal y As Single, ByVal Width As Single, ByVal Height As Single)
-    GdipAddPathEllipse mHandle, x, y, Width, Height
+Public Sub AddEllipse(ByVal X As Single, ByVal Y As Single, ByVal Width As Single, ByVal Height As Single)
+    GdipAddPathEllipse mHandle, X, Y, Width, Height
 End Sub
 
 Public Sub AddPath(Path As cPath, ByVal bConnect As Boolean)
     GdipAddPathPath mHandle, Path.Handle, IIf(bConnect, 1, 0)
 End Sub
 
-Public Sub AddPie(ByVal x As Single, ByVal y As Single, ByVal Width As Single, ByVal Height As Single, ByVal startAngle As Single, ByVal sweepAngle As Single)
-    GdipAddPathPie mHandle, x, y, Width, Height, startAngle, sweepAngle
+Public Sub AddPie(ByVal X As Single, ByVal Y As Single, ByVal Width As Single, ByVal Height As Single, ByVal startAngle As Single, ByVal sweepAngle As Single)
+    GdipAddPathPie mHandle, X, Y, Width, Height, startAngle, sweepAngle
 End Sub
 
 Public Sub AddPolygon(Ps() As POINTF)
@@ -221,8 +223,8 @@ Public Sub AddPolygon(Ps() As POINTF)
     GdipAddPathPolygon mHandle, Ps(LBound(Ps)), Count
 End Sub
 
-Public Sub AddRectangle(ByVal x As Single, ByVal y As Single, ByVal Width As Single, ByVal Height As Single)
-    GdipAddPathRectangle mHandle, x, y, Width, Height
+Public Sub AddRectangle(ByVal X As Single, ByVal Y As Single, ByVal Width As Single, ByVal Height As Single)
+    GdipAddPathRectangle mHandle, X, Y, Width, Height
 End Sub
 
 Public Sub AddRectangles(Rects() As RECTF)

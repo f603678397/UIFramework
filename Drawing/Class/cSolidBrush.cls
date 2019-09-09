@@ -34,8 +34,10 @@ End Sub
 
 Public Function Clone() As cSolidBrush
     Dim Brush As New cSolidBrush
+    Dim h As Long
     Brush.Release
-    GdipCloneBrush mHandle, Brush.Handle
+    GdipCloneBrush mHandle, h
+    Brush.Handle = h
     Set Clone = Brush
 End Function
 

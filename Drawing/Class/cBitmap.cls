@@ -49,19 +49,23 @@ End Sub
 
 Public Function Clone() As cBitmap
     Dim Bitmap As New cBitmap
-    GdipCloneImage mHandle, Bitmap.Handle
+    Dim h As Long
+    GdipCloneImage mHandle, h
+    Bitmap.Handle = h
     Set Clone = Bitmap
 End Function
 
-Public Function CloneArea(ByVal X As Single, ByVal Y As Single, ByVal w As Single, ByVal H As Single) As cBitmap
+Public Function CloneArea(ByVal X As Single, ByVal Y As Single, ByVal w As Single, ByVal h As Single) As cBitmap
     Dim Bitmap As New cBitmap
-    GdipCloneBitmapArea X, Y, w, H, Me.PixelFormat, mHandle, Bitmap.Handle
+    GdipCloneBitmapArea X, Y, w, h, Me.PixelFormat, mHandle, Bitmap.Handle
     Set CloneArea = Bitmap
 End Function
 
 Public Function CreateCacheBitmap(Graphics As cGraphics) As cCachedBitmap
     Dim Cache As cCachedBitmap
-    GdipCreateCachedBitmap mHandle, Graphics.Handle, Cache.Handle
+    Dim h As Long
+    GdipCreateCachedBitmap mHandle, Graphics.Handle, h
+    Cache.Handle = h
     Set CreateCacheBitmap = Cache
 End Function
 
@@ -151,22 +155,24 @@ End Sub
 
 Public Function ApplyEffectNewBitmap(Effect As cEffect, mRect As RECTL, outRect As RECTL) As cBitmap
     Dim Bitmap As New cBitmap
-    GdipBitmapCreateApplyEffect mHandle, 1, Effect.Handle, mRect, outRect, Bitmap.Handle, 0, 0, 0
+    Dim h As Long
+    GdipBitmapCreateApplyEffect mHandle, 1, Effect.Handle, mRect, outRect, h, 0, 0, 0
+    Bitmap.Handle = h
     Set ApplyEffectNewBitmap = Bitmap
 End Function
 
 Public Function GetGraphics() As cGraphics
     Dim Graphics As New cGraphics
-    Dim H As Long
-    GdipGetImageGraphicsContext mHandle, H
-    Graphics.Handle = H
+    Dim h As Long
+    GdipGetImageGraphicsContext mHandle, h
+    Graphics.Handle = h
     Set GetGraphics = Graphics
 End Function
 
 Public Function ToImage() As cImage
     Dim Img As New cImage
-    Dim H As Long
-    GdipCloneImage mHandle, H
-    Img.Handle = H
+    Dim h As Long
+    GdipCloneImage mHandle, h
+    Img.Handle = h
     Set ToImage = Img
 End Function
