@@ -175,7 +175,7 @@ End Sub
 Friend Function GetImage() As cImage: Set GetImage = ResultBMP.ToImage: End Function
 
 Friend Function GetRoot() As cLayout: Set GetRoot = Layout: End Function
-'Friend Sub SetRoot(Root As cLayout): Set Layout = Root: End Sub
+Friend Sub SetRoot(Root As cLayout): Set Layout = Root: End Sub
 
 Friend Sub RaiseLostFocus(): isFocus = False: RaiseEvent LostFocus: End Sub
 Friend Sub RaiseGotFocus()
@@ -415,8 +415,23 @@ Friend Sub MergeImage()
     Next
 End Sub
 
+Public Function GetCacheBitmap() As cBitmap: Set GetCacheBitmap = ResultBMP: End Function
+Public Function GetCacheBitmapWithoutChild() As cBitmap: Set GetCacheBitmapWithoutChild = Bitmap: End Function
+
 Public Function GetParent() As cView: Set GetParent = mParent: End Function
-'Public Sub SetParent(NewParent As cView): End Sub
+Public Sub SetParent(NewParent As cView)
+    If NewParent Is mParent Then Exit Sub
+    
+    If NewParent Is Nothing Then
+        If Not Layout Is Nothing Then
+            Layout.AddView Me
+        End If
+    Else
+        NewParent.AddView Me
+    End If
+End Sub
+
+Friend Sub f_SetParent(NewParent As cView): Set mParent = NewParent: End Sub
 
 Public Sub Refresh()
     RaisePaint
@@ -455,15 +470,35 @@ Public Function CreateView(ByVal L As Integer, ByVal T As Integer, ByVal W As In
     View.ReDraw
 End Function
 
-'Public Sub AddView(View As cView, Optional ByVal Order As Long = -1)
-'    If View.GetParent Is mParent Then Exit Sub
-'
-''    If Not View.GetParent Is Nothing Then Exit Sub
-''    If Not View.GetRoot Is Layout Then Exit Sub
-'
-'    ViewList.Add View, Order
-'End Sub
+Public Sub AddView(View As cView)
+    Dim mRoot As cLayout
+    Dim Parent As cView
+    
+    Set mRoot = View.GetRoot
+    Set Parent = View.GetParent
+    
+    If Parent Is Me Then Exit Sub
+    If Parent Is Nothing Then
+        If Not mRoot Is Nothing Then
+            mRoot.f_RemoveView View
+            If Not mRoot Is Layout Then mRoot.Refresh
+        End If
+    Else
+        Parent.f_RemoveView View
+    End If
+    View.f_SetParent Me
+    ViewList.Add View
+    
+    View.SetRoot Layout
+    Layout.Refresh
+End Sub
 
-Public Sub RemoveView(View As cView): ViewList.RemoveObject View: End Sub
+Public Sub RemoveView(View As cView): f_RemoveView View: Notify: End Sub
+Friend Sub f_RemoveView(View As cView)
+    If ViewList.Find(View) = -1 Then Exit Sub
+    View.SetRoot Nothing
+    View.f_SetParent Nothing
+    ViewList.RemoveObject View
+End Sub
 
 Public Sub Clear(): ViewList.Clear: End Sub
