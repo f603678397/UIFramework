@@ -26,6 +26,8 @@ Public Sub Terminate()
         Set Activity = Nothing
     Next
     Set ActivityList = Nothing
+    IM.Release
+    Set IM = Nothing
     Drawing.SHUTDOWN
 End Sub
 
@@ -51,6 +53,8 @@ End Function
 Public Sub DestroyActivity(Activity As cActivity)
     Activity.Release
 End Sub
+
+Public Function GetImageManager() As cImageManager: Set GetImageManager = IM: End Function
 
 Public Sub ShowRedrawRgn(ByVal bShow As Boolean)
     bShowRedrawRgn = bShow

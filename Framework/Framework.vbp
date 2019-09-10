@@ -10,6 +10,7 @@ Class=cArrayList; Class\cArrayList.cls
 Class=cObjectList; Class\cObjectList.cls
 Class=cLayout; Class\cLayout.cls
 Class=cView; Class\cView.cls
+Class=cImageManager; Class\cImageManager.cls
 Startup="(None)"
 HelpFile=""
 Title="Framework"

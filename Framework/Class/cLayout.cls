@@ -313,10 +313,40 @@ Public Function CreateView(ByVal L As Integer, ByVal T As Integer, ByVal W As In
     Set CreateView = View
 End Function
 
-Public Sub RemoveView(View As cView): ViewList.RemoveObject View: End Sub
+Public Sub RemoveView(View As cView): f_RemoveView View: Refresh: End Sub
+Friend Sub f_RemoveView(View As cView)
+    If ViewList.Find(View) = -1 Then Exit Sub
+    View.SetRoot Nothing
+    View.f_SetParent Nothing
+    ViewList.RemoveObject View:
+End Sub
 
 Public Sub Clear(): ViewList.Clear: End Sub
 
-'Public Sub AddView(View As cView, ByVal L As Integer, ByVal T As Integer)
-'
-'End Sub
+Public Sub AddView(View As cView)
+    Dim Root As cLayout
+    Dim Parent As cView
+    
+    Set Root = View.GetRoot
+    Set Parent = View.GetParent
+    
+    If Not Root Is Nothing Then
+        If Not Root Is Me Then
+            Root.f_RemoveView View
+            Root.Refresh
+            View.SetRoot Me
+            ViewList.Add View
+        End If
+    Else
+        View.SetRoot Me
+        ViewList.Add View
+    End If
+    
+    If Not Parent Is Nothing Then
+        Parent.f_RemoveView View
+    End If
+    View.f_SetParent Nothing
+    
+    View.ReDraw
+    Me.Refresh
+End Sub

@@ -4,6 +4,7 @@ Option Explicit
 Public Drawing              As New cDrawing
 Public TimerList            As New cObjectList
 Public ActivityList         As New cObjectList
+Public IM                   As New cImageManager
 
 ' Debug ¿ª¹Ø
 Public bShowRedrawRgn       As Boolean
