@@ -57,18 +57,18 @@ End Sub
 
 Public Function Clone() As cTextureBrush
     Dim Brush As New cTextureBrush
-    Dim h As Long
-    GdipCloneBrush mHandle, h
-    Brush.Handle = h
+    Dim H As Long
+    GdipCloneBrush mHandle, H
+    Brush.Handle = H
     Set Clone = Brush
 End Function
 
 Public Function GetTransform() As cMatrix
     Dim Matrix As New cMatrix
-    Dim h As Long
+    Dim H As Long
     Matrix.Release
-    GdipGetTextureTransform mHandle, h
-    Matrix.Handle = h
+    GdipGetTextureTransform mHandle, H
+    Matrix.Handle = H
     Set GetTransform = Matrix
 End Function
 
@@ -98,22 +98,24 @@ End Sub
 
 Public Function GetImage() As cImage
     Dim Img As New cImage
-    Dim h As Long
-    GdipGetTextureImage mHandle, h
-    Img.Handle = h
+    Dim H As Long
+    GdipGetTextureImage mHandle, H
+    Img.Handle = H
     Set GetImage = Img
 End Function
 
 Public Function GetBitmap() As cBitmap
     Dim Bmp As New cBitmap
-    Dim h As Long
-    GdipGetTextureImage mHandle, h
-    Bmp.Handle = h
+    Dim H As Long
+    GdipGetTextureImage mHandle, H
+    Bmp.Handle = H
     Set GetBitmap = Bmp
 End Function
 
 Public Function GetBaseBrush() As cBrush
     Dim Brush As New cBrush
-    Brush.Handle = mHandle
+    Dim H As Long
+    GdipCloneBrush mHandle, H
+    Brush.Handle = H
     Set GetBaseBrush = Brush
 End Function

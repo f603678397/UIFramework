@@ -87,10 +87,10 @@ End Sub
 
 Public Function Clone() As cLinearBrush
     Dim Brush As New cLinearBrush
-    Dim h As Long
+    Dim H As Long
     Brush.Release
-    GdipCloneBrush mHandle, h
-    Brush.Handle = h
+    GdipCloneBrush mHandle, H
+    Brush.Handle = H
     Set Clone = Brush
 End Function
 
@@ -190,10 +190,10 @@ End Sub
 
 Public Function GetTransform() As cMatrix
     Dim Matrix As New cMatrix
-    Dim h As Long
+    Dim H As Long
     Matrix.Release
-    GdipGetLineTransform mHandle, h
-    Matrix.Handle = h
+    GdipGetLineTransform mHandle, H
+    Matrix.Handle = H
     Set GetTransform = Matrix
 End Function
 
@@ -203,6 +203,8 @@ End Sub
 
 Public Function GetBaseBrush() As cBrush
     Dim Brush As New cBrush
-    Brush.Handle = mHandle
+    Dim H As Long
+    GdipCloneBrush mHandle, H
+    Brush.Handle = H
     Set GetBaseBrush = Brush
 End Function

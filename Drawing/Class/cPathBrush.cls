@@ -92,9 +92,9 @@ End Sub
 
 Public Function Clone() As cPathBrush
     Dim Brush As New cPathBrush
-    Dim h As Long
-    GdipCloneBrush mHandle, h
-    Brush.Handle = h
+    Dim H As Long
+    GdipCloneBrush mHandle, H
+    Brush.Handle = H
     Set Clone = Brush
 End Function
 
@@ -104,10 +104,10 @@ End Sub
 
 Public Function GetPath() As cPath
     Dim Path As New cPath
-    Dim h As Long
+    Dim H As Long
     Path.Release
-    GdipGetPathGradientPath mHandle, h
-    Path.Handle = h
+    GdipGetPathGradientPath mHandle, H
+    Path.Handle = H
     Set GetPath = Path
 End Function
 
@@ -131,10 +131,10 @@ End Function
 
 Public Function GetTransform() As cMatrix
     Dim Matrix As New cMatrix
-    Dim h As Long
+    Dim H As Long
     Matrix.Release
-    GdipGetPathGradientTransform mHandle, h
-    Matrix.Handle = h
+    GdipGetPathGradientTransform mHandle, H
+    Matrix.Handle = H
     Set GetTransform = Matrix
 End Function
 
@@ -206,6 +206,8 @@ End Sub
 
 Public Function GetBaseBrush() As cBrush
     Dim Brush As New cBrush
-    Brush.Handle = mHandle
+    Dim H As Long
+    GdipCloneBrush mHandle, H
+    Brush.Handle = H
     Set GetBaseBrush = Brush
 End Function

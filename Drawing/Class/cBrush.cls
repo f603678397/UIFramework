@@ -30,41 +30,51 @@ End Function
 
 Public Function Clone() As cBrush
     Dim Brush As New cBrush
-    Dim h As Long
-    GdipCloneBrush mHandle, h
-    Brush.Handle = h
+    Dim H As Long
+    GdipCloneBrush mHandle, H
+    Brush.Handle = H
     Set Clone = Brush
 End Function
 
 Public Function ToSolidBrush() As cSolidBrush
     Dim Brush As New cSolidBrush
+    Dim H As Long
     Brush.Release
-    Brush.Handle = mHandle
+    GdipCloneBrush mHandle, H
+    Brush.Handle = H
     Set ToSolidBrush = Brush
 End Function
 
 Public Function ToLinearBrush() As cLinearBrush
     Dim Brush As New cLinearBrush
+    Dim H As Long
     Brush.Release
-    Brush.Handle = mHandle
+    GdipCloneBrush mHandle, H
+    Brush.Handle = H
     Set ToLinearBrush = Brush
 End Function
 
 Public Function ToHatchBrush() As cHatchBrush
     Dim Brush As New cHatchBrush
+    Dim H As Long
     Brush.Release
-    Brush.Handle = mHandle
+    GdipCloneBrush mHandle, H
+    Brush.Handle = H
     Set ToHatchBrush = Brush
 End Function
 
 Public Function ToPathBrush() As cPathBrush
     Dim Brush As New cPathBrush
-    Brush.Handle = mHandle
+    Dim H As Long
+    GdipCloneBrush mHandle, H
+    Brush.Handle = H
     Set ToHatchBrush = Brush
 End Function
 
 Public Function ToTextureBrush() As cTextureBrush
     Dim Brush As New cTextureBrush
-    Brush.Handle = mHandle
+    Dim H As Long
+    GdipCloneBrush mHandle, H
+    Brush.Handle = H
     Set ToTextureBrush = Brush
 End Function
