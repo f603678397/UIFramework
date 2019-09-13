@@ -74,15 +74,17 @@ End Sub
 
 Public Function Clone() As cHatchBrush
     Dim Brush As New cHatchBrush
-    Dim h As Long
+    Dim H As Long
     Brush.Release
-    GdipCloneBrush mHandle, h
-    Brush.Handle = h
+    GdipCloneBrush mHandle, H
+    Brush.Handle = H
     Set Clone = Brush
 End Function
 
 Public Function GetBaseBrush() As cBrush
     Dim Brush As New cBrush
-    Brush.Handle = mHandle
+    Dim H As Long
+    GdipCloneBrush mHandle, H
+    Brush.Handle = H
     Set GetBaseBrush = Brush
 End Function

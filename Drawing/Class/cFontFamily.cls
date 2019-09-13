@@ -25,7 +25,7 @@ Friend Sub Release()
 End Sub
 
 Public Sub FromName(ByVal sName As String)
-    GdipCreateFontFamilyFromName sName, 0, mHandle
+    GdipCreateFontFamilyFromName StrPtr(sName), 0, mHandle
 End Sub
 
 Public Function Clone() As cFontFamily
