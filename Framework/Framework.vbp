@@ -11,6 +11,7 @@ Class=cObjectList; Class\cObjectList.cls
 Class=cLayout; Class\cLayout.cls
 Class=cView; Class\cView.cls
 Class=cImageManager; Class\cImageManager.cls
+Class=cToast; Class\cToast.cls
 Startup="(None)"
 HelpFile=""
 Title="Framework"

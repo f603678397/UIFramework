@@ -20,27 +20,20 @@ Private Sub Class_Terminate(): Release: End Sub
 Friend Sub Release(): ImageList.Clear: End Sub
 
 Public Function LoadImage(ByVal imgPath As String, ByVal Key As String) As Boolean
-    Dim Img As New cImage
-    
     If Dir(imgPath) = "" Or Trim(Key) = "" Then Exit Function
+    LoadImage = AddImage(imgPath, Key)
+End Function
+
+Private Function AddImage(ByVal imgPath As String, ByVal Key As String) As Boolean
+    Dim Img As New cImage
     
     Img.FromFile imgPath
     If Img.Handle = 0 Then Exit Function
     
     ImageList.Add Img
     KeyList.Add LCase(Trim(Key))
-    LoadImage = True
+    AddImage = True
 End Function
-
-Private Sub AddImage(ByVal imgPath As String, ByVal Key As String)
-    Dim Img As New cImage
-    
-    Img.FromFile imgPath
-    If Img.Handle = 0 Then Exit Sub
-    
-    ImageList.Add Img
-    KeyList.Add LCase(Trim(Key))
-End Sub
 
 Public Sub LoadAllImage(ByVal DirPath As String)
     Dim FileName As String

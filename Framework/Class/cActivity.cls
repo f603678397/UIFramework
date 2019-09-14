@@ -49,11 +49,12 @@ End Function
 Public Function GetLayout() As cLayout: Set GetLayout = Layout: End Function
 Public Sub SetLayout(NewLayout As cLayout)
     If NewLayout Is Nothing Then Exit Sub
+    If NewLayout Is Layout Then Exit Sub
     If Not Layout Is Nothing Then
-        Layout.IsForeground = False
+        Layout.SetRoot Nothing
     End If
     Set Layout = NewLayout
-    Layout.IsForeground = True
+    Layout.SetRoot Me
     Refresh
 End Sub
 
@@ -187,7 +188,6 @@ End Sub
 Private Sub onSize(ByVal wParam As Long, ByVal lParam As Long)
     If wParam = SIZE_RESTORED Or SIZE_MAXIMIZED Then
         DestroyMemoryDC
-'        GetWindowSize mhWnd
         
         mWidth = LowWord(lParam)
         mHeight = HighWord(lParam)

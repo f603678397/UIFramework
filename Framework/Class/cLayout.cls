@@ -22,7 +22,6 @@ Private Activity        As cActivity
 
 Private mBKColor        As Long
 Private FirstDone       As Boolean
-Private bForeground     As Boolean
 
 Public Event MouseMove(ByVal Button As Integer, ByVal Shift As Integer, ByVal X As Integer, ByVal Y As Integer)
 Public Event MouseDown(ByVal Button As Integer, ByVal Shift As Integer, ByVal X As Integer, ByVal Y As Integer)
@@ -62,11 +61,14 @@ End Sub
 Friend Property Get IsFirstDone() As Boolean: IsFirstDone = FirstDone: End Property
 Public Property Get ViewCount(): ViewCount = ViewList.GetCount: End Property
 
-Public Property Get IsForeground() As Boolean: IsForeground = bForeground: End Property
-Friend Property Let IsForeground(ByVal B As Boolean): bForeground = B: End Property
-
 Public Property Get BackgroundColor() As Long: BackgroundColor = mBKColor: End Property
 Public Property Let BackgroundColor(ByVal nColor As Long): mBKColor = nColor: Refresh: End Property
+
+Friend Function GetRoot() As cActivity: Set GetRoot = Activity: End Function
+Friend Sub SetRoot(Root As cActivity)
+    If Root Is Nothing Then Exit Sub
+    Set Activity = Root
+End Sub
 
 Friend Function GetImage() As cImage: Set GetImage = Bitmap.ToImage: End Function
 Friend Sub ChangeSize(ByVal nWidth As Long, ByVal nHeight As Long)
@@ -158,7 +160,7 @@ Public Sub Refresh()
     
     If ViewList.GetCount > 0 Then FirstDone = True
     
-    If bForeground Then Activity.Refresh
+    If Not Activity Is Nothing Then Activity.Refresh
 End Sub
 
 Friend Sub RefreshRect(ByVal L As Integer, ByVal T As Integer, ByVal W As Integer, ByVal H As Integer)
@@ -197,7 +199,7 @@ Friend Sub RefreshRect(ByVal L As Integer, ByVal T As Integer, ByVal W As Intege
     End If
     
     Graphics.ResetClip
-    If bForeground Then Activity.RefreshRect L, T, W, H
+    If Not Activity Is Nothing Then Activity.RefreshRect L, T, W, H
 End Sub
 
 Private Sub OnMouseEvent(ByVal uMsg As Long, ByVal wParam As Long, ByVal lParam As Long)
@@ -219,7 +221,7 @@ Private Sub OnMouseEvent(ByVal uMsg As Long, ByVal wParam As Long, ByVal lParam 
             Set View = ViewList.GetObject(i)
                 If View.Visible Then
                     If View.CheckMouseIn(X, Y) Then
-                        View.RaiseMouseMove Button, Shift, X, Y
+                        If View.Enabled Then View.RaiseMouseMove Button, Shift, X, Y
                         Set View = Nothing
                         Exit Sub
                     End If
@@ -227,7 +229,7 @@ Private Sub OnMouseEvent(ByVal uMsg As Long, ByVal wParam As Long, ByVal lParam 
             Set View = Nothing
         Next
         If Not HoverView Is Nothing Then
-            HoverView.RaiseMouseLeave
+            If HoverView.Enabled Then HoverView.RaiseMouseLeave
             Set HoverView = Nothing
         End If
         RaiseEvent MouseMove(Button, Shift, X, Y)
@@ -236,7 +238,7 @@ Private Sub OnMouseEvent(ByVal uMsg As Long, ByVal wParam As Long, ByVal lParam 
             Set View = ViewList.GetObject(i)
                 If View.Visible Then
                     If View.CheckMouseIn(X, Y) Then
-                        View.RaiseMouseDown Button, Shift, X - View.Left, Y - View.Top
+                        If View.Enabled Then View.RaiseMouseDown Button, Shift, X - View.Left, Y - View.Top
                         Set View = Nothing
                         Exit Sub
                     End If
@@ -244,13 +246,13 @@ Private Sub OnMouseEvent(ByVal uMsg As Long, ByVal wParam As Long, ByVal lParam 
             Set View = Nothing
         Next
         If Not FocusView Is Nothing Then
-            FocusView.RaiseLostFocus
+            If FocusView.Enabled Then FocusView.RaiseLostFocus
             Set FocusView = Nothing
         End If
         RaiseEvent MouseDown(Button, Shift, X, Y)
     ElseIf uMsg = WM_LBUTTONUP Or uMsg = WM_RBUTTONUP Or uMsg = WM_MBUTTONUP Then
         If Not FocusView Is Nothing Then
-            If FocusView.Visible Then
+            If FocusView.Visible And FocusView.Enabled Then
                 Set View = FocusView.GetParent
                 Do While Not View Is Nothing
                     X = X - View.Left
@@ -264,7 +266,7 @@ Private Sub OnMouseEvent(ByVal uMsg As Long, ByVal wParam As Long, ByVal lParam 
         End If
     ElseIf uMsg = WM_MOUSEWHEEL Then
         If Not HoverView Is Nothing Then
-            HoverView.RaiseMouseWheel IIf(wParam > 0, True, False)
+            If HoverView.Enabled Then HoverView.RaiseMouseWheel IIf(wParam > 0, True, False)
         Else
             RaiseEvent MouseWheel(IIf(wParam > 0, True, False))
         End If
@@ -277,8 +279,10 @@ End Sub
 
 Public Sub OnKeyEvent(ByVal uMsg As Long, ByVal wParam As Long, ByVal lParam As Long)
     If Not FocusView Is Nothing Then
-        If uMsg = WM_KEYDOWN Then FocusView.RaiseKeyDown wParam
-        If uMsg = WM_KEYUP Then FocusView.RaiseKeyUp wParam
+        If FocusView.Enabled Then
+            If uMsg = WM_KEYDOWN Then FocusView.RaiseKeyDown wParam
+            If uMsg = WM_KEYUP Then FocusView.RaiseKeyUp wParam
+        End If
     Else
         If uMsg = WM_KEYDOWN Then RaiseEvent KeyDown(wParam)
         If uMsg = WM_KEYUP Then RaiseEvent KeyUp(wParam)
@@ -302,7 +306,7 @@ Public Sub OnCharEvent(ByVal uMsg As Long, ByVal wParam As Long, ByVal lParam As
     LastChar = 0
     
     If Not FocusView Is Nothing Then
-        FocusView.RaiseChar Ascii
+        If FocusView.Enabled Then FocusView.RaiseChar Ascii
     End If
 End Sub
 

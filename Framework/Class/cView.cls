@@ -25,6 +25,7 @@ Private mHeight         As Integer
 Private mOpacity        As Single
 Private mParent         As cView
 Private mVisible        As Boolean
+Private mEnabled        As Boolean
 Private ViewList        As New cObjectList
 Private Layout          As cLayout
 Private isHover         As Boolean
@@ -108,6 +109,9 @@ Public Property Let Height(ByVal nHeight As Integer)
     Notify True
 End Property
 
+Public Property Get Enabled() As Boolean: Enabled = mEnabled: End Property
+Public Property Let Enabled(ByVal bEnabled As Boolean): mEnabled = bEnabled: End Property
+
 Public Property Get Visible() As Boolean: Visible = mVisible: End Property
 Public Property Let Visible(ByVal bVisible As Boolean): mVisible = bVisible: Notify: End Property
 
@@ -135,6 +139,7 @@ Friend Sub Create(Root As cLayout, ParentView As cView, ByVal L As Integer, ByVa
     
     mVisible = True
     mOpacity = 1
+    mEnabled = True
     Set Layout = Root
     Set mParent = ParentView
 End Sub
@@ -199,7 +204,7 @@ Friend Sub RaiseMouseMove(ByVal Button As Integer, ByVal Shift As Integer, ByVal
     For i = ViewList.GetCount - 1 To 0 Step -1
         Set View = ViewList.GetObject(i)
             If View.CheckMouseIn(X, Y) Then
-                View.RaiseMouseMove Button, Shift, X - View.Left, Y - View.Top
+                If View.Enabled Then View.RaiseMouseMove Button, Shift, X - View.Left, Y - View.Top
                 Set View = Nothing
                 Exit Sub
             End If
@@ -215,7 +220,7 @@ Friend Sub RaiseMouseDown(ByVal Button As Integer, ByVal Shift As Integer, ByVal
     For i = ViewList.GetCount - 1 To 0 Step -1
         Set View = ViewList.GetObject(i)
             If View.CheckMouseIn(X, Y) Then
-                View.RaiseMouseDown Button, Shift, X - View.Left, Y - View.Top
+                If View.Enabled Then View.RaiseMouseDown Button, Shift, X - View.Left, Y - View.Top
                 Set View = Nothing
                 Exit Sub
             End If
