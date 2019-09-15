@@ -192,12 +192,6 @@ Friend Sub RefreshRect(ByVal L As Integer, ByVal T As Integer, ByVal W As Intege
         Set View = Nothing
     Next
     
-    If bShowRedrawRgn Then
-        Dim Brush As New cSolidBrush
-        Brush.Color = cColor.FromARGB(100, 255, 0, 0)
-        Graphics.FillRectangle Brush.GetBaseBrush, 0, 0, Bitmap.Width, Bitmap.Height
-    End If
-    
     Graphics.ResetClip
     If Not Activity Is Nothing Then Activity.RefreshRect L, T, W, H
 End Sub

@@ -26,6 +26,10 @@ Private mOpacity        As Single
 Private mParent         As cView
 Private mVisible        As Boolean
 Private mEnabled        As Boolean
+Private mPaddingLeft    As Integer
+Private mPaddingTop     As Integer
+Private mPaddingRight   As Integer
+Private mPaddingBottom  As Integer
 Private ViewList        As New cObjectList
 Private Layout          As cLayout
 Private isHover         As Boolean
@@ -108,6 +112,27 @@ Public Property Let Height(ByVal nHeight As Integer)
     MergeImageSelf
     Notify True
 End Property
+
+Public Property Let Padding(ByVal nPadding As Integer)
+    mPaddingLeft = nPadding
+    mPaddingTop = nPadding
+    mPaddingRight = nPadding
+    mPaddingBottom = nPadding
+    Notify
+End Property
+
+Public Property Get PaddingLeft() As Integer: PaddingLeft = mPaddingLeft: End Property
+Public Property Let PaddingLeft(ByVal nPadding As Integer): mPaddingLeft = nPadding: Notify: End Property
+
+Public Property Get PaddingTop() As Integer: PaddingTop = mPaddingTop: End Property
+Public Property Let PaddingTop(ByVal nPadding As Integer): mPaddingTop = nPadding: Notify: End Property
+
+Public Property Get PaddingRight() As Integer: PaddingRight = mPaddingRight: End Property
+Public Property Let PaddingRight(ByVal nPadding As Integer): mPaddingRight = nPadding: Notify: End Property
+
+Public Property Get PaddingBottom() As Integer: PaddingBottom = mPaddingBottom: End Property
+Public Property Let PaddingBottom(ByVal nPadding As Integer): mPaddingBottom = nPadding: Notify: End Property
+
 
 Public Property Get Enabled() As Boolean: Enabled = mEnabled: End Property
 Public Property Let Enabled(ByVal bEnabled As Boolean): mEnabled = bEnabled: End Property
@@ -286,10 +311,29 @@ Friend Function CheckMouseIn(ByVal X As Integer, ByVal Y As Integer) As Boolean
 End Function
 
 Friend Sub NotifyRefesh(ByVal L As Integer, ByVal T As Integer, ByVal W As Integer, ByVal H As Integer)
+    Dim mL As Integer, mT As Integer, mW As Integer, mH As Integer
+    Dim cW As Integer, cH As Integer
+    
+    If L > mWidth - mPaddingRight Or T > mHeight - mPaddingBottom Or W < 1 Or H < 1 Then Exit Sub
+    
+    cW = mWidth - mPaddingLeft - mPaddingRight
+    cH = mHeight - mPaddingTop - mPaddingBottom
+    
+    mL = IIf(L < mPaddingLeft, mPaddingLeft, L)
+    mT = IIf(T < mPaddingTop, mPaddingTop, T)
+    mW = IIf(W > cW, cW, W)
+    mH = IIf(H > cH, cH, H)
+    
+    If L >= mPaddingLeft And L + W >= mWidth - mPaddingRight Then mW = cW - (L - mPaddingLeft)
+    If T >= mPaddingTop And T + H >= mHeight - mPaddingBottom Then mH = cH - (T - mPaddingTop)
+    
+    If L <= mPaddingLeft And L + W < mWidth - mPaddingRight Then mW = W - (mPaddingLeft - L)
+    If T <= mPaddingTop And T + H < mHeight - mPaddingBottom Then mH = H - (mPaddingTop - T)
+    
     If Not mParent Is Nothing Then
-        mParent.NotifyRefesh L + mLeft, T + mTop, W, H
+        mParent.NotifyRefesh mL + mLeft, mT + mTop, mW, mH
     Else
-        Layout.RefreshRect L + mLeft, T + mTop, W, H
+        Layout.RefreshRect mL + mLeft, mT + mTop, mW, mH
     End If
 End Sub
 
@@ -331,7 +375,8 @@ Friend Sub RefreshRect(ByVal L As Integer, ByVal T As Integer, ByVal W As Intege
     
     If Not FirstDraw Then ReDraw
     
-    Canvas.SetClip L, T, W, H, CombineModeReplace
+    Canvas.SetClip mPaddingLeft, mPaddingTop, mWidth - mPaddingLeft - PaddingRight, mHeight - mPaddingTop - mPaddingBottom, CombineModeReplace
+    Canvas.SetClip L, T, W, H, CombineModeIntersect
     Canvas.Clear
     Canvas.DrawImage Bitmap.ToImage, 0, 0
     
@@ -374,6 +419,7 @@ Friend Sub MergeImageSelf()
     
     Canvas.Clear
     Canvas.DrawImage Bitmap.ToImage, 0, 0
+    Canvas.SetClip mPaddingLeft, mPaddingTop, mWidth - mPaddingLeft - PaddingRight, mHeight - mPaddingTop - mPaddingBottom, CombineModeReplace
     
     For i = 0 To ViewList.GetCount - 1
         Set View = ViewList.GetObject(i)
@@ -386,6 +432,8 @@ Friend Sub MergeImageSelf()
             End If
         Set View = Nothing
     Next
+    
+    Canvas.ResetClip
 End Sub
 
 Friend Sub MergeImage()
@@ -404,6 +452,7 @@ Friend Sub MergeImage()
     
     Canvas.Clear
     Canvas.DrawImage Bitmap.ToImage, 0, 0
+    Canvas.SetClip mPaddingLeft, mPaddingTop, mWidth - mPaddingLeft - PaddingRight, mHeight - mPaddingTop - mPaddingBottom, CombineModeReplace
     
     For i = 0 To ViewList.GetCount - 1
         Set View = ViewList.GetObject(i)
@@ -418,6 +467,8 @@ Friend Sub MergeImage()
             End If
         Set View = Nothing
     Next
+    
+    Canvas.ResetClip
 End Sub
 
 Public Function GetCacheBitmap() As cBitmap: Set GetCacheBitmap = ResultBMP: End Function
