@@ -73,9 +73,18 @@ Friend Sub RefreshRect(ByVal L As Integer, ByVal T As Integer, ByVal W As Intege
 
     If Not Layout Is Nothing Then
         RECT.Left = L: RECT.Top = T: RECT.Right = W: RECT.bottom = H
+        
+        If bShowRedrawRgn Then Graphics.DrawImage Layout.GetImage, 0, 0
+        
         Graphics.SetClip L, T, W, H, CombineModeReplace
         Graphics.Clear cColor.Transparent
         Graphics.DrawImagePointRect Layout.GetImage, L, T, RECT
+        
+        If bShowRedrawRgn Then
+            Dim Brush As New cSolidBrush
+            Brush.Color = cColor.FromARGB(100, 255, 0, 0)
+            Graphics.FillRectangle Brush.GetBaseBrush, 0, 0, mWidth, mHeight
+        End If
         Graphics.ResetClip
     Else
         Exit Sub
