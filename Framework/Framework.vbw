@@ -1,10 +1,10 @@
-cCore = 297, 26, 971, 527, C
+cCore = 270, 44, 944, 545, C
 mGlobal = 387, 53, 1037, 630, C
-cActivity = 158, 103, 871, 664, 
-cTimer = 288, 45, 1019, 557, C
+cActivity = 233, 13, 946, 574, C
+cTimer = 89, 43, 820, 555, C
 cArrayList = 137, 115, 999, 555, C
 cObjectList = 72, 58, 934, 498, C
 cLayout = 62, 34, 716, 533, 
-cView = 219, 27, 963, 555, 
+cView = 219, 27, 963, 555, C
 cImageManager = 204, 51, 930, 527, C
-cToast = 203, 26, 1024, 522, C
+cToast = 203, 26, 1024, 522, 

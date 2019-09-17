@@ -101,6 +101,9 @@ Friend Sub Create(ByVal hWnd As Long, ByVal bLayer As Boolean)
     mbLayer = bLayer
     mhWnd = hWnd
     PreFunc = SetWindowLongA(hWnd, GWL_WNDPROC, AddressOf WndProc)
+    If bLayer Then
+        SetWindowLongA hWnd, GWL_EXSTYLE, GetWindowLongA(hWnd, GWL_EXSTYLE) Or WS_EX_LAYERED
+    End If
     GetWindowSize mhWnd
     SrcDC = GetDC(mhWnd)
     CreateMemoryDC
