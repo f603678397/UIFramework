@@ -19,8 +19,9 @@ End Sub
 
 Public Sub Terminate()
     Dim i As Long
-    Dim Activity As cActivity
-    Dim Timer As cTimer
+    Dim Activity    As cActivity
+    Dim Timer       As cTimer
+    Dim Drawable    As cDrawable
     
     For i = 0 To ActivityList.GetCount - 1
         Set Activity = ActivityList.GetObject(i)
@@ -35,6 +36,13 @@ Public Sub Terminate()
         Set Timer = Nothing
     Next
     Set TimerList = Nothing
+    
+    For i = 0 To DrawableList.GetCount - 1
+        Set Drawable = DrawableList.GetObject(i)
+            Drawable.Release
+        Set Drawable = Nothing
+    Next
+    Set DrawableList = Nothing
     
     IM.Release
     Set IM = Nothing
