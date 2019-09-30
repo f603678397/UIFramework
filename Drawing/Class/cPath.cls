@@ -28,10 +28,10 @@ Friend Sub Release(): GdipDeletePath mHandle: mHandle = 0: End Sub
 
 Public Function Clone() As cPath
     Dim Path As New cPath
-    Dim h As Long
+    Dim H As Long
     Path.Release
-    GdipClonePath mHandle, h
-    Path.Handle = h
+    GdipClonePath mHandle, H
+    Path.Handle = H
     Set Clone = Path
 End Function
 
@@ -154,8 +154,8 @@ Public Sub AddLines(Ps() As POINTF)
     GdipAddPathLine2 mHandle, Ps(LBound(Ps)), Count
 End Sub
 
-Public Sub AddArc(ByVal X As Single, ByVal Y As Single, ByVal w As Single, ByVal h As Single, ByVal startAngle As Single, ByVal sweepAngle As Single)
-    GdipAddPathArc mHandle, X, Y, w, h, startAngle, sweepAngle
+Public Sub AddArc(ByVal X As Single, ByVal Y As Single, ByVal w As Single, ByVal H As Single, ByVal startAngle As Single, ByVal sweepAngle As Single)
+    GdipAddPathArc mHandle, X, Y, w, H, startAngle, sweepAngle
 End Sub
 
 Public Sub AddBezier(ByVal x1 As Single, ByVal y1 As Single, ByVal x2 As Single, ByVal y2 As Single, ByVal x3 As Single, ByVal y3 As Single, ByVal x4 As Single, ByVal y4 As Single)
@@ -234,6 +234,6 @@ Public Sub AddRectangles(Rects() As RECTF)
     GdipAddPathRectangles mHandle, Rects(LBound(Rects)), Count
 End Sub
 
-Public Sub AddString()
-    '// TODO: AddPathString
+Public Sub AddString(ByVal Text As String, Fam As cFontFamily, Style As FontStyle, ByVal Size As Single, Layout As RECTF, strFormat As cStringFormat)
+    GdipAddPathString mHandle, StrPtr(Text), -1, Fam.Handle, Style, Size, Layout, strFormat.Handle
 End Sub

@@ -153,10 +153,10 @@ End Sub
 
 Public Function GetWorldTransform() As cMatrix
     Dim Matrix As New cMatrix
-    Dim h As Long
+    Dim H As Long
     Matrix.Release
-    GdipGetWorldTransform mHandle, h
-    Matrix.Handle = h
+    GdipGetWorldTransform mHandle, H
+    Matrix.Handle = H
     Set GetWorldTransform = Matrix
 End Function
 
@@ -236,8 +236,8 @@ Public Function GetHalftonePalette() As Long    '???????????
     GetHalftonePalette = GdipCreateHalftonePalette()
 End Function
 
-Public Sub DrawArc(Pen As cPen, ByVal X As Single, ByVal Y As Single, ByVal w As Single, ByVal h As Single, ByVal startAngle As Single, ByVal sweepAngle As Single)
-    GdipDrawArc mHandle, Pen.Handle, X, Y, w, h, startAngle, sweepAngle
+Public Sub DrawArc(Pen As cPen, ByVal X As Single, ByVal Y As Single, ByVal w As Single, ByVal H As Single, ByVal startAngle As Single, ByVal sweepAngle As Single)
+    GdipDrawArc mHandle, Pen.Handle, X, Y, w, H, startAngle, sweepAngle
 End Sub
 
 Public Sub DrawBezier(Pen As cPen, ByVal x1 As Single, ByVal y1 As Single, ByVal x2 As Single, ByVal y2 As Single, ByVal x3 As Single, ByVal y3 As Single, ByVal x4 As Single, ByVal y4 As Single)
@@ -294,7 +294,7 @@ Public Sub DrawString(ByVal sText As String, Font As cFont, Layout As RECTF, str
     GdipDrawString mHandle, StrPtr(sText), -1, Font.Handle, Layout, strFormat.Handle, Brush.Handle
 End Sub
 
-Public Sub PrintString(ByVal sText As String, Layout As RECTF, Optional nColor As Long = &HFF000000, Optional ByVal nSize As Single = 15, Optional ByVal sFontName As String = "????")
+Public Sub PrintString(ByVal sText As String, Layout As RECTF, Optional nColor As Long = &HFF000000, Optional ByVal nSize As Single = 15, Optional ByVal sFontName As String = "ËÎÌו")
     Dim Fam As Long
     Dim mFont As Long
     Dim mFormat As Long
@@ -310,6 +310,10 @@ Public Sub PrintString(ByVal sText As String, Layout As RECTF, Optional nColor A
     GdipDeleteStringFormat mFormat
     GdipDeleteFont mFont
     GdipDeleteFontFamily Fam
+End Sub
+
+Public Sub DrawPath(Path As cPath, Pen As cPen)
+    GdipDrawPath mHandle, Pen.Handle, Path.Handle
 End Sub
 
 Public Function MeasureString(ByVal sText As String, Font As cFont, Layout As RECTF, strFormat As cStringFormat) As RECTF
@@ -338,8 +342,8 @@ Public Function MeasureCharacterRanges(ByVal sText As String, Font As cFont, Lay
     MeasureCharacterRanges = objRgn
 End Function
 
-Public Sub DrawEllipse(Pen As cPen, ByVal X As Single, ByVal Y As Single, ByVal w As Single, ByVal h As Single)
-    GdipDrawEllipse mHandle, Pen.Handle, X, Y, w, h
+Public Sub DrawEllipse(Pen As cPen, ByVal X As Single, ByVal Y As Single, ByVal w As Single, ByVal H As Single)
+    GdipDrawEllipse mHandle, Pen.Handle, X, Y, w, H
 End Sub
 
 Public Sub DrawLine(Pen As cPen, ByVal x1 As Single, ByVal y1 As Single, ByVal x2 As Single, ByVal y2 As Single)
@@ -433,7 +437,7 @@ Public Sub FillPie(Brush As cBrush, ByVal X As Single, ByVal Y As Single, ByVal 
     GdipFillPie mHandle, Brush.Handle, X, Y, Width, Height, startAngle, sweepAngle
 End Sub
 
-Public Sub fillPath(Brush As cBrush, Path As cPath)
+Public Sub FillPath(Brush As cBrush, Path As cPath)
     GdipFillPath mHandle, Brush.Handle, Path.Handle
 End Sub
 
@@ -454,9 +458,9 @@ Public Sub DrawImageRect(Img As cImage, ByVal X As Single, ByVal Y As Single, By
 End Sub
 
 Public Sub DrawImageRectRect(Img As cImage, dstRect As RECTF, srcRect As RECTF, imgAttr As cImageAttributes)
-    Dim h As Long
-    If Not imgAttr Is Nothing Then h = imgAttr.Handle
-    GdipDrawImageRectRect mHandle, Img.Handle, dstRect.Left, dstRect.Top, dstRect.Right, dstRect.Bottom, srcRect.Left, srcRect.Top, srcRect.Right, srcRect.Bottom, UnitPixel, h, 0, 0
+    Dim H As Long
+    If Not imgAttr Is Nothing Then H = imgAttr.Handle
+    GdipDrawImageRectRect mHandle, Img.Handle, dstRect.Left, dstRect.Top, dstRect.Right, dstRect.Bottom, srcRect.Left, srcRect.Top, srcRect.Right, srcRect.Bottom, UnitPixel, H, 0, 0
 End Sub
 
 Public Sub DrawImagePointRect(Img As cImage, ByVal X As Single, ByVal Y As Single, srcRect As RECTF)

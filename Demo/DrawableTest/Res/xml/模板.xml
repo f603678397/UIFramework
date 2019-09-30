@@ -1,0 +1,116 @@
+<!--
+canvas标签 必须位于根标签，定义画布大小及背景色
+属性：
+width   画布宽度
+height  画布高度
+color   背景色     可选，默认为透明色
+-->
+<canvas width="800" height="600" color="#FFFFFFFF">
+    
+    <!--
+    Line标签 画一条线，可嵌套于Path标签内
+    属性：
+    start   起点
+    end     终点
+    Edge    边框宽度    可选，默认为1。当嵌套于Path标签内时无效
+    color   描边颜色    可选，默认为黑色。当嵌套于Path标签内时无效
+    -->
+    <Line start="10,10" end="50,10" edge="2" color="#FF000000"/>
+    
+    <!--
+    Arc标签 画圆弧，可嵌套于Path标签内
+    属性：
+    Position    左上角边距
+    size        宽高
+    start       圆弧起始角度
+    angle       圆弧角度
+    Edge    边框宽度    可选，默认为1。当嵌套于Path标签内时无效
+    color       描边颜色    可选，默认为黑色。当嵌套于Path标签内时无效
+    -->
+    <Arc Position="60,5" size="20,20" start="-90" angle="90" color="#FFFF0000"/>
+    
+    <!--
+    Rect标签 画一个矩形，可嵌套于Path标签内
+    属性：
+    Position    左上角边距
+    size        宽高
+    Edge        边框宽度    可选，默认为1。当嵌套于Path标签内时无效
+    color       描边颜色    可选，默认为黑色。当嵌套于Path标签内时无效
+    -->
+    <Rect Position="10,20" size="50,50" edge="3" color="#FF0000FF">
+        <!--
+        Solid标签 纯色刷子，用于填充图形或路径
+        属性：
+        color   刷子颜色
+        -->
+        <Solid Color="#FF00FF00"/>
+        
+    </Rect>
+    
+    <!--
+    Oval标签 画一个椭圆，可嵌套于Path标签内
+    属性：
+    position    左上角边距
+    size        宽高
+    Edge        边框宽度    可选，默认为1。当嵌套于Path标签内时无效
+    color       描边颜色    可选，默认为黑色。当嵌套于Path标签内时无效
+    -->
+    <Oval Position="70,20" size="50,50" color="#FF000000">
+        <!--
+        Gradient标签 渐变刷子
+        属性：
+        position    渐变起点    可选，默认为(0,0)
+        vector      渐变终点
+        start       开始颜色
+        end         结束颜色
+        -->
+        <Gradient position="0,20" Vector="0,45" Start="#FFFFFFFF" end="#FF000000"/>
+        
+    </Oval>
+    
+    <!--
+    Img标签 画一张图片
+    属性：
+    src         图片路径
+    position    左上角边距
+    size        宽高
+    Clip        图片裁剪区域      可选，默认为整幅图
+    -->
+    <Img src="./head.jpg" position="10,80" size="50,50" Clip="100,45,150,120"/>
+    
+    <!--
+    path标签 绘制路径
+    属性：
+    Edge        边框宽度    可选，默认为1
+    color       描边颜色    可选，默认为黑色
+    Close       闭合路径    可选，默认为True。可选值为True,False
+    -->
+    <Path Edge="1" Color="#FF000000" Close="True">
+        <Arc Position="70,80" size="10,10" start="180" angle="90"/>
+        <Arc Position="170,80" size="10,10" start="270" angle="90"/>
+        <Arc Position="170,120" size="10,10" start="0" angle="90"/>
+        <Arc Position="70,120" size="10,10" start="90" angle="90"/>
+        
+        <Gradient position="70,80" Vector="70,120" Start="#FFF03F4E" end="#FF800F0E"/>
+    </Path>
+    
+    <!--
+    string标签 画一段文字，可嵌套于Path标签内
+    属性：
+    text        文字内容
+    position    绘制区域左上角边距
+    size        绘制区域尺寸
+    color       文字颜色    可选，默认为黑色。当嵌套于Path标签内时无效
+    align       对齐模式    可选，默认为左对齐。可选值为 Left,Center,Right
+    fontName    字体       可选，默认为宋体。
+    fontSize    字体大小    可选，默认为15
+    -->
+    <string 
+        text="测试文本"
+        position="70,95"
+        size="110,20"
+        color="#FFE0E0E0"
+        align="center"
+        fontName="微软雅黑"
+        fontSize="15"/>
+</canvas>
