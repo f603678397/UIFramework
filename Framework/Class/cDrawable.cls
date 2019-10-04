@@ -110,7 +110,7 @@ Private Sub CreateCanvas(Node As IXMLDOMNode)
     Set NodeMap = Node.Attributes
     If NodeMap Is Nothing Then Exit Sub
     
-    For i = 0 To NodeMap.Length - 1
+    For i = 0 To NodeMap.length - 1
         NodeName = LCase(NodeMap.Item(i).NodeName)
         NodeValue = NodeMap.Item(i).NodeValue
         
@@ -139,7 +139,7 @@ Private Sub DrawShape(ParentNode As IXMLDOMNode)
     Dim Node    As IXMLDOMNode
     Dim i       As Integer
 '----------------------------------------------------------------------------
-    For i = 0 To ParentNode.childNodes.Length - 1
+    For i = 0 To ParentNode.childNodes.length - 1
         Set Node = ParentNode.childNodes.Item(i)
             Select Case LCase(Node.NodeName)
                 Case LCase("Line")
@@ -183,7 +183,7 @@ Private Function GetStringParam(Node As IXMLDOMNode, ByRef Out As StringParam) A
     Set NodeMap = Node.Attributes
     If NodeMap Is Nothing Then Exit Function
     
-    For i = 0 To NodeMap.Length - 1
+    For i = 0 To NodeMap.length - 1
         NodeName = LCase(NodeMap.Item(i).NodeName)
         NodeValue = NodeMap.Item(i).NodeValue
         Select Case NodeName
@@ -238,7 +238,7 @@ Private Function GetLineParam(Node As IXMLDOMNode, ByRef Out As LineParam) As Bo
     Set NodeMap = Node.Attributes
     If NodeMap Is Nothing Then Exit Function
     
-    For i = 0 To NodeMap.Length - 1
+    For i = 0 To NodeMap.length - 1
         NodeName = LCase(NodeMap.Item(i).NodeName)
         NodeValue = NodeMap.Item(i).NodeValue
         Select Case NodeName
@@ -284,7 +284,7 @@ Private Function GetArcParam(Node As IXMLDOMNode, ByRef Out As ArcParam) As Bool
     Set NodeMap = Node.Attributes
     If NodeMap Is Nothing Then Exit Function
     
-    For i = 0 To NodeMap.Length - 1
+    For i = 0 To NodeMap.length - 1
         NodeName = LCase(NodeMap.Item(i).NodeName)
         NodeValue = NodeMap.Item(i).NodeValue
         Select Case NodeName
@@ -334,7 +334,7 @@ Private Function GetRectParam(Node As IXMLDOMNode, ByRef Out As RectParam) As Bo
     Set NodeMap = Node.Attributes
     If NodeMap Is Nothing Then Exit Function
     
-    For i = 0 To NodeMap.Length - 1
+    For i = 0 To NodeMap.length - 1
         NodeName = LCase(NodeMap.Item(i).NodeName)
         NodeValue = NodeMap.Item(i).NodeValue
         Select Case NodeName
@@ -379,7 +379,7 @@ Private Function GetBrush(ParentNode As IXMLDOMNode) As cBrush
     Dim Node    As IXMLDOMNode
     Dim i       As Integer
     
-    For i = 0 To ParentNode.childNodes.Length - 1
+    For i = 0 To ParentNode.childNodes.length - 1
         Set Node = ParentNode.childNodes.Item(i)
             Select Case LCase(Node.NodeName)
                 Case LCase("Solid")
@@ -408,7 +408,7 @@ Private Function GetSolidBrush(Node As IXMLDOMNode) As cBrush
     Set NodeMap = Node.Attributes
     If NodeMap Is Nothing Then Exit Function
     
-    For i = 0 To NodeMap.Length - 1
+    For i = 0 To NodeMap.length - 1
         NodeName = LCase(NodeMap.Item(i).NodeName)
         NodeValue = NodeMap.Item(i).NodeValue
         
@@ -440,7 +440,7 @@ Private Function GetGradientBrush(Node As IXMLDOMNode) As cBrush
     Set NodeMap = Node.Attributes
     If NodeMap Is Nothing Then Exit Function
     
-    For i = 0 To NodeMap.Length - 1
+    For i = 0 To NodeMap.length - 1
         NodeName = LCase(NodeMap.Item(i).NodeName)
         NodeValue = NodeMap.Item(i).NodeValue
         
@@ -543,7 +543,7 @@ Private Sub DrawImg(Node As IXMLDOMNode)
     Set NodeMap = Node.Attributes
     If NodeMap Is Nothing Then Exit Sub
     
-    For i = 0 To NodeMap.Length - 1
+    For i = 0 To NodeMap.length - 1
         NodeName = LCase(NodeMap.Item(i).NodeName)
         NodeValue = NodeMap.Item(i).NodeValue
         Select Case NodeName
@@ -619,7 +619,7 @@ Private Sub DrawPath(Node As IXMLDOMNode)
     Set NodeMap = Node.Attributes
     If NodeMap Is Nothing Then Exit Sub
     
-    For i = 0 To NodeMap.Length - 1
+    For i = 0 To NodeMap.length - 1
         NodeName = LCase(NodeMap.Item(i).NodeName)
         NodeValue = NodeMap.Item(i).NodeValue
         Select Case NodeName
@@ -639,6 +639,8 @@ Private Sub DrawPath(Node As IXMLDOMNode)
     If Not Brush Is Nothing Then
         Graphics.FillPath Brush, Path
     End If
+    Pen.Width = Width
+    Pen.Color = Color
     Graphics.DrawPath Path, Pen
 End Sub
 
@@ -646,7 +648,7 @@ Private Sub AddPath(Path As cPath, ParentNode As IXMLDOMNode)
     Dim Node    As IXMLDOMNode
     Dim i       As Integer
 '----------------------------------------------------------------------------
-    For i = 0 To ParentNode.childNodes.Length - 1
+    For i = 0 To ParentNode.childNodes.length - 1
         Set Node = ParentNode.childNodes.Item(i)
             Select Case LCase(Node.NodeName)
                 Case LCase("Line")
