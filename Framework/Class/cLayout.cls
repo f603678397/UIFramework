@@ -31,6 +31,7 @@ Public Event MouseHover()
 Public Event MouseLeave()
 Public Event KeyDown(ByVal KeyCode As Integer)
 Public Event KeyUp(ByVal KeyCode As Integer)
+Public Event Resize()
 
 Private Sub Class_Terminate(): Release: End Sub
 
@@ -77,6 +78,7 @@ Friend Sub ChangeSize(ByVal nWidth As Long, ByVal nHeight As Long)
     Set Bitmap = New cBitmap
     Bitmap.CreateEmptyBitmap nWidth, nHeight
     Set Graphics = Bitmap.GetGraphics
+    RaiseEvent Resize
     Refresh
 End Sub
 
