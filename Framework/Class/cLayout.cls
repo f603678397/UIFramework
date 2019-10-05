@@ -73,12 +73,14 @@ End Sub
 
 Friend Function GetImage() As cImage: Set GetImage = Bitmap.ToImage: End Function
 Friend Sub ChangeSize(ByVal nWidth As Long, ByVal nHeight As Long)
-    Set Graphics = Nothing
-    Set Bitmap = Nothing
-    Set Bitmap = New cBitmap
-    Bitmap.CreateEmptyBitmap nWidth, nHeight
-    Set Graphics = Bitmap.GetGraphics
-    RaiseEvent Resize
+    If nWidth <> Bitmap.Width Or nHeight <> Bitmap.Height Then
+        Set Graphics = Nothing
+        Set Bitmap = Nothing
+        Set Bitmap = New cBitmap
+        Bitmap.CreateEmptyBitmap nWidth, nHeight
+        Set Graphics = Bitmap.GetGraphics
+        RaiseEvent Resize
+    End If
     Refresh
 End Sub
 
