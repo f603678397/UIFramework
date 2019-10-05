@@ -1,0 +1,31 @@
+<canvas width="301" height="151">
+    
+    <rect position="180,15" size="100,120" color="#FFF0F0F0">
+        <solid color="#FFF0F0F0"/>
+    </rect>
+    
+    <path color="#FF2A2A2A">
+        <line start="180,120" end="180,135"/>
+        <line start="180,135" end="200,120"/>
+        <solid color="#FF2E2E2E"/>
+    </path>
+    
+    <Rect position="0,0" size="200,120" color="#FF414141">
+        <solid color="#FF414141"/>
+    </Rect>
+    
+    <Rect position="220,60" size="25,25" color="#FFC0C0C0"/>
+    
+    <rect position="230,70" size="25,25" color="#FFC0C0C0">
+        <solid color="#FFC0C0C0"/>
+    </rect>
+
+    <string
+            text="Drawable\nBuilder"
+            position="10,10"
+            size="190,120"
+            color="#FFF0FFFF"
+            align="left"
+            fontname="微软雅黑"
+            fontsize="24"/>
+</canvas>

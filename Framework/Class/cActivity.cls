@@ -55,6 +55,7 @@ Public Sub SetLayout(NewLayout As cLayout)
     End If
     Set Layout = NewLayout
     Layout.SetRoot Me
+    Layout.ChangeSize mWidth, mHeight
     Refresh
 End Sub
 

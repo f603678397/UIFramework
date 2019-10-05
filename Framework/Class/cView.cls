@@ -37,6 +37,7 @@ Private isFocus         As Boolean
 Private mBKColor        As Long
 Private ReDrawRect      As RECTI
 Private FirstDraw       As Boolean
+Private mTag            As String
 
 Public Event MouseMove(ByVal Button As Integer, ByVal Shift As Integer, ByVal X As Integer, ByVal Y As Integer)
 Public Event MouseDown(ByVal Button As Integer, ByVal Shift As Integer, ByVal X As Integer, ByVal Y As Integer)
@@ -54,6 +55,9 @@ Public Event LostFocus()
 Public Event Paint(Canvas As cGraphics)
 
 Private Sub Class_Terminate(): Release: End Sub
+
+Public Property Get Tag() As String: Tag = mTag: End Property
+Public Property Let Tag(ByVal sTag As String): mTag = sTag: End Property
 
 Public Property Get Left() As Integer: Left = mLeft: End Property
 Public Property Let Left(ByVal nLeft As Integer)
