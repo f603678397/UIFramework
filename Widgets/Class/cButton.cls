@@ -26,11 +26,11 @@ Public Event LostFocus()
 Public Event Click()
 Public Event DblClick()
 
-
 Private mCaption    As String
 Private mFontName   As String
 Private mFontSize   As Single
 Private mStyle      As FontStyle
+Private mAccent     As Boolean
 
 Private bFocus      As Boolean
 Private bDown       As Boolean
@@ -46,6 +46,7 @@ End Sub
 Public Sub Create(Layout As cLayout, ByVal sCaption As String, ByVal nLeft As Integer, ByVal nTop As Integer, ByVal nWidth As Integer, ByVal nHeight As Integer)
     Set View = Layout.CreateView(nLeft, nTop, nWidth, nHeight)
     mCaption = sCaption
+    View.Name = sCaption
 End Sub
 
 Public Sub BindView(DstView As cView)
@@ -67,6 +68,9 @@ End Sub
 
 '=========================================================================================
 'Í¨ÓÃ´úÂë
+
+Public Property Get Name() As String: Name = View.Name: End Property
+Public Property Let Name(ByVal sName As String): View.Name = Trim(sName): End Property
 
 Public Property Get left() As Integer: left = View.left: End Property
 Public Property Let left(ByVal nLeft As Integer)
@@ -129,6 +133,8 @@ Public Sub Move(ByVal nLeft As Integer, Optional nTop, Optional nWidth, Optional
     
     View.Move nLeft, T, W, H
 End Sub
+
+Public Sub Refresh(): View.Refresh: End Sub
 
 '=========================================================================================
 Public Property Get Caption() As String: Caption = mCaption: End Property
@@ -216,6 +222,13 @@ Public Property Let FontStrikeout(ByVal bStru As Boolean)
     View.Refresh
 End Property
 
+Public Property Get IsAccent() As Boolean: IsAccent = mAccent: End Property
+Public Property Let IsAccent(ByVal bAccent As Boolean)
+    If mAccent = bAccent Then Exit Property
+    mAccent = bAccent
+    View.Refresh
+End Property
+
 Private Sub View_Click(): RaiseEvent Click: End Sub
 Private Sub View_DblClick(): RaiseEvent DblClick: End Sub
 
@@ -274,26 +287,45 @@ Private Sub View_Paint(Canvas As Drawing2D.cGraphics)
     strFormat.LineAlign = StringAlignmentCenter
     
     If View.Enabled Then
-        If bHover Then
-            Canvas.Clear cColor.FromARGB(255, 80, 80, 80)
-            If bDown Then
-                Canvas.Clear cColor.FromARGB(255, 70, 70, 70)
+        If mAccent Then
+            If bHover Then
+                Canvas.Clear ThemeColor.AccentLightColor
+                If bDown Then
+                    Canvas.Clear ThemeColor.AccentDarkColor
+                End If
+            Else
+                Canvas.Clear ThemeColor.AccentColor
             End If
+            
+            Pen.Color = ThemeColor.AccentColor
         Else
-            Canvas.Clear cColor.FromARGB(255, 65, 65, 65)
+            If bHover Then
+                Canvas.Clear ThemeColor.PrimaryLightColor
+                If bDown Then
+                    Canvas.Clear ThemeColor.PrimaryDrakColor
+                End If
+            Else
+                Canvas.Clear ThemeColor.PrimaryColor
+            End If
+            
+            If bFocus Then
+                Pen.Color = ThemeColor.AccentColor
+            Else
+                Pen.Color = ThemeColor.BorderColor
+            End If
         End If
         
-        If bFocus Then
-            Pen.Color = cColor.FromARGB(255, 30, 110, 195)
-        Else
-            Pen.Color = cColor.FromARGB(255, 32, 32, 32)
-        End If
-        
-        Brush.Color = cColor.FromARGB(255, 205, 205, 205)
+        Brush.Color = ThemeColor.TextColor
     Else
-        Canvas.Clear cColor.FromARGB(255, 50, 50, 50)
-        Pen.Color = cColor.FromARGB(255, 40, 40, 40)
-        Brush.Color = cColor.FromARGB(255, 110, 110, 110)
+        If mAccent Then
+            Canvas.Clear ThemeColor.AccentDarkColor
+            Pen.Color = ThemeColor.AccentDarkColor
+            Brush.Color = ThemeColor.AccentLightColor
+        Else
+            Canvas.Clear ThemeColor.PrimaryDrakColor
+            Pen.Color = ThemeColor.BorderColor
+            Brush.Color = ThemeColor.PrimaryLightColor
+        End If
     End If
     
     Bound = NewRectF(0, 0, View.Width - 1, View.Height - 1)

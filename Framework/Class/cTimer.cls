@@ -30,7 +30,7 @@ Public Sub Create(ByVal hWnd As Long)
     TimerList.Add Me
 End Sub
 
-Friend Sub Release()
+Public Sub Release()
     KillTimer mhWnd, mHandle
     TimerList.Remove TimerList.Find(Me)
 End Sub
