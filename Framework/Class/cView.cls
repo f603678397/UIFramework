@@ -33,7 +33,7 @@ Private mPaddingBottom  As Integer
 Private ViewList        As New cObjectList
 Private Layout          As cLayout
 Private isHover         As Boolean
-Private isFocus         As Boolean
+Private mIsFocus         As Boolean
 Private mBKColor        As Long
 Private ReDrawRect      As RECTI
 Private FirstDraw       As Boolean
@@ -137,6 +137,7 @@ Public Property Let PaddingRight(ByVal nPadding As Integer): mPaddingRight = nPa
 Public Property Get PaddingBottom() As Integer: PaddingBottom = mPaddingBottom: End Property
 Public Property Let PaddingBottom(ByVal nPadding As Integer): mPaddingBottom = nPadding: Notify: End Property
 
+Public Property Get IsFocus(): IsFocus = mIsFocus: End Property
 
 Public Property Get Enabled() As Boolean: Enabled = mEnabled: End Property
 Public Property Let Enabled(ByVal bEnabled As Boolean): mEnabled = bEnabled: End Property
@@ -211,10 +212,10 @@ Friend Function GetImage() As cImage: Set GetImage = ResultBMP.ToImage: End Func
 Friend Function GetRoot() As cLayout: Set GetRoot = Layout: End Function
 Friend Sub SetRoot(Root As cLayout): Set Layout = Root: End Sub
 
-Friend Sub RaiseLostFocus(): isFocus = False: RaiseEvent LostFocus: End Sub
+Friend Sub RaiseLostFocus(): mIsFocus = False: RaiseEvent LostFocus: End Sub
 Friend Sub RaiseGotFocus()
-    If Not isFocus Then
-        isFocus = True
+    If Not mIsFocus Then
+        mIsFocus = True
         RaiseEvent GotFocus
     End If
 End Sub
