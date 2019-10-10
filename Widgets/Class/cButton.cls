@@ -30,6 +30,7 @@ Public Event DblClick()
 Private mCaption    As String
 Private mFontName   As String
 Private mFontSize   As Single
+Private mStyle      As FontStyle
 
 Private bFocus      As Boolean
 Private bDown       As Boolean
@@ -39,6 +40,7 @@ Private Sub Class_Initialize()
     mCaption = "Button"
     mFontName = "ËÎÌו"
     mFontSize = 14
+    mStyle = FontStyleRegular
 End Sub
 
 Public Sub Create(Layout As cLayout, ByVal sCaption As String, ByVal nLeft As Integer, ByVal nTop As Integer, ByVal nWidth As Integer, ByVal nHeight As Integer)
@@ -106,6 +108,18 @@ Public Property Let Visible(ByVal bVisible As Boolean)
     View.Visible = bVisible
 End Property
 
+Public Property Get Opacity() As Single: Opacity = View.Opacity: End Property
+Public Property Let Opacity(ByVal fOpacity As Single)
+    If View.Opacity = fOpacity Then Exit Property
+    View.Opacity = fOpacity
+End Property
+
+Public Property Get ZOrder() As Long: ZOrder = View.ZOrder: End Property
+Public Property Let ZOrder(ByVal nZ As Long)
+    If View.ZOrder = nZ Then Exit Property
+    View.ZOrder = nZ
+End Property
+
 Public Sub Move(ByVal nLeft As Integer, Optional nTop, Optional nWidth, Optional nHeight)
     Dim T As Integer, W As Integer, H As Integer
     
@@ -135,6 +149,70 @@ Public Property Get FontSize() As Single: FontSize = mFontSize: End Property
 Public Property Let FontSize(ByVal nSize As Single)
     If mFontSize = nSize Then Exit Property
     mFontSize = nSize
+    View.Refresh
+End Property
+
+Public Property Get FontBold() As Boolean
+    If (mStyle And FontStyleBold) = FontStyle.FontStyleBold Then FontBold = True
+End Property
+Public Property Let FontBold(ByVal bBold As Boolean)
+    Dim nStyle As FontStyle
+    
+    nStyle = (mStyle Or FontStyleBold)
+    If Not bBold Then
+        nStyle = nStyle Xor FontStyleBold
+    End If
+    
+    If mStyle = nStyle Then Exit Property
+    mStyle = nStyle
+    View.Refresh
+End Property
+
+Public Property Get FontItalic() As Boolean
+    If (mStyle And FontStyleItalic) = FontStyle.FontStyleItalic Then FontItalic = True
+End Property
+Public Property Let FontItalic(ByVal bItalic As Boolean)
+    Dim nStyle As FontStyle
+    
+    nStyle = (mStyle Or FontStyleItalic)
+    If Not bItalic Then
+        nStyle = nStyle Xor FontStyleItalic
+    End If
+    
+    If mStyle = nStyle Then Exit Property
+    mStyle = nStyle
+    View.Refresh
+End Property
+
+Public Property Get FontUnderLine() As Boolean
+    If (mStyle And FontStyleUnderline) = FontStyle.FontStyleUnderline Then FontUnderLine = True
+End Property
+Public Property Let FontUnderLine(ByVal bLine As Boolean)
+    Dim nStyle As FontStyle
+    
+    nStyle = (mStyle Or FontStyleUnderline)
+    If Not bLine Then
+        nStyle = nStyle Xor FontStyleUnderline
+    End If
+    
+    If mStyle = nStyle Then Exit Property
+    mStyle = nStyle
+    View.Refresh
+End Property
+
+Public Property Get FontStrikeout() As Boolean
+    If (mStyle And FontStyleStrikeout) = FontStyle.FontStyleStrikeout Then FontStrikeout = True
+End Property
+Public Property Let FontStrikeout(ByVal bStru As Boolean)
+    Dim nStyle As FontStyle
+    
+    nStyle = (mStyle Or FontStyleStrikeout)
+    If Not bStru Then
+        nStyle = nStyle Xor FontStyleStrikeout
+    End If
+    
+    If mStyle = nStyle Then Exit Property
+    mStyle = nStyle
     View.Refresh
 End Property
 
@@ -191,7 +269,7 @@ Private Sub View_Paint(Canvas As Drawing2D.cGraphics)
     Dim Bound As RECTF
     
     Fam.FromName mFontName
-    Font.FromFamily Fam, mFontSize, FontStyleRegular, UnitPixel
+    Font.FromFamily Fam, mFontSize, mStyle, UnitPixel
     strFormat.Align = StringAlignmentCenter
     strFormat.LineAlign = StringAlignmentCenter
     
