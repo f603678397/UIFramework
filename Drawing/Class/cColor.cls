@@ -579,3 +579,70 @@ End Property
 Public Function FromARGB(ByVal A As Byte, ByVal R As Byte, ByVal G As Byte, ByVal B As Byte) As Long
     FromARGB = ARGB(A, R, G, B)
 End Function
+
+Public Function GetAlpha(ByVal nColor As Long) As Byte
+    Dim A As Byte
+    CopyMemory ByVal VarPtr(A), ByVal VarPtr(nColor) + 3, 1
+    GetAlpha = A
+End Function
+
+Public Function GetRed(ByVal nColor As Long) As Byte
+    Dim R As Byte
+    CopyMemory ByVal VarPtr(R), ByVal VarPtr(nColor) + 2, 1
+    GetRed = R
+End Function
+
+Public Function GetGreen(ByVal nColor As Long) As Byte
+    Dim G As Byte
+    CopyMemory ByVal VarPtr(G), ByVal VarPtr(nColor) + 1, 1
+    GetGreen = G
+End Function
+
+Public Function GetBlue(ByVal nColor As Long) As Byte
+    Dim B As Byte
+    CopyMemory ByVal VarPtr(B), ByVal VarPtr(nColor), 1
+    GetBlue = B
+End Function
+
+Public Function SetBrightness(ByVal nColor As Long, ByVal Offset As Single) As Long
+    Dim A As Byte, R As Byte, G As Byte, B As Byte
+    
+    A = GetAlpha(nColor)
+    R = GetRed(nColor)
+    G = GetGreen(nColor)
+    B = GetBlue(nColor)
+    
+    Offset = IIf(Offset < -1, -1, IIf(Offset > 1, 1, Offset))
+    
+    If Offset < 0 Then
+        R = R + R * Offset
+        G = G + G * Offset
+        B = B + B * Offset
+    Else
+        R = R + (255 - R) * Offset
+        G = G + (255 - G) * Offset
+        B = B + (255 - B) * Offset
+    End If
+
+    SetBrightness = ARGB(A, R, G, B)
+End Function
+
+Public Function SetAlpha(ByVal nColor As Long, ByVal Offset As Single) As Long
+    Dim A As Byte, R As Byte, G As Byte, B As Byte
+    
+    A = GetAlpha(nColor)
+    R = GetRed(nColor)
+    G = GetGreen(nColor)
+    B = GetBlue(nColor)
+    
+    Offset = IIf(Offset < -1, -1, IIf(Offset > 1, 1, Offset))
+    
+    If Offset < 0 Then
+        A = A + A * Offset
+    Else
+        A = A + (255 - A) * Offset
+    End If
+    
+    SetAlpha = ARGB(A, R, G, B)
+End Function
+

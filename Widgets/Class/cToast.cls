@@ -25,6 +25,7 @@ Private mFGColor                As Long
 Private mFontName               As String
 Private mFontSize               As Single
 Private bShadown                As Boolean
+Private mStyle                  As Drawing2D.FontStyle
 
 Public Enum ToastFlag
     TF_POS_TOP = 0
@@ -33,7 +34,24 @@ Public Enum ToastFlag
     TF_WIDTH_MIN = 2
 End Enum
 
-Private Const TipHeight As Integer = 25
+Private Const TipHeight As Integer = 30
+
+Public Function SetFont(ByVal FontName As String, ByVal fSize As Single, ByVal bBold As Boolean, ByVal bItalic As Boolean) As cToast
+    mFontName = Trim(FontName)
+    mFontSize = fSize
+    
+    mStyle = mStyle Or FontStyleBold
+    If Not bBold Then
+        mStyle = mStyle Xor FontStyleBold
+    End If
+    
+    mStyle = mStyle Or FontStyleItalic
+    If Not bItalic Then
+        mStyle = mStyle Xor FontStyleItalic
+    End If
+    
+    Set SetFont = Me
+End Function
 
 Public Function SetFontName(ByVal FontName As String) As cToast
     mFontName = Trim(FontName)
@@ -43,6 +61,22 @@ End Function
 Public Function SetFontSize(ByVal fSize As Single) As cToast
     mFontSize = fSize
     Set SetFontSize = Me
+End Function
+
+Public Function SetFontBold(ByVal bBold As Boolean) As cToast
+    mStyle = mStyle Or FontStyleBold
+    If Not bBold Then
+        mStyle = mStyle Xor FontStyleBold
+    End If
+    Set SetFontBold = Me
+End Function
+
+Public Function SetFontItalic(ByVal bItalic As Boolean) As cToast
+    mStyle = mStyle Or FontStyleItalic
+    If Not bItalic Then
+        mStyle = mStyle Xor FontStyleItalic
+    End If
+    Set SetFontItalic = Me
 End Function
 
 Public Function SetShadown(ByVal bOpen As Boolean) As cToast
@@ -71,7 +105,7 @@ End Function
 
 Public Sub Show(Optional ByVal Offset As Integer = 0)
     Dim Activity As cActivity
-    Dim Left As Integer, Top As Integer, Width As Integer, Height As Integer
+    Dim left As Integer, Top As Integer, Width As Integer, Height As Integer
     
     If Context Is Nothing Then Exit Sub
     Set Activity = Context.GetRoot
@@ -83,7 +117,7 @@ Public Sub Show(Optional ByVal Offset As Integer = 0)
     
     If (mFlag And TF_WIDTH_MIN) = TF_WIDTH_MIN Then
         If Width > 180 Then
-            Left = (Width - 180) / 2
+            left = (Width - 180) / 2
             Width = 180
         End If
     End If
@@ -95,12 +129,12 @@ Public Sub Show(Optional ByVal Offset As Integer = 0)
     End If
     Height = TipHeight
     
-    If mBKColor = 0 Then mBKColor = cColor.DarkGray
-    If mFGColor = 0 Then mFGColor = cColor.White
+    If mBKColor = 0 Then mBKColor = ThemeColor.AccentColor  ' cColor.FromARGB(255, 0, 128, 0)
+    If mFGColor = 0 Then mFGColor = ThemeColor.TextColor
     If mFontName = vbNullString Then mFontName = "ËÎÌו"
     If mFontSize <= 0 Then mFontSize = 15
     
-    Set View = Context.CreateView(Left, Top, Width, Height)
+    Set View = Context.CreateView(left, Top, Width, Height)
 
     Set Timer = New cTimer
     Timer.Create Activity.hWnd
@@ -126,7 +160,7 @@ Private Sub Timer_onTime()
             End If
         Case 1
             T2 = GetTickCount
-            If T2 - T1 >= 1200 Then '
+            If T2 - T1 >= 1500 Then '
                 B = 2
             End If
         Case 2
@@ -160,7 +194,7 @@ Private Sub View_Paint(Canvas As Drawing2D.cGraphics)
     Brush.Color = mFGColor
     
     Family.FromName mFontName
-    Font.FromFamily Family, mFontSize, FontStyleBold, UnitPixel
+    Font.FromFamily Family, mFontSize, mStyle, UnitPixel
     
     If (mFlag And TF_WIDTH_MIN) = TF_WIDTH_MIN Then
         Format.Align = StringAlignmentCenter
@@ -183,7 +217,7 @@ Private Sub View_Paint(Canvas As Drawing2D.cGraphics)
         End If
 
         For i = 3 To 0 Step -1
-            Pen.Color = cColor.FromARGB(i ^ 2 * 20, 0, 0, 0)
+            Pen.Color = cColor.FromARGB(i ^ 2 * 15, 0, 0, 0)
             
             Select Case Pos
                 Case 0
@@ -205,7 +239,7 @@ Private Sub View_Paint(Canvas As Drawing2D.cGraphics)
     End If
     
     Canvas.SetTextRenderingHint TextRenderingHintClearTypeGridFit
-    Canvas.SetClip RECT.Left, RECT.Top, RECT.Right, RECT.bottom, CombineModeReplace
+    Canvas.SetClip RECT.left, RECT.Top, RECT.Right, RECT.Bottom, CombineModeReplace
     Canvas.Clear mBKColor
     Canvas.DrawString Msg, Font, RECT, Format, Brush.GetBaseBrush
     Canvas.ResetClip
