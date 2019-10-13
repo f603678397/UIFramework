@@ -26,6 +26,8 @@ Private mFontName               As String
 Private mFontSize               As Single
 Private bShadown                As Boolean
 Private mStyle                  As Drawing2D.FontStyle
+Private ThemeColor              As ThemeColorType
+Private Stage                   As Byte
 
 Public Enum ToastFlag
     TF_POS_TOP = 0
@@ -35,6 +37,24 @@ Public Enum ToastFlag
 End Enum
 
 Private Const TipHeight As Integer = 30
+
+Private Sub Class_Initialize()
+    SetTheme Preset
+End Sub
+
+Public Function SetTheme(NewTheme As PresetThemeEnum) As cToast
+    Select Case NewTheme
+        Case PresetThemeEnum.DrakTheme
+            SetDarkTheme ThemeColor
+        Case PresetThemeEnum.LightTheme
+            SetLightTheme ThemeColor
+    End Select
+    
+    mBKColor = ThemeColor.AccentColor
+    mFGColor = ThemeColor.TextColor
+    
+    Set SetTheme = Me
+End Function
 
 Public Function SetFont(ByVal FontName As String, ByVal fSize As Single, ByVal bBold As Boolean, ByVal bItalic As Boolean) As cToast
     mFontName = Trim(FontName)
@@ -97,6 +117,12 @@ End Function
 Public Function MakeText(Layout As cLayout, ByVal Message As String, Flag As ToastFlag) As cToast
     If Layout Is Nothing Then Exit Function
     
+    Do While Stage <> 0
+        Stage = 2
+        Sleep 10
+        DoEvents
+    Loop
+    
     Set Context = Layout
     Msg = Message
     mFlag = Flag
@@ -129,7 +155,7 @@ Public Sub Show(Optional ByVal Offset As Integer = 0)
     End If
     Height = TipHeight
     
-    If mBKColor = 0 Then mBKColor = ThemeColor.AccentColor  ' cColor.FromARGB(255, 0, 128, 0)
+    If mBKColor = 0 Then mBKColor = ThemeColor.AccentColor
     If mFGColor = 0 Then mFGColor = ThemeColor.TextColor
     If mFontName = vbNullString Then mFontName = "ËÎÌו"
     If mFontSize <= 0 Then mFontSize = 15
@@ -143,30 +169,29 @@ End Sub
 
 Private Sub Timer_onTime()
     Static Opacity As Single
-    Static B As Byte
     Static T1 As Long
     Dim T2 As Long
     Dim fStep As Single
     
-    fStep = 0.2
+    fStep = 0.3
     
-    Select Case B
+    Select Case Stage
         Case 0
             Opacity = Opacity + fStep
             If Opacity >= 1 Then
                 Opacity = 1
-                B = 1
+                Stage = 1
                 T1 = GetTickCount
             End If
         Case 1
             T2 = GetTickCount
             If T2 - T1 >= 1500 Then '
-                B = 2
+                Stage = 2
             End If
         Case 2
             Opacity = Opacity - fStep
             If Opacity <= 0 Then
-                B = 0
+                Stage = 0
                 Timer.Enabled = False
                 Timer.Release
                 Context.RemoveView View
@@ -217,21 +242,21 @@ Private Sub View_Paint(Canvas As Drawing2D.cGraphics)
         End If
 
         For i = 3 To 0 Step -1
-            Pen.Color = cColor.FromARGB(i ^ 2 * 15, 0, 0, 0)
+            Pen.Color = cColor.FromARGB(i ^ 2 * 20, 0, 0, 0)
             
             Select Case Pos
                 Case 0
                     Canvas.DrawLine Pen, 0, View.Height - i, View.Width, View.Height - i
                 Case 1
-                    Canvas.DrawLine Pen, i, View.Height - i, View.Width - i, View.Height - i
-                    Canvas.DrawLine Pen, i, 0, i, View.Height - i - 1
-                    Canvas.DrawLine Pen, View.Width - i, 0, View.Width - i, View.Height - i - 1
+                    Canvas.DrawLine Pen, i, View.Height - i - 1, View.Width - i - 1, View.Height - i - 1
+                    Canvas.DrawLine Pen, i, 0, i, View.Height - i - 2
+                    Canvas.DrawLine Pen, View.Width - i - 1, 0, View.Width - i - 1, View.Height - i - 2
                 Case 2
                     Canvas.DrawLine Pen, 0, i, View.Width, i
                 Case 3
-                    Canvas.DrawLine Pen, i, i, View.Width - i, i
-                    Canvas.DrawLine Pen, i, i, i, View.Height - 1
-                    Canvas.DrawLine Pen, View.Width - i, i, View.Width - i, View.Height - 1
+                    Canvas.DrawLine Pen, i, i, View.Width - i - 1, i
+                    Canvas.DrawLine Pen, i, i + 1, i, View.Height - 1
+                    Canvas.DrawLine Pen, View.Width - i - 1, i + 1, View.Width - i - 1, View.Height - 1
             End Select
         Next
     Else

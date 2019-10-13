@@ -30,10 +30,297 @@ Private mCaption    As String
 Private mFontName   As String
 Private mFontSize   As Single
 Private mStyle      As FontStyle
+Private mAccent     As Boolean
+
+Private mAlignCenter        As Boolean
+Private mLineCenter         As Boolean
+
+Private ThemeColor  As ThemeColorType
 
 Private Sub Class_Initialize()
     mCaption = "Button"
     mFontName = "ËÎÌו"
     mFontSize = 14
     mStyle = FontStyleRegular
+    
+    SetTheme Preset
+End Sub
+
+Public Sub Create(Parent As Object, ByVal sCaption As String, ByVal nLeft As Integer, ByVal nTop As Integer, ByVal nWidth As Integer, ByVal nHeight As Integer)
+    Set View = Parent.CreateView(nLeft, nTop, nWidth, nHeight)
+    mCaption = sCaption
+    View.Name = sCaption
+End Sub
+
+Public Sub BindView(DstView As cView)
+    Dim V As cView
+    
+    If DstView Is View Then Exit Sub
+    
+    Set V = View
+    Set View = Nothing
+    Set View = DstView
+    
+    V.Refresh
+    View.Refresh
+End Sub
+
+Public Property Get Name() As String: Name = View.Name: End Property
+Public Property Let Name(ByVal sName As String): View.Name = Trim(sName): End Property
+
+Public Property Get left() As Integer: left = View.left: End Property
+Public Property Let left(ByVal nLeft As Integer)
+    If View.left = nLeft Then Exit Property
+    View.left = nLeft
+End Property
+
+Public Property Get Top() As Integer: Top = View.Top: End Property
+Public Property Let Top(ByVal nTop As Integer)
+    If View.Top = nTop Then Exit Property
+    View.Top = nTop
+End Property
+
+Public Property Get Width() As Integer: Width = View.Width: End Property
+Public Property Let Width(ByVal nWidth As Integer)
+    If View.Width = nWidth Then Exit Property
+    View.Width = nWidth
+End Property
+
+Public Property Get Height() As Integer: Height = View.Height: End Property
+Public Property Let Height(ByVal nHeight As Integer)
+    If View.Height = nHeight Then Exit Property
+    View.Height = nHeight
+End Property
+
+Public Property Get Tag() As String: Tag = View.Tag: End Property
+Public Property Let Tag(ByVal sTag As String): View.Tag = sTag: End Property
+
+Public Property Get Enabled() As Boolean: Enabled = View.Enabled: End Property
+Public Property Let Enabled(ByVal bEnabled As Boolean)
+    If View.Enabled = bEnabled Then Exit Property
+    View.Enabled = bEnabled
+    View.Refresh
+End Property
+
+Public Property Get Visible() As Boolean: Visible = View.Visible: End Property
+Public Property Let Visible(ByVal bVisible As Boolean)
+    If View.Visible = bVisible Then Exit Property
+    View.Visible = bVisible
+End Property
+
+Public Property Get Opacity() As Single: Opacity = View.Opacity: End Property
+Public Property Let Opacity(ByVal fOpacity As Single)
+    If View.Opacity = fOpacity Then Exit Property
+    View.Opacity = fOpacity
+End Property
+
+Public Property Get ZOrder() As Long: ZOrder = View.ZOrder: End Property
+Public Property Let ZOrder(ByVal nZ As Long)
+    If View.ZOrder = nZ Then Exit Property
+    View.ZOrder = nZ
+End Property
+
+Public Sub Move(ByVal nLeft As Integer, Optional nTop, Optional nWidth, Optional nHeight)
+    Dim T As Integer, W As Integer, H As Integer
+    
+    T = IIf(IsMissing(nTop), View.Top, CInt(nTop))
+    W = IIf(IsMissing(nWidth), View.Width, CInt(nWidth))
+    H = IIf(IsMissing(nHeight), View.Height, CInt(nHeight))
+    
+    View.Move nLeft, T, W, H
+End Sub
+
+Public Property Get BackColor() As Long: BackColor = ThemeColor.PrimaryColor: End Property
+Public Property Let BackColor(ByVal nColor As Long)
+    If nColor = ThemeColor.PrimaryColor Then Exit Property
+    
+    ThemeColor.PrimaryColor = nColor
+    ThemeColor.PrimaryDrakColor = cColor.SetBrightness(nColor, -0.1)
+    ThemeColor.PrimaryLightColor = cColor.SetBrightness(nColor, 0.1)
+    
+    View.Refresh
+End Property
+
+Public Property Get ForeColor() As Long: ForeColor = ThemeColor.TextColor: End Property
+Public Property Let ForeColor(ByVal nColor As Long)
+    If nColor = ThemeColor.TextColor Then Exit Property
+    
+    ThemeColor.TextColor = nColor
+    View.Refresh
+End Property
+
+Public Property Get FocusColor() As Long: FocusColor = ThemeColor.AccentColor: End Property
+Public Property Let FocusColor(ByVal nColor As Long)
+    If nColor = ThemeColor.AccentColor Then Exit Property
+    
+    ThemeColor.AccentColor = nColor
+    ThemeColor.AccentDarkColor = cColor.SetBrightness(nColor, -0.1)
+    ThemeColor.AccentLightColor = cColor.SetBrightness(nColor, 0.1)
+    
+    View.Refresh
+End Property
+
+Public Sub Refresh(): View.Refresh: End Sub
+
+Public Sub SetTheme(NewTheme As PresetThemeEnum)
+    Select Case NewTheme
+        Case PresetThemeEnum.DrakTheme
+            SetDarkTheme ThemeColor
+        Case PresetThemeEnum.LightTheme
+            SetLightTheme ThemeColor
+    End Select
+    ThemeColor.PrimaryColor = cColor.Transparent
+End Sub
+'=========================================================================================
+Public Property Get Caption() As String: Caption = mCaption: End Property
+Public Property Let Caption(ByVal sCaption As String)
+    If mCaption = sCaption Then Exit Property
+    mCaption = sCaption
+    View.Refresh
+End Property
+
+Public Property Get FontName() As String: FontName = mFontName: End Property
+Public Property Let FontName(ByVal sFontName As String)
+    If mFontName = sFontName Then Exit Property
+    mFontName = sFontName
+    View.Refresh
+End Property
+
+Public Property Get FontSize() As Single: FontSize = mFontSize: End Property
+Public Property Let FontSize(ByVal nSize As Single)
+    If mFontSize = nSize Then Exit Property
+    mFontSize = nSize
+    View.Refresh
+End Property
+
+Public Property Get FontBold() As Boolean
+    If (mStyle And FontStyleBold) = FontStyle.FontStyleBold Then FontBold = True
+End Property
+Public Property Let FontBold(ByVal bBold As Boolean)
+    Dim nStyle As FontStyle
+    
+    nStyle = (mStyle Or FontStyleBold)
+    If Not bBold Then
+        nStyle = nStyle Xor FontStyleBold
+    End If
+    
+    If mStyle = nStyle Then Exit Property
+    mStyle = nStyle
+    View.Refresh
+End Property
+
+Public Property Get FontItalic() As Boolean
+    If (mStyle And FontStyleItalic) = FontStyle.FontStyleItalic Then FontItalic = True
+End Property
+Public Property Let FontItalic(ByVal bItalic As Boolean)
+    Dim nStyle As FontStyle
+    
+    nStyle = (mStyle Or FontStyleItalic)
+    If Not bItalic Then
+        nStyle = nStyle Xor FontStyleItalic
+    End If
+    
+    If mStyle = nStyle Then Exit Property
+    mStyle = nStyle
+    View.Refresh
+End Property
+
+Public Property Get FontUnderLine() As Boolean
+    If (mStyle And FontStyleUnderline) = FontStyle.FontStyleUnderline Then FontUnderLine = True
+End Property
+Public Property Let FontUnderLine(ByVal bLine As Boolean)
+    Dim nStyle As FontStyle
+    
+    nStyle = (mStyle Or FontStyleUnderline)
+    If Not bLine Then
+        nStyle = nStyle Xor FontStyleUnderline
+    End If
+    
+    If mStyle = nStyle Then Exit Property
+    mStyle = nStyle
+    View.Refresh
+End Property
+
+Public Property Get FontStrikeout() As Boolean
+    If (mStyle And FontStyleStrikeout) = FontStyle.FontStyleStrikeout Then FontStrikeout = True
+End Property
+Public Property Let FontStrikeout(ByVal bStru As Boolean)
+    Dim nStyle As FontStyle
+    
+    nStyle = (mStyle Or FontStyleStrikeout)
+    If Not bStru Then
+        nStyle = nStyle Xor FontStyleStrikeout
+    End If
+    
+    If mStyle = nStyle Then Exit Property
+    mStyle = nStyle
+    View.Refresh
+End Property
+
+Public Property Get IsAccent() As Boolean: IsAccent = mAccent: End Property
+Public Property Let IsAccent(ByVal bAccent As Boolean)
+    If mAccent = bAccent Then Exit Property
+    mAccent = bAccent
+    View.Refresh
+End Property
+
+Public Property Get AlignCenter() As Boolean: AlignCenter = mAlignCenter: End Property
+Public Property Let AlignCenter(ByVal bCenter As Boolean)
+    If bCenter = mAlignCenter Then Exit Property
+    mAlignCenter = bCenter
+    View.Refresh
+End Property
+
+Public Property Get LineAlignCenter() As Boolean: LineAlignCenter = mLineCenter: End Property
+Public Property Let LineAlignCenter(ByVal bCenter As Boolean)
+    If bCenter = mLineCenter Then Exit Property
+    mLineCenter = bCenter
+    View.Refresh
+End Property
+
+Private Sub View_Click(): RaiseEvent Click: End Sub
+Private Sub View_DblClick(): RaiseEvent DblClick: End Sub
+
+Private Sub View_GotFocus(): RaiseEvent GotFocus: End Sub
+Private Sub View_LostFocus(): RaiseEvent LostFocus: End Sub
+
+Private Sub View_MouseHover(): RaiseEvent MouseHover: End Sub
+Private Sub View_MouseLeave(): RaiseEvent MouseLeave: End Sub
+
+Private Sub View_MouseDown(ByVal Button As Integer, ByVal Shift As Integer, ByVal X As Integer, ByVal Y As Integer): RaiseEvent MouseDown(Button, Shift, X, Y): End Sub
+Private Sub View_MouseMove(ByVal Button As Integer, ByVal Shift As Integer, ByVal X As Integer, ByVal Y As Integer): RaiseEvent MouseMove(Button, Shift, X, Y): End Sub
+Private Sub View_MouseUp(ByVal Button As Integer, ByVal Shift As Integer, ByVal X As Integer, ByVal Y As Integer): RaiseEvent MouseUp(Button, Shift, X, Y): End Sub
+
+Private Sub View_Paint(Canvas As Drawing2D.cGraphics)
+    Dim Brush As New cSolidBrush
+    
+    Dim Fam As New cFontFamily
+    Dim Font As New cFont
+    Dim strFormat As New cStringFormat
+    Dim Bound As RECTF
+    
+    Fam.FromName mFontName
+    Font.FromFamily Fam, mFontSize, mStyle, UnitPixel
+    If mAlignCenter Then strFormat.Align = StringAlignmentCenter
+    If mLineCenter Then strFormat.LineAlign = StringAlignmentCenter
+    
+    Bound = NewRectF(0, 0, View.Width - 1, View.Height - 1)
+    
+    If View.Enabled Then
+        If mAccent Then
+            Brush.Color = ThemeColor.AccentColor
+        Else
+            Brush.Color = ThemeColor.TextColor
+        End If
+    Else
+        If mAccent Then
+            Brush.Color = ThemeColor.AccentDarkColor
+        Else
+            Brush.Color = ThemeColor.PrimaryLightColor
+        End If
+    End If
+    
+    Canvas.SetTextRenderingHint TextRenderingHintClearTypeGridFit
+    Canvas.Clear ThemeColor.PrimaryColor
+    Canvas.DrawString mCaption, Font, Bound, strFormat, Brush.GetBaseBrush
 End Sub

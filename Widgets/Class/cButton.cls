@@ -36,11 +36,15 @@ Private bFocus      As Boolean
 Private bDown       As Boolean
 Private bHover      As Boolean
 
+Private ThemeColor  As ThemeColorType
+
 Private Sub Class_Initialize()
     mCaption = "Button"
     mFontName = "ËÎÌו"
     mFontSize = 14
     mStyle = FontStyleRegular
+    
+    SetTheme Preset
 End Sub
 
 Public Sub Create(Parent As Object, ByVal sCaption As String, ByVal nLeft As Integer, ByVal nTop As Integer, ByVal nWidth As Integer, ByVal nHeight As Integer)
@@ -134,7 +138,46 @@ Public Sub Move(ByVal nLeft As Integer, Optional nTop, Optional nWidth, Optional
     View.Move nLeft, T, W, H
 End Sub
 
+Public Property Get BackColor() As Long: BackColor = ThemeColor.PrimaryColor: End Property
+Public Property Let BackColor(ByVal nColor As Long)
+    If nColor = ThemeColor.PrimaryColor Then Exit Property
+    
+    ThemeColor.PrimaryColor = nColor
+    ThemeColor.PrimaryDrakColor = cColor.SetBrightness(nColor, -0.1)
+    ThemeColor.PrimaryLightColor = cColor.SetBrightness(nColor, 0.1)
+    
+    View.Refresh
+End Property
+
+Public Property Get ForeColor() As Long: ForeColor = ThemeColor.TextColor: End Property
+Public Property Let ForeColor(ByVal nColor As Long)
+    If nColor = ThemeColor.TextColor Then Exit Property
+    
+    ThemeColor.TextColor = nColor
+    View.Refresh
+End Property
+
+Public Property Get FocusColor() As Long: FocusColor = ThemeColor.AccentColor: End Property
+Public Property Let FocusColor(ByVal nColor As Long)
+    If nColor = ThemeColor.AccentColor Then Exit Property
+    
+    ThemeColor.AccentColor = nColor
+    ThemeColor.AccentDarkColor = cColor.SetBrightness(nColor, -0.1)
+    ThemeColor.AccentLightColor = cColor.SetBrightness(nColor, 0.1)
+    
+    View.Refresh
+End Property
+
 Public Sub Refresh(): View.Refresh: End Sub
+
+Public Sub SetTheme(NewTheme As PresetThemeEnum)
+    Select Case NewTheme
+        Case PresetThemeEnum.DrakTheme
+            SetDarkTheme ThemeColor
+        Case PresetThemeEnum.LightTheme
+            SetLightTheme ThemeColor
+    End Select
+End Sub
 
 '=========================================================================================
 Public Property Get Caption() As String: Caption = mCaption: End Property
@@ -226,6 +269,15 @@ Public Property Get IsAccent() As Boolean: IsAccent = mAccent: End Property
 Public Property Let IsAccent(ByVal bAccent As Boolean)
     If mAccent = bAccent Then Exit Property
     mAccent = bAccent
+    View.Refresh
+End Property
+
+Public Property Get BorderColor() As Long: BorderColor = ThemeColor.BorderColor: End Property
+Public Property Let BorderColor(ByVal nColor As Long)
+    If nColor = ThemeColor.BorderColor Then Exit Property
+    
+    ThemeColor.BorderColor = nColor
+    
     View.Refresh
 End Property
 
@@ -323,7 +375,7 @@ Private Sub View_Paint(Canvas As Drawing2D.cGraphics)
             Brush.Color = ThemeColor.AccentLightColor
         Else
             Canvas.Clear ThemeColor.PrimaryDrakColor
-            Pen.Color = ThemeColor.BorderColor
+            Pen.Color = ThemeColor.PrimaryColor
             Brush.Color = ThemeColor.PrimaryLightColor
         End If
     End If
