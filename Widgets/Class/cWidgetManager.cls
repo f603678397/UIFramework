@@ -13,47 +13,77 @@ Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = True
 Option Explicit
 
+Private Layout              As cLayout
+
 Public Enum PresetThemeEnum
     DrakTheme
     LightTheme
 End Enum
 
-Public Sub Initialize(Optional ByVal nFlag As PresetThemeEnum)
-    SetPresetTheme nFlag
+Private Sub Class_Terminate(): Release: End Sub
+
+Private Sub Release()
+    Set Layout = Nothing
+    Set ViewList = Nothing
+End Sub
+
+Private Function GetBackColor() As Long
+    Dim Color As Long
+    Select Case Preset
+        Case PresetThemeEnum.DrakTheme
+            Color = cColor.FromARGB(255, 50, 50, 50)
+        Case PresetThemeEnum.LightTheme
+            Color = cColor.FromARGB(255, 225, 225, 225)
+    End Select
+    GetBackColor = Color
+End Function
+
+Public Sub BindLayout(dstLayout As cLayout)
+    Set Layout = dstLayout
+    
+    Layout.BackgroundColor = GetBackColor
 End Sub
 
 Public Sub SetPresetTheme(ByVal nFlag As PresetThemeEnum)
-    Select Case nFlag
-        Case PresetThemeEnum.DrakTheme
-            SetDarkTheme
-        Case PresetThemeEnum.LightTheme
-            SetLightTheme
-    End Select
+    Dim View As Object
+    Dim i As Long
+    
+    Preset = nFlag
+    
+    For i = 0 To ViewList.GetCount - 1
+        Set View = ViewList.GetObject(i)
+            View.SetTheme nFlag
+        Set View = Nothing
+    Next
+    
+    If Layout Is Nothing Then Exit Sub
+    Layout.BackgroundColor = GetBackColor
+    Layout.ReDrawAllView
 End Sub
 
-Private Sub SetDarkTheme()
-    With ThemeColor
-        .AccentColor = cColor.FromARGB(255, 30, 110, 195)
-        .AccentDarkColor = cColor.SetBrightness(.AccentColor, -0.1)
-        .AccentLightColor = cColor.SetBrightness(.AccentColor, 0.1)
-        .PrimaryColor = cColor.FromARGB(255, 70, 70, 70)
-        .PrimaryDrakColor = cColor.FromARGB(255, 65, 65, 65)
-        .PrimaryLightColor = cColor.FromARGB(255, 80, 80, 80)
-        .BorderColor = cColor.FromARGB(255, 40, 40, 40)
-        .TextColor = cColor.FromARGB(255, 205, 205, 205)
-    End With
-End Sub
+Public Function CreateButton(Parent As Object, ByVal L As Integer, ByVal T As Integer, ByVal W As Integer, ByVal H As Integer) As cButton
+    Dim Button As New cButton
+    
+    If Parent Is Nothing Then
+        Button.Create Layout, "Button", L, T, W, H
+    Else
+        Button.Create Parent, "Button", L, T, W, H
+    End If
+    
+    ViewList.Add Button
+    Set CreateButton = Button
+End Function
 
-Private Sub SetLightTheme()
-    With ThemeColor
-        .AccentColor = cColor.FromARGB(255, 50, 210, 130)
-        .AccentDarkColor = cColor.SetBrightness(.AccentColor, -0.1)
-        .AccentLightColor = cColor.SetBrightness(.AccentColor, 0.1)
-        .PrimaryColor = cColor.FromARGB(255, 240, 240, 240)
-        .PrimaryDrakColor = cColor.FromARGB(255, 235, 235, 235)
-        .PrimaryLightColor = cColor.FromARGB(255, 250, 250, 250)
-        .BorderColor = cColor.FromARGB(255, 200, 200, 200)
-        .TextColor = cColor.FromARGB(255, 50, 50, 50)
-    End With
-End Sub
+Public Function CreateLabel(Parent As Object, ByVal L As Integer, ByVal T As Integer, ByVal W As Integer, ByVal H As Integer) As cLabel
+    Dim Label As New cLabel
+    
+    If Parent Is Nothing Then
+        Label.Create Layout, "Label", L, T, W, H
+    Else
+        Label.Create Parent, "Label", L, T, W, H
+    End If
+    
+    ViewList.Add Label
+    Set CreateLabel = Label
+End Function
 
