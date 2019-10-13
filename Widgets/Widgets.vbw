@@ -1,5 +1,5 @@
 cButton = 6, 1, 776, 518, 
-cLabel = 78, 78, 768, 550, C
-mGlobal = 572, 36, 1296, 513, 
-cToast = 8, 8, 737, 603, 
-cWidgetManager = 143, 33, 812, 597, 
+cLabel = 290, 42, 980, 513, 
+mGlobal = 131, 31, 855, 508, C
+cToast = 8, 8, 737, 603, C
+cWidgetManager = 143, 33, 812, 597, C
