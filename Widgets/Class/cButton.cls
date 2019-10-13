@@ -43,8 +43,8 @@ Private Sub Class_Initialize()
     mStyle = FontStyleRegular
 End Sub
 
-Public Sub Create(Layout As cLayout, ByVal sCaption As String, ByVal nLeft As Integer, ByVal nTop As Integer, ByVal nWidth As Integer, ByVal nHeight As Integer)
-    Set View = Layout.CreateView(nLeft, nTop, nWidth, nHeight)
+Public Sub Create(Parent As Object, ByVal sCaption As String, ByVal nLeft As Integer, ByVal nTop As Integer, ByVal nWidth As Integer, ByVal nHeight As Integer)
+    Set View = Parent.CreateView(nLeft, nTop, nWidth, nHeight)
     mCaption = sCaption
     View.Name = sCaption
 End Sub

@@ -132,6 +132,11 @@ Friend Sub SetFocusView(View As cView)
     End If
 End Sub
 
+Public Sub ReDrawAllView()
+    FirstDone = False
+    Refresh
+End Sub
+
 Public Sub Refresh()
     Dim i As Long
     Dim View As cView
@@ -219,7 +224,7 @@ Private Sub OnMouseEvent(ByVal uMsg As Long, ByVal wParam As Long, ByVal lParam 
             Set View = ViewList.GetObject(i)
                 If View.Visible Then
                     If View.CheckMouseIn(X, Y) Then
-                        If View.Enabled Then View.RaiseMouseMove Button, Shift, X, Y
+                        If View.Enabled Then View.RaiseMouseMove Button, Shift, X - View.Left, Y - View.Top
                         Set View = Nothing
                         Exit Sub
                     End If

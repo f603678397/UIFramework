@@ -241,7 +241,7 @@ Friend Sub RaiseMouseMove(ByVal Button As Integer, ByVal Shift As Integer, ByVal
         Set View = Nothing
     Next
     Layout.SetHoverView Me
-    RaiseEvent MouseMove(Button, Shift, X - mLeft, Y - mTop)
+    RaiseEvent MouseMove(Button, Shift, X, Y)
 End Sub
 
 Friend Sub RaiseMouseDown(ByVal Button As Integer, ByVal Shift As Integer, ByVal X As Integer, ByVal Y As Integer)
@@ -257,7 +257,7 @@ Friend Sub RaiseMouseDown(ByVal Button As Integer, ByVal Shift As Integer, ByVal
         Set View = Nothing
     Next
     Layout.SetFocusView Me
-    RaiseEvent MouseDown(Button, Shift, X - mLeft, Y - mTop)
+    RaiseEvent MouseDown(Button, Shift, X, Y)
 End Sub
 
 Friend Sub RaiseMouseUp(ByVal Button As Integer, ByVal Shift As Integer, ByVal X As Integer, ByVal Y As Integer)
