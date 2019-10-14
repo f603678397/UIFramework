@@ -53,6 +53,7 @@ Public Event KeyPress(ByVal KeyAscii As Long)
 Public Event GotFocus()
 Public Event LostFocus()
 Public Event Paint(Canvas As cGraphics)
+Public Event HandleMsg(ByVal nMsg As Long, ByVal wParam As Long, ByVal lParam As Long)
 
 Private Sub Class_Terminate(): Release: End Sub
 
@@ -156,6 +157,8 @@ Public Property Let ZOrder(ByVal nOrder As Long): mParent.ChangeChildZOrder Me, 
 
 Public Property Get Opacity() As Single: Opacity = mOpacity: End Property
 Public Property Let Opacity(ByVal fOpacity As Single): mOpacity = fOpacity: Notify: End Property
+
+Public Property Get ViewCount() As Long: ViewCount = ViewList.GetCount: End Property
 
 Friend Sub Create(Root As cLayout, ParentView As cView, ByVal L As Integer, ByVal T As Integer, ByVal W As Integer, ByVal H As Integer)
     Set Bitmap = New cBitmap
@@ -554,6 +557,8 @@ Public Sub AddView(View As cView)
     Layout.Refresh
 End Sub
 
+Public Function GetView(ByVal Index As Long): Set GetView = ViewList.GetObject(Index): End Function
+
 Public Sub RemoveView(View As cView): f_RemoveView View: Notify: End Sub
 Friend Sub f_RemoveView(View As cView)
     If ViewList.Find(View) = -1 Then Exit Sub
@@ -563,3 +568,26 @@ Friend Sub f_RemoveView(View As cView)
 End Sub
 
 Public Sub Clear(): ViewList.Clear: End Sub
+
+Friend Sub RelayMsgToTopView(ByVal nMsg As Long, ByVal wParam As Long, ByVal lParam As Long)
+    Dim i As Long
+    Dim View As cView
+    
+    For i = 0 To ViewList.GetCount - 1
+        Set View = ViewList.GetObject(i)
+            View.RaiseHandleMsg nMsg, wParam, lParam
+        Set View = Nothing
+    Next
+End Sub
+
+Friend Sub RaiseHandleMsg(ByVal nMsg As Long, ByVal wParam As Long, ByVal lParam As Long)
+    RaiseEvent HandleMsg(nMsg, wParam, lParam)
+End Sub
+
+Public Sub SendMsgToSameLevel(ByVal nMsg As Long, ByVal wParam As Long, ByVal lParam As Long)
+    If Not mParent Is Nothing Then
+        mParent.RelayMsgToTopView nMsg, wParam, lParam
+    Else
+        Layout.RelayMsgToTopView nMsg, wParam, lParam
+    End If
+End Sub

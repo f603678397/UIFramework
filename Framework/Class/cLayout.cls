@@ -60,7 +60,7 @@ Friend Sub Release()
 End Sub
 
 Friend Property Get IsFirstDone() As Boolean: IsFirstDone = FirstDone: End Property
-Public Property Get ViewCount(): ViewCount = ViewList.GetCount: End Property
+Public Property Get ViewCount() As Long: ViewCount = ViewList.GetCount: End Property
 
 Public Property Get BackgroundColor() As Long: BackgroundColor = mBKColor: End Property
 Public Property Let BackgroundColor(ByVal nColor As Long): mBKColor = nColor: Refresh: End Property
@@ -320,6 +320,8 @@ Public Function CreateView(ByVal L As Integer, ByVal T As Integer, ByVal W As In
     Set CreateView = View
 End Function
 
+Public Function GetView(ByVal Index As Long): Set GetView = ViewList.GetObject(Index): End Function
+
 Public Sub RemoveView(View As cView): f_RemoveView View: Refresh: End Sub
 Friend Sub f_RemoveView(View As cView)
     If ViewList.Find(View) = -1 Then Exit Sub
@@ -356,4 +358,15 @@ Public Sub AddView(View As cView)
     
     View.ReDraw
     Me.Refresh
+End Sub
+
+Friend Sub RelayMsgToTopView(ByVal nMsg As Long, ByVal wParam As Long, ByVal lParam As Long)
+    Dim i As Long
+    Dim View As cView
+    
+    For i = 0 To ViewList.GetCount - 1
+        Set View = ViewList.GetObject(i)
+            View.RaiseHandleMsg nMsg, wParam, lParam
+        Set View = Nothing
+    Next
 End Sub
