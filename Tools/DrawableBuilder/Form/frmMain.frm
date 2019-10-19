@@ -189,6 +189,10 @@ Private Sub Layout_Resize()
     WorkArea.Move 3, 25, Me.ScaleWidth - 6, Me.ScaleHeight - 28
 End Sub
 
+Private Sub TitleBar_Click()
+    btnMax_Click
+End Sub
+
 Private Sub TitleBar_MouseDown(ByVal Button As Integer, ByVal Shift As Integer, ByVal X As Integer, ByVal Y As Integer)
     ReleaseCapture
     SendMessageA Me.hWnd, WM_NCLBUTTONDOWN, HTCAPTION, 0

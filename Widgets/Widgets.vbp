@@ -8,6 +8,7 @@ Class=cLabel; Class\cLabel.cls
 Module=mGlobal; Module\mGlobal.bas
 Class=cToast; Class\cToast.cls
 Class=cWidgetManager; Class\cWidgetManager.cls
+Class=cOption; Class\cOption.cls
 Startup="(None)"
 HelpFile=""
 Title="Widgets"
