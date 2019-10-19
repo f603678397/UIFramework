@@ -350,6 +350,7 @@ Private Sub View_Paint(Canvas As Drawing2D.cGraphics)
             End If
             
             Pen.Color = ThemeColor.AccentColor
+            Brush.Color = cColor.FromARGB(255, 240, 240, 240)
         Else
             If bHover Then
                 Canvas.Clear ThemeColor.PrimaryLightColor
@@ -365,9 +366,9 @@ Private Sub View_Paint(Canvas As Drawing2D.cGraphics)
             Else
                 Pen.Color = ThemeColor.BorderColor
             End If
+            
+            Brush.Color = ThemeColor.TextColor
         End If
-        
-        Brush.Color = ThemeColor.TextColor
     Else
         If mAccent Then
             Canvas.Clear ThemeColor.AccentDarkColor
@@ -382,7 +383,7 @@ Private Sub View_Paint(Canvas As Drawing2D.cGraphics)
     
     Bound = NewRectF(0, 0, View.Width - 1, View.Height - 1)
     
-    Canvas.SetTextRenderingHint TextRenderingHintClearTypeGridFit
+    Canvas.SetTextRenderingHint TextRenderingHintAntiAliasGridFit
     Canvas.DrawRectangle Pen, 0, 0, View.Width - 1, View.Height - 1
     Canvas.DrawString mCaption, Font, Bound, strFormat, Brush.GetBaseBrush
 End Sub

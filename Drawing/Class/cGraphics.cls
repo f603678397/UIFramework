@@ -437,7 +437,7 @@ Public Sub FillPie(Brush As cBrush, ByVal X As Single, ByVal Y As Single, ByVal 
     GdipFillPie mHandle, Brush.Handle, X, Y, Width, Height, startAngle, sweepAngle
 End Sub
 
-Public Sub FillPath(Brush As cBrush, Path As cPath)
+Public Sub fillPath(Brush As cBrush, Path As cPath)
     GdipFillPath mHandle, Brush.Handle, Path.Handle
 End Sub
 
@@ -465,6 +465,13 @@ End Sub
 
 Public Sub DrawImagePointRect(Img As cImage, ByVal X As Single, ByVal Y As Single, srcRect As RECTF)
     GdipDrawImagePointRect mHandle, Img.Handle, X, Y, srcRect.Left, srcRect.Top, srcRect.Right, srcRect.Bottom, UnitPixel
+End Sub
+
+Public Sub DrawImagePointsRect(Img As cImage, pts() As POINTF, ByVal SrcX As Single, ByVal SrcY As Single, ByVal srcWidth As Single, ByVal srcHeight As Single)
+    Dim Count As Long
+    If (Not pts) = -1 Then Exit Sub
+    Count = UBound(pts) - LBound(pts) + 1
+    GdipDrawImagePointsRect mHandle, Img.Handle, pts(LBound(pts)), Count, SrcX, SrcY, srcWidth, srcHeight, UnitPixel
 End Sub
 
 Public Sub DrawImagePoints(Img As cImage, pts() As POINTF)

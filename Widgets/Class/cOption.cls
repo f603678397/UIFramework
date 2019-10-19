@@ -6,7 +6,7 @@ BEGIN
   DataSourceBehavior  = 0  'vbNone
   MTSTransactionMode  = 0  'NotAnMTSObject
 END
-Attribute VB_Name = "cLabel"
+Attribute VB_Name = "cOption"
 Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = True
 Attribute VB_PredeclaredId = False
@@ -25,15 +25,18 @@ Public Event GotFocus()
 Public Event LostFocus()
 Public Event Click()
 Public Event DblClick()
+Public Event ValueChanged(ByVal ByUser As Boolean)
 
 Private mCaption    As String
+Private mValue      As Boolean
 Private mFontName   As String
 Private mFontSize   As Single
 Private mStyle      As FontStyle
-Private mAccent     As Boolean
 
-Private mAlignCenter        As Boolean
-Private mLineCenter         As Boolean
+Private bDown       As Boolean
+Private bHover      As Boolean
+Private mID         As Long
+
 
 Private ThemeColor  As ThemeColorType
 
@@ -44,6 +47,7 @@ Private Sub Class_Initialize()
     mStyle = FontStyleRegular
     
     SetTheme Preset
+    mID = ObjPtr(Me)
 End Sub
 
 Public Sub Create(Parent As Object, ByVal sCaption As String, ByVal nLeft As Integer, ByVal nTop As Integer, ByVal nWidth As Integer, ByVal nHeight As Integer)
@@ -60,10 +64,16 @@ Public Sub BindView(DstView As cView)
     Set V = View
     Set View = Nothing
     Set View = DstView
+
+    bHover = False
+    bDown = False
     
     V.Refresh
     View.Refresh
 End Sub
+
+'=========================================================================================
+'Í¨ÓÃ´úÂë
 
 Public Property Get Name() As String: Name = View.Name: End Property
 Public Property Let Name(ByVal sName As String): View.Name = Trim(sName): End Property
@@ -169,13 +179,23 @@ Public Sub SetTheme(NewTheme As PresetThemeEnum)
         Case PresetThemeEnum.LightTheme
             SetLightTheme ThemeColor
     End Select
+    
     ThemeColor.PrimaryColor = cColor.Transparent
 End Sub
+
 '=========================================================================================
 Public Property Get Caption() As String: Caption = mCaption: End Property
 Public Property Let Caption(ByVal sCaption As String)
     If mCaption = sCaption Then Exit Property
     mCaption = sCaption
+    View.Refresh
+End Property
+
+Public Property Get Value() As Boolean: Value = mValue: End Property
+Public Property Let Value(ByVal bValue As Boolean)
+    If mValue = bValue Then Exit Property
+    mValue = bValue
+    ChangeValue False
     View.Refresh
 End Property
 
@@ -257,70 +277,105 @@ Public Property Let FontStrikeout(ByVal bStru As Boolean)
     View.Refresh
 End Property
 
-Public Property Get IsAccent() As Boolean: IsAccent = mAccent: End Property
-Public Property Let IsAccent(ByVal bAccent As Boolean)
-    If mAccent = bAccent Then Exit Property
-    mAccent = bAccent
-    View.Refresh
-End Property
+Private Sub ChangeValue(ByVal ByUser As Boolean)
+    View.SendMsgToSameLevel VM_OPTION, mID, 0
+    RaiseEvent ValueChanged(ByUser)
+End Sub
 
-Public Property Get AlignCenter() As Boolean: AlignCenter = mAlignCenter: End Property
-Public Property Let AlignCenter(ByVal bCenter As Boolean)
-    If bCenter = mAlignCenter Then Exit Property
-    mAlignCenter = bCenter
-    View.Refresh
-End Property
-
-Public Property Get LineAlignCenter() As Boolean: LineAlignCenter = mLineCenter: End Property
-Public Property Let LineAlignCenter(ByVal bCenter As Boolean)
-    If bCenter = mLineCenter Then Exit Property
-    mLineCenter = bCenter
-    View.Refresh
-End Property
-
-Private Sub View_Click(): RaiseEvent Click: End Sub
+Private Sub View_Click()
+    RaiseEvent Click
+    If mValue = False Then
+        mValue = True
+        ChangeValue True
+        View.Refresh
+    End If
+End Sub
 Private Sub View_DblClick(): RaiseEvent DblClick: End Sub
 
 Private Sub View_GotFocus(): RaiseEvent GotFocus: End Sub
+
+Private Sub View_HandleMsg(ByVal nMsg As Long, ByVal wParam As Long, ByVal lParam As Long)
+    If nMsg <> VM_OPTION Then Exit Sub
+    If wParam = mID Or mValue = False Then Exit Sub
+    mValue = False
+    RaiseEvent ValueChanged(False)
+    View.Refresh
+End Sub
+
 Private Sub View_LostFocus(): RaiseEvent LostFocus: End Sub
 
-Private Sub View_MouseHover(): RaiseEvent MouseHover: End Sub
-Private Sub View_MouseLeave(): RaiseEvent MouseLeave: End Sub
+Private Sub View_MouseHover()
+    RaiseEvent MouseHover
+    bHover = True
+    View.Refresh
+End Sub
 
-Private Sub View_MouseDown(ByVal Button As Integer, ByVal Shift As Integer, ByVal X As Integer, ByVal Y As Integer): RaiseEvent MouseDown(Button, Shift, X, Y): End Sub
-Private Sub View_MouseMove(ByVal Button As Integer, ByVal Shift As Integer, ByVal X As Integer, ByVal Y As Integer): RaiseEvent MouseMove(Button, Shift, X, Y): End Sub
-Private Sub View_MouseUp(ByVal Button As Integer, ByVal Shift As Integer, ByVal X As Integer, ByVal Y As Integer): RaiseEvent MouseUp(Button, Shift, X, Y): End Sub
+Private Sub View_MouseLeave()
+    RaiseEvent MouseLeave
+    bHover = False
+    View.Refresh
+End Sub
+
+Private Sub View_MouseDown(ByVal Button As Integer, ByVal Shift As Integer, ByVal X As Integer, ByVal Y As Integer)
+    RaiseEvent MouseDown(Button, Shift, X, Y)
+    bDown = True
+    View.Refresh
+End Sub
+
+Private Sub View_MouseMove(ByVal Button As Integer, ByVal Shift As Integer, ByVal X As Integer, ByVal Y As Integer)
+    RaiseEvent MouseMove(Button, Shift, X, Y)
+End Sub
+
+Private Sub View_MouseUp(ByVal Button As Integer, ByVal Shift As Integer, ByVal X As Integer, ByVal Y As Integer)
+    RaiseEvent MouseUp(Button, Shift, X, Y)
+    bDown = False
+    View.Refresh
+End Sub
 
 Private Sub View_Paint(Canvas As Drawing2D.cGraphics)
+    Dim Pen As New cPen
+    Dim Brush2 As New cSolidBrush
     Dim Brush As New cSolidBrush
     
     Dim Fam As New cFontFamily
     Dim Font As New cFont
     Dim strFormat As New cStringFormat
+    
     Dim Bound As RECTF
     
     Fam.FromName mFontName
     Font.FromFamily Fam, mFontSize, mStyle, UnitPixel
-    If mAlignCenter Then strFormat.Align = StringAlignmentCenter
-    If mLineCenter Then strFormat.LineAlign = StringAlignmentCenter
-    
-    Bound = NewRectF(0, 0, View.Width - 1, View.Height - 1)
+    strFormat.Align = StringAlignmentNear
+    strFormat.LineAlign = StringAlignmentCenter
     
     If View.Enabled Then
-        If mAccent Then
-            Brush.Color = ThemeColor.AccentColor
+        If bHover Then
+            If bDown Then
+                Pen.Color = ThemeColor.AccentDarkColor
+            Else
+                Pen.Color = ThemeColor.AccentLightColor
+            End If
         Else
-            Brush.Color = ThemeColor.TextColor
+            Pen.Color = ThemeColor.AccentColor
         End If
+        Brush.Color = ThemeColor.TextColor
     Else
-        If mAccent Then
-            Brush.Color = ThemeColor.AccentDarkColor
-        Else
-            Brush.Color = ThemeColor.PrimaryLightColor
-        End If
+        Brush.Color = ThemeColor.PrimaryLightColor
+        Pen.Color = ThemeColor.PrimaryLightColor
     End If
     
+    Brush2.Color = Pen.Color
+    Pen.Width = 2
+    
+    Bound = NewRectF(20, 1, View.Width - 21, View.Height - 1)
+    
     Canvas.SetTextRenderingHint TextRenderingHintAntiAliasGridFit
+    Canvas.SetSmoothingMode SmoothingModeAntiAlias
     Canvas.Clear ThemeColor.PrimaryColor
+    
+    Canvas.DrawEllipse Pen, 4, (View.Height - 1 - 10) / 2, 10, 10
+    If mValue Then
+        Canvas.FillEllipse Brush2.GetBaseBrush, 6, (View.Height - 1 - 6) / 2, 6, 6
+    End If
     Canvas.DrawString mCaption, Font, Bound, strFormat, Brush.GetBaseBrush
 End Sub

@@ -20,6 +20,11 @@ Public Enum PresetThemeEnum
     LightTheme
 End Enum
 
+Public Enum ViewMessageEnum
+    VM_EMPTY = 0
+    VM_OPTION = 1
+End Enum
+
 Private Sub Class_Terminate(): Release: End Sub
 
 Private Sub Release()
@@ -87,3 +92,15 @@ Public Function CreateLabel(Parent As Object, ByVal L As Integer, ByVal T As Int
     Set CreateLabel = Label
 End Function
 
+Public Function CreateOption(Parent As Object, ByVal L As Integer, ByVal T As Integer, ByVal W As Integer, ByVal H As Integer) As cOption
+    Dim Option1 As New cOption
+    
+    If Parent Is Nothing Then
+        Option1.Create Layout, "Option", L, T, W, H
+    Else
+        Option1.Create Parent, "Option", L, T, W, H
+    End If
+    
+    ViewList.Add Option1
+    Set CreateOption = Option1
+End Function

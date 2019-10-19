@@ -28,6 +28,7 @@ Private bShadown                As Boolean
 Private mStyle                  As Drawing2D.FontStyle
 Private ThemeColor              As ThemeColorType
 Private Stage                   As Byte
+Private mDuration               As Long
 
 Public Enum ToastFlag
     TF_POS_TOP = 0
@@ -51,9 +52,14 @@ Public Function SetTheme(NewTheme As PresetThemeEnum) As cToast
     End Select
     
     mBKColor = ThemeColor.AccentColor
-    mFGColor = ThemeColor.TextColor
+    mFGColor = cColor.FromARGB(255, 240, 240, 240)
     
     Set SetTheme = Me
+End Function
+
+Public Function SetDuration(ByVal ms As Long) As cToast
+    mDuration = ms
+    Set SetDuration = Me
 End Function
 
 Public Function SetFont(ByVal FontName As String, ByVal fSize As Single, ByVal bBold As Boolean, ByVal bItalic As Boolean) As cToast
@@ -159,6 +165,7 @@ Public Sub Show(Optional ByVal Offset As Integer = 0)
     If mFGColor = 0 Then mFGColor = ThemeColor.TextColor
     If mFontName = vbNullString Then mFontName = "ËÎÌו"
     If mFontSize <= 0 Then mFontSize = 15
+    If mDuration <= 0 Then mDuration = 1500
     
     Set View = Context.CreateView(left, Top, Width, Height)
 
@@ -185,7 +192,7 @@ Private Sub Timer_onTime()
             End If
         Case 1
             T2 = GetTickCount
-            If T2 - T1 >= 1500 Then '
+            If T2 - T1 >= mDuration Then '
                 Stage = 2
             End If
         Case 2
@@ -242,7 +249,7 @@ Private Sub View_Paint(Canvas As Drawing2D.cGraphics)
         End If
 
         For i = 3 To 0 Step -1
-            Pen.Color = cColor.FromARGB(i ^ 2 * 20, 0, 0, 0)
+            Pen.Color = cColor.FromARGB(i * 20, 0, 0, 0)
             
             Select Case Pos
                 Case 0
