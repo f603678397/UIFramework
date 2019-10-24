@@ -38,7 +38,7 @@ Private Function GetBackColor() As Long
         Case PresetThemeEnum.DrakTheme
             Color = cColor.FromARGB(255, 50, 50, 50)
         Case PresetThemeEnum.LightTheme
-            Color = cColor.FromARGB(255, 225, 225, 225)
+            Color = cColor.FromARGB(255, 235, 235, 235)
     End Select
     GetBackColor = Color
 End Function
@@ -103,4 +103,17 @@ Public Function CreateOption(Parent As Object, ByVal L As Integer, ByVal T As In
     
     ViewList.Add Option1
     Set CreateOption = Option1
+End Function
+
+Public Function CreateFrame(Parent As Object, ByVal L As Integer, ByVal T As Integer, ByVal W As Integer, ByVal H As Integer) As cFrame
+    Dim Frame As New cFrame
+    
+    If Parent Is Nothing Then
+        Frame.Create Layout, "Frame", L, T, W, H
+    Else
+        Frame.Create Parent, "Frame", L, T, W, H
+    End If
+    
+    ViewList.Add Frame
+    Set CreateFrame = Frame
 End Function

@@ -52,9 +52,9 @@ Private Sub btnClose_Paint(Canvas As Drawing2D.cGraphics)
     cX = btnClose.Width / 2
     cY = btnClose.Height / 2
     
-    Pen.Color = cColor.FromARGB(255, 250, 250, 250)
+    Pen.Color = cColor.FromARGB(255, 225, 225, 225)
+    Pen.Width = 2
     
-    Canvas.SetSmoothingMode SmoothingModeAntiAlias
     Canvas.DrawLine Pen, cX - 5, cY - 5, cX + 4, cY + 4
     Canvas.DrawLine Pen, cX + 4, cY - 5, cX - 5, cY + 4
 End Sub

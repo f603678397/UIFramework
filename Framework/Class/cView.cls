@@ -444,7 +444,7 @@ Friend Sub MergeImageSelf()
     Canvas.ResetClip
 End Sub
 
-Friend Sub MergeImage()
+Friend Sub MergeImage(Optional ReDrawChild As Boolean = False)
     Dim i As Long
     Dim View As cView
     Dim Attr As New cImageAttributes
@@ -465,7 +465,7 @@ Friend Sub MergeImage()
     For i = 0 To ViewList.GetCount - 1
         Set View = ViewList.GetObject(i)
             If View.Visible Then
-                If Not Layout.IsFirstDone Then View.ReDraw
+                If Not Layout.IsFirstDone Or ReDrawChild Then View.ReDraw
                 View.MergeImage
                 CM.m(3, 3) = View.Opacity
                 Attr.SetColorMatrix CM, ColorAdjustTypeBitmap
@@ -497,8 +497,14 @@ End Sub
 
 Friend Sub f_SetParent(NewParent As cView): Set mParent = NewParent: End Sub
 
-Public Sub Refresh()
-    RaisePaint
+Public Sub Refresh(Optional ReDrawChild As Boolean = False)
+    If Not ReDrawChild Then
+        RaisePaint
+    Else
+        ReDraw
+        MergeImage True
+        Notify
+    End If
 End Sub
 
 Public Sub Move(ByVal L As Integer, Optional ByVal T, Optional ByVal W, Optional ByVal H)
