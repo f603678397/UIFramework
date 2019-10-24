@@ -27,6 +27,7 @@ Attribute btnOk.VB_VarHelpID = -1
 Dim WithEvents btnCancel    As cButton
 Attribute btnCancel.VB_VarHelpID = -1
 Dim Label1                  As cLabel
+Dim Frame1                  As cFrame
 Dim WithEvents Option1      As cOption
 Attribute Option1.VB_VarHelpID = -1
 Dim WithEvents Option2      As cOption
@@ -34,6 +35,7 @@ Attribute Option2.VB_VarHelpID = -1
 
 Private Sub btnOk_Click()
 '
+Frame1.Enabled = Not Frame1.Enabled
 End Sub
 
 Private Sub btnCancel_Click()
@@ -58,25 +60,30 @@ End Sub
 
 Private Sub Form_Load()
     cCore.Initialize
-    
+
     Set Activity = cCore.CreateActivity(Me.hWnd)
     Set Layout = Activity.CreateLayout
     
-    cWidgetManager.SetPresetTheme DrakTheme
     cWidgetManager.BindLayout Layout
     
     Set btnOk = cWidgetManager.CreateButton(Layout, 260, 260, 60, 30)
     Set btnCancel = cWidgetManager.CreateButton(Layout, 330, 260, 60, 30)
     
     Set Label1 = cWidgetManager.CreateLabel(Layout, 10, 10, 100, 20)
-    Set Option1 = cWidgetManager.CreateOption(Layout, 10, 40, 100, 20)
-    Set Option2 = cWidgetManager.CreateOption(Layout, 10, 70, 100, 20)
+    Set Frame1 = cWidgetManager.CreateFrame(Layout, 10, 30, 100, 80)
+    Set Option1 = cWidgetManager.CreateOption(Frame1, 5, 20, 100, 20)
+    Set Option2 = cWidgetManager.CreateOption(Frame1, 5, 50, 100, 20)
     
     With Label1
         .Caption = "¿Ø¼þÊ¾Àý"
         .FontName = "Î¢ÈíÑÅºÚ"
         .LineAlignCenter = True
         .IsAccent = True
+    End With
+    
+    With Frame1
+        .Caption = "Ö÷Ìâ"
+        .FontName = "Î¢ÈíÑÅºÚ"
     End With
     
     With Option1

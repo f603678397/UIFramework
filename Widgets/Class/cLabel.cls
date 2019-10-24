@@ -60,10 +60,70 @@ Public Sub BindView(DstView As cView)
     Set V = View
     Set View = Nothing
     Set View = DstView
+    mCaption = "Label"
     
     V.Refresh
     View.Refresh
 End Sub
+
+Public Function GetView() As cView
+    Set GetView = View
+End Function
+
+'=========================================================================================
+'隐藏函数
+Public Sub SetAttr(ByVal AttrName As String, ByVal Value As String)
+    Select Case LCase(AttrName)
+    '-----------------------------------------
+        Case LCase("Name")
+            Me.Name = Value
+        Case LCase("Left")
+            Me.left = CInt(Value)
+        Case LCase("Top")
+            Me.Top = CInt(Value)
+        Case LCase("Width")
+            Me.Width = CInt(Value)
+        Case LCase("Height")
+            Me.Height = CInt(Value)
+        Case LCase("Enabled")
+            Me.Enabled = CBool(Value)
+        Case LCase("Visible")
+            Me.Visible = CBool(Value)
+        Case LCase("Opacity")
+            Me.Opacity = CSng(Value)
+    '-----------------------------------------
+        Case LCase("Caption")
+            Me.Caption = Value
+        Case LCase("BackColor")
+            Me.BackColor = CLng(Value)
+        Case LCase("ForeColor")
+            Me.ForeColor = CLng(Value)
+        Case LCase("IsAccent")
+            Me.IsAccent = CBool(Value)
+        Case LCase("AccentColor")
+            Me.AccentColor = CLng(Value)
+        Case LCase("AlignCenter")
+            Me.AlignCenter = CBool(Value)
+        Case LCase("LineAlignCenter")
+            Me.LineAlignCenter = CBool(Value)
+    '-----------------------------------------
+        Case LCase("FontBold")
+            Me.FontBold = CBool(Value)
+        Case LCase("FontItalic")
+            Me.FontItalic = CBool(Value)
+        Case LCase("FontName")
+            Me.FontName = Value
+        Case LCase("FontSize")
+            Me.FontSize = CSng(Value)
+        Case LCase("FontStrikeout")
+            Me.FontStrikeout = CBool(Value)
+        Case LCase("FontUnderLine")
+            Me.FontUnderLine = CBool(Value)
+    End Select
+End Sub
+
+'=========================================================================================
+'通用代码
 
 Public Property Get Name() As String: Name = View.Name: End Property
 Public Property Let Name(ByVal sName As String): View.Name = Trim(sName): End Property
@@ -130,13 +190,13 @@ Public Sub Move(ByVal nLeft As Integer, Optional nTop, Optional nWidth, Optional
     View.Move nLeft, T, W, H
 End Sub
 
-Public Property Get BackColor() As Long: BackColor = ThemeColor.PrimaryColor: End Property
+Public Property Get BackColor() As Long: BackColor = ThemeColor.BKColor: End Property
 Public Property Let BackColor(ByVal nColor As Long)
-    If nColor = ThemeColor.PrimaryColor Then Exit Property
+    If nColor = ThemeColor.BKColor Then Exit Property
     
-    ThemeColor.PrimaryColor = nColor
-    ThemeColor.PrimaryDrakColor = cColor.SetBrightness(nColor, -0.1)
-    ThemeColor.PrimaryLightColor = cColor.SetBrightness(nColor, 0.1)
+    ThemeColor.BKColor = nColor
+    ThemeColor.BKDrakColor = cColor.SetBrightness(nColor, -0.1)
+    ThemeColor.BKLightColor = cColor.SetBrightness(nColor, 0.1)
     
     View.Refresh
 End Property
@@ -149,17 +209,6 @@ Public Property Let ForeColor(ByVal nColor As Long)
     View.Refresh
 End Property
 
-Public Property Get FocusColor() As Long: FocusColor = ThemeColor.AccentColor: End Property
-Public Property Let FocusColor(ByVal nColor As Long)
-    If nColor = ThemeColor.AccentColor Then Exit Property
-    
-    ThemeColor.AccentColor = nColor
-    ThemeColor.AccentDarkColor = cColor.SetBrightness(nColor, -0.1)
-    ThemeColor.AccentLightColor = cColor.SetBrightness(nColor, 0.1)
-    
-    View.Refresh
-End Property
-
 Public Sub Refresh(): View.Refresh: End Sub
 
 Public Sub SetTheme(NewTheme As PresetThemeEnum)
@@ -169,7 +218,7 @@ Public Sub SetTheme(NewTheme As PresetThemeEnum)
         Case PresetThemeEnum.LightTheme
             SetLightTheme ThemeColor
     End Select
-    ThemeColor.PrimaryColor = cColor.Transparent
+    ThemeColor.BKColor = cColor.Transparent
 End Sub
 '=========================================================================================
 Public Property Get Caption() As String: Caption = mCaption: End Property
@@ -264,6 +313,15 @@ Public Property Let IsAccent(ByVal bAccent As Boolean)
     View.Refresh
 End Property
 
+Public Property Get AccentColor() As Long: AccentColor = ThemeColor.AccentColor: End Property
+Public Property Let AccentColor(ByVal nColor As Long)
+    If ThemeColor.AccentColor = nColor Then Exit Property
+    ThemeColor.AccentColor = nColor
+    ThemeColor.AccentDarkColor = cColor.SetBrightness(nColor, -0.2)
+    ThemeColor.AccentLightColor = cColor.SetBrightness(nColor, 0.15)
+    View.Refresh
+End Property
+
 Public Property Get AlignCenter() As Boolean: AlignCenter = mAlignCenter: End Property
 Public Property Let AlignCenter(ByVal bCenter As Boolean)
     If bCenter = mAlignCenter Then Exit Property
@@ -314,13 +372,13 @@ Private Sub View_Paint(Canvas As Drawing2D.cGraphics)
         End If
     Else
         If mAccent Then
-            Brush.Color = ThemeColor.AccentDarkColor
+            Brush.Color = ThemeColor.BorderDisEnableColor
         Else
-            Brush.Color = ThemeColor.PrimaryLightColor
+            Brush.Color = ThemeColor.BorderDisEnableColor
         End If
     End If
     
     Canvas.SetTextRenderingHint TextRenderingHintAntiAliasGridFit
-    Canvas.Clear ThemeColor.PrimaryColor
+    Canvas.Clear ThemeColor.BKColor
     Canvas.DrawString mCaption, Font, Bound, strFormat, Brush.GetBaseBrush
 End Sub
