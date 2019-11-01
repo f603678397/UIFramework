@@ -65,7 +65,8 @@ Public Property Get ViewCount() As Long: ViewCount = ViewList.GetCount: End Prop
 Public Property Get BackgroundColor() As Long: BackgroundColor = mBKColor: End Property
 Public Property Let BackgroundColor(ByVal nColor As Long): mBKColor = nColor: Refresh: End Property
 
-Public Function GetRoot() As cActivity: Set GetRoot = Activity: End Function
+Public Function GetActivity() As cActivity: Set GetActivity = Activity: End Function
+Friend Function GetRoot() As cActivity: Set GetRoot = Activity: End Function
 Friend Sub SetRoot(Root As cActivity)
     If Root Is Nothing Then Exit Sub
     Set Activity = Root

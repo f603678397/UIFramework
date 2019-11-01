@@ -32,31 +32,10 @@ Dim WithEvents Option1      As cOption
 Attribute Option1.VB_VarHelpID = -1
 Dim WithEvents Option2      As cOption
 Attribute Option2.VB_VarHelpID = -1
-
-Private Sub btnOk_Click()
-'
-Frame1.Enabled = Not Frame1.Enabled
-End Sub
-
-Private Sub btnCancel_Click()
-    Unload Me
-End Sub
-
-Private Sub Option1_ValueChanged(ByVal ByUser As Boolean)
-    If Not Option1.Value Or Not ByUser Then Exit Sub
-    cWidgetManager.SetPresetTheme DrakTheme
-    cToast.SetTheme DrakTheme
-    cToast.MakeText Layout, "已切换为暗色主题", TF_POS_TOP Or TF_WIDTH_MIN
-    cToast.Show
-End Sub
-
-Private Sub Option2_ValueChanged(ByVal ByUser As Boolean)
-    If Not Option2.Value Or Not ByUser Then Exit Sub
-    cWidgetManager.SetPresetTheme LightTheme
-    cToast.SetTheme LightTheme
-    cToast.MakeText Layout, "已切换为浅色主题", TF_POS_TOP Or TF_WIDTH_MIN
-    cToast.Show
-End Sub
+Dim Waiting                 As cWaiting
+Dim WithEvents Timer1       As cTimer
+Attribute Timer1.VB_VarHelpID = -1
+Dim Progress1               As cProgressBar
 
 Private Sub Form_Load()
     cCore.Initialize
@@ -73,6 +52,12 @@ Private Sub Form_Load()
     Set Frame1 = cWidgetManager.CreateFrame(Layout, 10, 30, 100, 80)
     Set Option1 = cWidgetManager.CreateOption(Frame1, 5, 20, 100, 20)
     Set Option2 = cWidgetManager.CreateOption(Frame1, 5, 50, 100, 20)
+    
+    Set Progress1 = cWidgetManager.CreateProgressBar(Layout, 10, 120, 100, 3)
+    
+    Set Waiting = cWidgetManager.CreateWaiting(Layout, 10, 135, 50, 50)
+    Set Timer1 = New cTimer
+    Timer1.Create Me.hWnd
     
     With Label1
         .Caption = "控件示例"
@@ -97,6 +82,11 @@ Private Sub Form_Load()
         .FontName = "微软雅黑"
     End With
     
+    With Progress1
+        .Value = 30
+        .SecondValue = 50
+    End With
+    
     With btnOk
         .Caption = "确定"
         .FontName = "微软雅黑"
@@ -111,8 +101,43 @@ Private Sub Form_Load()
     Activity.SetLayout Layout
     
     cToast.SetShadown(True).SetFontName("微软雅黑").SetDuration (1000)
+    
+    Timer1.Interval = 50
 End Sub
 
 Private Sub Form_Unload(Cancel As Integer)
+    Timer1.Release
     cCore.Terminate
+End Sub
+
+Private Sub btnOk_Click()
+'
+Progress1.Enabled = Not Progress1.Enabled
+End Sub
+
+Private Sub btnCancel_Click()
+    Unload Me
+End Sub
+
+Private Sub Option1_ValueChanged(ByVal ByUser As Boolean)
+    If Not Option1.Value Or Not ByUser Then Exit Sub
+    cWidgetManager.SetPresetTheme DrakTheme
+    cToast.SetTheme DrakTheme
+    cToast.MakeText Layout, "已切换为暗色主题", TF_POS_TOP Or TF_WIDTH_MIN
+    cToast.Show
+End Sub
+
+Private Sub Option2_ValueChanged(ByVal ByUser As Boolean)
+    If Not Option2.Value Or Not ByUser Then Exit Sub
+    cWidgetManager.SetPresetTheme LightTheme
+    cToast.SetTheme LightTheme
+    cToast.MakeText Layout, "已切换为浅色主题", TF_POS_TOP Or TF_WIDTH_MIN
+    cToast.Show
+End Sub
+
+Private Sub Timer1_onTime()
+    Progress1.Value = Progress1.Value + 1
+    Progress1.SecondValue = Progress1.SecondValue + 1
+    If Progress1.Value > Progress1.Max Then Progress1.Value = 0
+    If Progress1.SecondValue > Progress1.Max Then Progress1.SecondValue = 0
 End Sub

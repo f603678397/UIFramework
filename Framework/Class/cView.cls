@@ -214,6 +214,7 @@ Friend Function GetImage() As cImage: Set GetImage = ResultBMP.ToImage: End Func
 
 Friend Function GetRoot() As cLayout: Set GetRoot = Layout: End Function
 Friend Sub SetRoot(Root As cLayout): Set Layout = Root: End Sub
+Public Function GetLayout() As cLayout: Set GetLayout = Layout: End Function
 
 Friend Sub RaiseLostFocus(): mIsFocus = False: RaiseEvent LostFocus: End Sub
 Friend Sub RaiseGotFocus()

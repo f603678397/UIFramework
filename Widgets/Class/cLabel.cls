@@ -73,6 +73,7 @@ End Function
 '=========================================================================================
 'Òþ²Øº¯Êý
 Public Sub SetAttr(ByVal AttrName As String, ByVal Value As String)
+Attribute SetAttr.VB_MemberFlags = "40"
     Select Case LCase(AttrName)
     '-----------------------------------------
         Case LCase("Name")

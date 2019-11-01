@@ -124,8 +124,9 @@ Public Function MakeText(Layout As cLayout, ByVal Message As String, Flag As Toa
     If Layout Is Nothing Then Exit Function
     
     Do While Stage <> 0
-        Stage = 2
-        Sleep 10
+        If Timer.Interval <> 1 Then Timer.Interval = 1
+        Stage = 3
+        Sleep 5
         DoEvents
     Loop
     
@@ -140,7 +141,7 @@ Public Sub Show(Optional ByVal Offset As Integer = 0)
     Dim left As Integer, Top As Integer, Width As Integer, Height As Integer
     
     If Context Is Nothing Then Exit Sub
-    Set Activity = Context.GetRoot
+    Set Activity = Context.GetActivity
     If Activity Is Nothing Then Exit Sub
     
     Top = Offset
@@ -180,22 +181,22 @@ Private Sub Timer_onTime()
     Dim T2 As Long
     Dim fStep As Single
     
-    fStep = 0.3
+    fStep = 0.25
     
     Select Case Stage
-        Case 0
+        Case 0 '---> 淡入
             Opacity = Opacity + fStep
             If Opacity >= 1 Then
                 Opacity = 1
                 Stage = 1
                 T1 = GetTickCount
             End If
-        Case 1
+        Case 1 '--->持续显示
             T2 = GetTickCount
             If T2 - T1 >= mDuration Then '
                 Stage = 2
             End If
-        Case 2
+        Case 2 '--->淡出
             Opacity = Opacity - fStep
             If Opacity <= 0 Then
                 Stage = 0
@@ -208,6 +209,16 @@ Private Sub Timer_onTime()
                 Set Timer = Nothing
                 Exit Sub
             End If
+        Case 3 '--->销毁
+            Stage = 0
+            Timer.Enabled = False
+            Timer.Release
+            Context.RemoveView View
+            
+            Set View = Nothing
+            Set Context = Nothing
+            Set Timer = Nothing
+            Exit Sub
     End Select
     
     View.Opacity = Opacity

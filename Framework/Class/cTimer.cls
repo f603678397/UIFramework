@@ -24,11 +24,19 @@ Public Event onTime()
 Private Sub Class_Initialize(): mEnabled = True: End Sub
 Private Sub Class_Terminate(): Release: End Sub
 
-Public Sub Create(ByVal hWnd As Long)
+Public Function Create(ByVal hWnd As Long) As Boolean
     mhWnd = hWnd
-    mID = GetTimerID
-    TimerList.Add Me
-End Sub
+    mID = ObjPtr(Me)
+    
+    mHandle = SetTimer(mhWnd, mID, 1000, AddressOf TimerProc)
+    If mHandle <> 0 Then
+        TimerList.Add Me
+        Create = True
+    Else
+        Create = False
+    End If
+    KillTimer mhWnd, mHandle
+End Function
 
 Public Sub Release()
     KillTimer mhWnd, mHandle
