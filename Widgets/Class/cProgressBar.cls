@@ -6,7 +6,7 @@ BEGIN
   DataSourceBehavior  = 0  'vbNone
   MTSTransactionMode  = 0  'NotAnMTSObject
 END
-Attribute VB_Name = "cOption"
+Attribute VB_Name = "cProgressBar"
 Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = True
 Attribute VB_PredeclaredId = False
@@ -25,34 +25,22 @@ Public Event GotFocus()
 Public Event LostFocus()
 Public Event Click()
 Public Event DblClick()
-Public Event ValueChanged(ByVal ByUser As Boolean)
+Public Event ProgressChanged()
 
-Private mCaption    As String
-Private mValue      As Boolean
-Private mFontName   As String
-Private mFontSize   As Single
-Private mStyle      As FontStyle
-
-Private bDown       As Boolean
-Private bHover      As Boolean
-Private mID         As Long
+Private mValue          As Long
+Private mSecondValue    As Long
+Private mMax            As Long
 
 Private ThemeColor  As ThemeColorType
 
 Private Sub Class_Initialize()
-    mCaption = "Button"
-    mFontName = "ËÎÌå"
-    mFontSize = 14
-    mStyle = FontStyleRegular
-    
+    mMax = 100
     SetTheme Preset
-    mID = ObjPtr(Me)
 End Sub
 
-Public Sub Create(Parent As Object, ByVal sCaption As String, ByVal nLeft As Integer, ByVal nTop As Integer, ByVal nWidth As Integer, ByVal nHeight As Integer)
+Public Sub Create(Parent As Object, ByVal sName As String, ByVal nLeft As Integer, ByVal nTop As Integer, ByVal nWidth As Integer, ByVal nHeight As Integer)
     Set View = Parent.CreateView(nLeft, nTop, nWidth, nHeight)
-    mCaption = sCaption
-    View.Name = sCaption
+    View.Name = sName
 End Sub
 
 Public Sub BindView(DstView As cView)
@@ -63,10 +51,6 @@ Public Sub BindView(DstView As cView)
     Set V = View
     Set View = Nothing
     Set View = DstView
-
-    bHover = False
-    bDown = False
-    mCaption = "Option"
     
     V.Refresh
     View.Refresh
@@ -75,6 +59,7 @@ End Sub
 Public Function GetView() As cView
     Set GetView = View
 End Function
+
 '=========================================================================================
 'Òþ²Øº¯Êý
 Public Sub SetAttr(ByVal AttrName As String, ByVal Value As String)
@@ -98,29 +83,21 @@ Attribute SetAttr.VB_MemberFlags = "40"
         Case LCase("Opacity")
             Me.Opacity = CSng(Value)
     '-----------------------------------------
-        Case LCase("Caption")
-            Me.Caption = Value
+        Case LCase("Value")
+            Me.Value = CLng(Value)
+        Case LCase("SecondValue")
+            Me.SecondValue = CLng(Value)
+        Case LCase("Max")
+            Me.Max = CLng(Value)
         Case LCase("BackColor")
             Me.BackColor = CLng(Value)
         Case LCase("ForeColor")
             Me.ForeColor = CLng(Value)
         Case LCase("AccentColor")
             Me.AccentColor = CLng(Value)
-        Case LCase("Value")
-            Me.Value = CBool(Value)
+        Case LCase("BorderColor")
+            Me.BorderColor = CLng(Value)
     '-----------------------------------------
-        Case LCase("FontBold")
-            Me.FontBold = CBool(Value)
-        Case LCase("FontItalic")
-            Me.FontItalic = CBool(Value)
-        Case LCase("FontName")
-            Me.FontName = Value
-        Case LCase("FontSize")
-            Me.FontSize = CSng(Value)
-        Case LCase("FontStrikeout")
-            Me.FontStrikeout = CBool(Value)
-        Case LCase("FontUnderLine")
-            Me.FontUnderLine = CBool(Value)
     End Select
 End Sub
 
@@ -220,26 +197,11 @@ Public Sub SetTheme(NewTheme As PresetThemeEnum)
         Case PresetThemeEnum.LightTheme
             SetLightTheme ThemeColor
     End Select
-    
-    ThemeColor.BKColor = cColor.Transparent
+    ThemeColor.BorderColor = cColor.Transparent
+    ThemeColor.BorderDisEnableColor = cColor.Transparent
 End Sub
 
 '=========================================================================================
-Public Property Get Caption() As String: Caption = mCaption: End Property
-Public Property Let Caption(ByVal sCaption As String)
-    If mCaption = sCaption Then Exit Property
-    mCaption = sCaption
-    View.Refresh
-End Property
-
-Public Property Get Value() As Boolean: Value = mValue: End Property
-Public Property Let Value(ByVal bValue As Boolean)
-    If mValue = bValue Then Exit Property
-    mValue = bValue
-    ChangeValue False
-    View.Refresh
-End Property
-
 Public Property Get AccentColor() As Long: AccentColor = ThemeColor.AccentColor: End Property
 Public Property Let AccentColor(ByVal nColor As Long)
     If ThemeColor.AccentColor = nColor Then Exit Property
@@ -249,183 +211,77 @@ Public Property Let AccentColor(ByVal nColor As Long)
     View.Refresh
 End Property
 
-Public Property Get FontName() As String: FontName = mFontName: End Property
-Public Property Let FontName(ByVal sFontName As String)
-    If mFontName = sFontName Then Exit Property
-    mFontName = sFontName
+Public Property Get BorderColor() As Long: BorderColor = ThemeColor.BorderColor: End Property
+Public Property Let BorderColor(ByVal nColor As Long)
+    If nColor = ThemeColor.BorderColor Then Exit Property
+    
+    ThemeColor.BorderColor = nColor
+    
     View.Refresh
 End Property
 
-Public Property Get FontSize() As Single: FontSize = mFontSize: End Property
-Public Property Let FontSize(ByVal nSize As Single)
-    If mFontSize = nSize Then Exit Property
-    mFontSize = nSize
+Public Property Get Value() As Long: Value = mValue: End Property
+Public Property Let Value(ByVal nValue As Long)
+    If mValue = nValue Then Exit Property
+    mValue = nValue
+    RaiseEvent ProgressChanged
     View.Refresh
 End Property
 
-Public Property Get FontBold() As Boolean
-    If (mStyle And FontStyleBold) = FontStyle.FontStyleBold Then FontBold = True
-End Property
-Public Property Let FontBold(ByVal bBold As Boolean)
-    Dim nStyle As FontStyle
-    
-    nStyle = (mStyle Or FontStyleBold)
-    If Not bBold Then
-        nStyle = nStyle Xor FontStyleBold
-    End If
-    
-    If mStyle = nStyle Then Exit Property
-    mStyle = nStyle
+Public Property Get SecondValue() As Long: SecondValue = mSecondValue: End Property
+Public Property Let SecondValue(ByVal nValue As Long)
+    If mSecondValue = nValue Then Exit Property
+    mSecondValue = nValue
     View.Refresh
 End Property
 
-Public Property Get FontItalic() As Boolean
-    If (mStyle And FontStyleItalic) = FontStyle.FontStyleItalic Then FontItalic = True
-End Property
-Public Property Let FontItalic(ByVal bItalic As Boolean)
-    Dim nStyle As FontStyle
-    
-    nStyle = (mStyle Or FontStyleItalic)
-    If Not bItalic Then
-        nStyle = nStyle Xor FontStyleItalic
-    End If
-    
-    If mStyle = nStyle Then Exit Property
-    mStyle = nStyle
+
+Public Property Get Max() As Long: Max = mMax: End Property
+Public Property Let Max(ByVal nMax As Long)
+    If mMax = nMax Then Exit Property
+    If nMax = 0 Then nMax = 1
+    mMax = nMax
     View.Refresh
 End Property
 
-Public Property Get FontUnderLine() As Boolean
-    If (mStyle And FontStyleUnderline) = FontStyle.FontStyleUnderline Then FontUnderLine = True
-End Property
-Public Property Let FontUnderLine(ByVal bLine As Boolean)
-    Dim nStyle As FontStyle
-    
-    nStyle = (mStyle Or FontStyleUnderline)
-    If Not bLine Then
-        nStyle = nStyle Xor FontStyleUnderline
-    End If
-    
-    If mStyle = nStyle Then Exit Property
-    mStyle = nStyle
-    View.Refresh
-End Property
-
-Public Property Get FontStrikeout() As Boolean
-    If (mStyle And FontStyleStrikeout) = FontStyle.FontStyleStrikeout Then FontStrikeout = True
-End Property
-Public Property Let FontStrikeout(ByVal bStru As Boolean)
-    Dim nStyle As FontStyle
-    
-    nStyle = (mStyle Or FontStyleStrikeout)
-    If Not bStru Then
-        nStyle = nStyle Xor FontStyleStrikeout
-    End If
-    
-    If mStyle = nStyle Then Exit Property
-    mStyle = nStyle
-    View.Refresh
-End Property
-
-Private Sub ChangeValue(ByVal ByUser As Boolean)
-    View.SendMsgToSameLevel VM_OPTION, mID, 0
-    RaiseEvent ValueChanged(ByUser)
-End Sub
-
-Private Sub View_Click()
-    RaiseEvent Click
-    If mValue = False Then
-        mValue = True
-        ChangeValue True
-        View.Refresh
-    End If
-End Sub
+Private Sub View_Click(): RaiseEvent Click: End Sub
 Private Sub View_DblClick(): RaiseEvent DblClick: End Sub
 
 Private Sub View_GotFocus(): RaiseEvent GotFocus: End Sub
-
-Private Sub View_HandleMsg(ByVal nMsg As Long, ByVal wParam As Long, ByVal lParam As Long)
-    If nMsg <> VM_OPTION Then Exit Sub
-    If wParam = mID Or mValue = False Then Exit Sub
-    mValue = False
-    RaiseEvent ValueChanged(False)
-    View.Refresh
-End Sub
-
 Private Sub View_LostFocus(): RaiseEvent LostFocus: End Sub
 
-Private Sub View_MouseHover()
-    RaiseEvent MouseHover
-    bHover = True
-    View.Refresh
-End Sub
+Private Sub View_MouseHover(): RaiseEvent MouseHover: End Sub
+Private Sub View_MouseLeave(): RaiseEvent MouseLeave: End Sub
 
-Private Sub View_MouseLeave()
-    RaiseEvent MouseLeave
-    bHover = False
-    View.Refresh
-End Sub
-
-Private Sub View_MouseDown(ByVal Button As Integer, ByVal Shift As Integer, ByVal X As Integer, ByVal Y As Integer)
-    RaiseEvent MouseDown(Button, Shift, X, Y)
-    bDown = True
-    View.Refresh
-End Sub
-
-Private Sub View_MouseMove(ByVal Button As Integer, ByVal Shift As Integer, ByVal X As Integer, ByVal Y As Integer)
-    RaiseEvent MouseMove(Button, Shift, X, Y)
-End Sub
-
-Private Sub View_MouseUp(ByVal Button As Integer, ByVal Shift As Integer, ByVal X As Integer, ByVal Y As Integer)
-    RaiseEvent MouseUp(Button, Shift, X, Y)
-    bDown = False
-    View.Refresh
-End Sub
+Private Sub View_MouseDown(ByVal Button As Integer, ByVal Shift As Integer, ByVal X As Integer, ByVal Y As Integer): RaiseEvent MouseDown(Button, Shift, X, Y): End Sub
+Private Sub View_MouseMove(ByVal Button As Integer, ByVal Shift As Integer, ByVal X As Integer, ByVal Y As Integer): RaiseEvent MouseMove(Button, Shift, X, Y): End Sub
+Private Sub View_MouseUp(ByVal Button As Integer, ByVal Shift As Integer, ByVal X As Integer, ByVal Y As Integer): RaiseEvent MouseUp(Button, Shift, X, Y): End Sub
 
 Private Sub View_Paint(Canvas As Drawing2D.cGraphics)
     Dim Pen As New cPen
+    Dim Brush1 As New cSolidBrush
     Dim Brush2 As New cSolidBrush
-    Dim Brush As New cSolidBrush
     
-    Dim Fam As New cFontFamily
-    Dim Font As New cFont
-    Dim strFormat As New cStringFormat
+    Dim P1 As Single, P2 As Single
+    Dim bgColor As Long
     
-    Dim Bound As RECTF
-    
-    Fam.FromName mFontName
-    Font.FromFamily Fam, mFontSize, mStyle, UnitPixel
-    strFormat.Align = StringAlignmentNear
-    strFormat.LineAlign = StringAlignmentCenter
+    P1 = CSng(mValue) / mMax
+    P2 = CSng(mSecondValue) / mMax
     
     If View.Enabled Then
-        If bHover Then
-            If bDown Then
-                Pen.Color = ThemeColor.AccentDarkColor
-            Else
-                Pen.Color = ThemeColor.AccentLightColor
-            End If
-        Else
-            Pen.Color = ThemeColor.AccentColor
-        End If
-        Brush.Color = ThemeColor.TextColor
+        Pen.Color = ThemeColor.BorderColor
+        Brush1.Color = ThemeColor.AccentColor
+        Brush2.Color = cColor.SetAlpha(Brush1.Color, -0.6)
+        bgColor = ThemeColor.BKColor
     Else
-        Brush.Color = ThemeColor.BorderDisEnableColor
         Pen.Color = ThemeColor.BorderDisEnableColor
+        Brush1.Color = cColor.SetBrightness(ThemeColor.BKDrakColor, -0.2)
+        Brush2.Color = cColor.SetAlpha(Brush1.Color, -0.6)
+        bgColor = ThemeColor.BKDrakColor
     End If
     
-    Brush2.Color = Pen.Color
-    Pen.Width = 2
-    
-    Bound = NewRectF(20, 1, View.Width - 21, View.Height - 1)
-    
-    Canvas.SetTextRenderingHint TextRenderingHintAntiAliasGridFit
-    Canvas.SetSmoothingMode SmoothingModeAntiAlias
-    Canvas.Clear ThemeColor.BKColor
-    
-    Canvas.DrawEllipse Pen, 4, (View.Height - 1 - 10) / 2, 10, 10
-    If mValue Then
-        Canvas.FillEllipse Brush2.GetBaseBrush, 6, (View.Height - 1 - 6) / 2, 6, 6
-    End If
-    Canvas.DrawString mCaption, Font, Bound, strFormat, Brush.GetBaseBrush
+    Canvas.Clear bgColor
+    Canvas.DrawRectangle Pen, 0, 0, View.Width - 1, View.Height - 1
+    Canvas.FillRectangle Brush2.GetBaseBrush, 0, 0, (View.Width - 1) * P2, View.Height
+    Canvas.FillRectangle Brush1.GetBaseBrush, 0, 0, (View.Width - 1) * P1, View.Height
 End Sub

@@ -79,10 +79,12 @@ End Function
 '=========================================================================================
 'Òþ²Øº¯Êý
 Public Function CreateView(ByVal L As Integer, ByVal T As Integer, ByVal W As Integer, ByVal H As Integer) As cView
+Attribute CreateView.VB_MemberFlags = "40"
     Set CreateView = View.CreateView(L, T, W, H)
 End Function
 
 Public Sub SetAttr(ByVal AttrName As String, ByVal Value As String)
+Attribute SetAttr.VB_MemberFlags = "40"
     Select Case LCase(AttrName)
     '-----------------------------------------
         Case LCase("Name")

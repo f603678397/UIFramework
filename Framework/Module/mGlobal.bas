@@ -34,32 +34,6 @@ Public Function WndProc(ByVal hWnd As Long, ByVal uMsg As Long, ByVal wParam As 
     WndProc = DefWindowProcA(hWnd, uMsg, wParam, lParam)
 End Function
 
-Public Function GetTimerID() As Long
-    Dim nID As Long
-    Dim T As cTimer
-    Dim i As Long
-    
-    If TimerList.GetCount >= 65535 Then Exit Function
-    
-    Randomize
-    
-NewID:
-    nID = Int(65535 * Rnd + 1)
-    
-    If TimerList.GetCount > 0 Then
-        For i = 0 To TimerList.GetCount - 1
-            Set T = TimerList.GetObject(i)
-                If T.ID = nID Then
-                    Set T = Nothing
-                    GoTo NewID
-                End If
-            Set T = Nothing
-        Next
-    End If
-    
-    GetTimerID = nID
-End Function
-
 Public Sub TimerProc(ByVal hWnd As Long, ByVal uMsg As Long, ByVal EventID As Long, ByVal dwTime As Long)
     If TimerList.GetCount = 0 Then Exit Sub
     

@@ -13,6 +13,8 @@ Public Type ThemeColorType
     AccentLightColor        As Long
 End Type
 
+Public Const PI As Single = 3.1415926
+
 Public ViewList         As New cObjectList
 
 Public Preset           As PresetThemeEnum
