@@ -20,20 +20,19 @@ Attribute Timer.VB_VarHelpID = -1
 
 Private ThemeColor  As ThemeColorType
 
-Private StartAngle  As Single
-Private EndAngle    As Single
+Private Points(4)   As Single
 
 Private Sub Class_Initialize()
     Set Timer = New cTimer
-    
-    StartAngle = 30
-    EndAngle = -30
-    
     SetTheme Preset
 End Sub
 
 Public Sub Create(Parent As Object, ByVal sCaption As String, ByVal nLeft As Integer, ByVal nTop As Integer, ByVal nWidth As Integer, ByVal nHeight As Integer)
     Dim nhWnd       As Long
+    
+    nWidth = IIf(nWidth < 20, 20, nWidth)
+    nHeight = IIf(nHeight < 20, 20, nHeight)
+    
     Set View = Parent.CreateView(nLeft, nTop, nWidth, nHeight)
     nhWnd = View.GetLayout.GetActivity.hWnd
     Timer.Create nhWnd
@@ -111,12 +110,14 @@ End Property
 
 Public Property Get Width() As Integer: Width = View.Width: End Property
 Public Property Let Width(ByVal nWidth As Integer)
+    nWidth = IIf(nWidth < 20, 20, nWidth)
     If View.Width = nWidth Then Exit Property
     View.Width = nWidth
 End Property
 
 Public Property Get Height() As Integer: Height = View.Height: End Property
 Public Property Let Height(ByVal nHeight As Integer)
+    nHeight = IIf(nHeight < 20, 20, nHeight)
     If View.Height = nHeight Then Exit Property
     View.Height = nHeight
 End Property
@@ -175,33 +176,64 @@ Public Property Let AccentColor(ByVal nColor As Long)
 End Property
 
 Private Sub Timer_onTime()
-    Static A As Single
+    Static Angle As Single
+    Static B As Byte
     Dim R As Single
+    Dim Offset As Single
+    Dim i As Integer
     
-    R = StartAngle / 720 * PI
-    StartAngle = StartAngle + 30 * Sin(R) + 1.5
-    StartAngle = IIf(StartAngle < 720, StartAngle, StartAngle - 720)
+    If Angle < 135 Or Angle > 225 Then
+        R = Angle / 180 * PI
+        Offset = 20 * Cos(R) + 20
+    Else
+        Offset = 3
+    End If
     
-    EndAngle = -135 * Sin(R) - 30
+    If Angle < 360 Then
+        Angle = Angle + Offset
+    Else
+        Angle = 0
+        B = IIf(B < 2, B + 1, 0)
+    End If
     
+    For i = UBound(Points) To 1 Step -1
+        Points(i) = Points(i - 1) - 10
+    Next
+    
+    If B <> 2 Then
+        Points(0) = Angle
+    Else
+        Points(0) = -1
+    End If
+
     View.Refresh
 End Sub
 
 Private Sub View_Paint(Canvas As Drawing2D.cGraphics)
-    Dim Pen As New cPen
-    Dim L As Integer, T As Integer, W As Integer
+    Dim Brush As New cSolidBrush
+    Dim L As Integer, T As Integer, N As Integer
+    Dim cX As Single, cY As Single, cR As Single
+    Dim i As Integer
+    Dim R As Single
     
-    Pen.Width = 3
-    Pen.Color = ThemeColor.AccentColor
+    Brush.Color = ThemeColor.AccentColor
     
-    W = IIf(View.Width < View.Height, View.Width - 5, View.Height - 5)
-    L = (View.Width - W) / 2
-    T = (View.Height - W) / 2
+    N = IIf(View.Width < View.Height, View.Width, View.Height) / 2
+    N = N - N / 5
+    cR = N / 5
+    L = View.Width / 2
+    T = View.Height / 2
     
-    Canvas.SetSmoothingMode SmoothingModeAntiAlias
-    Canvas.SetTranslate -View.Width / 2, -View.Height / 2, MatrixOrderPrepend
-    Canvas.SetRotate -90, MatrixOrderAppend
-    Canvas.SetTranslate View.Width / 2, View.Height / 2, MatrixOrderAppend
-    Canvas.DrawArc Pen, L, T, W, W, StartAngle, EndAngle
-    Canvas.ResetWorldTransform
+    
+    Canvas.SetSmoothingMode SmoothingModeAntiAlias8x8
+    
+    For i = 0 To UBound(Points)
+        If Points(i) > 0 Then
+            R = (Points(i) + 90) / 180 * PI
+            
+            cX = L + Cos(R) * N
+            cY = T + Sin(R) * N
+            Canvas.FillEllipse Brush.GetBaseBrush, cX - cR / 2, cY - cR / 2, cR, cR
+        End If
+    Next
 End Sub

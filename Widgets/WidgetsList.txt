@@ -1,0 +1,15 @@
+Button			√
+Label			√
+Option			√
+Frame			√
+ProgressBar		√
+Toast			√
+Waiting			√
+TextBox			×
+CheckBox		×
+ScrollBar			×
+ImageView		×
+ListView			×
+ComboBox		×
+TreeView			×
+ScrollView		×
