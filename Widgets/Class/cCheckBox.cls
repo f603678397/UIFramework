@@ -6,7 +6,7 @@ BEGIN
   DataSourceBehavior  = 0  'vbNone
   MTSTransactionMode  = 0  'NotAnMTSObject
 END
-Attribute VB_Name = "cOption"
+Attribute VB_Name = "cCheckBox"
 Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = True
 Attribute VB_PredeclaredId = False
@@ -25,7 +25,7 @@ Public Event GotFocus()
 Public Event LostFocus()
 Public Event Click()
 Public Event DblClick()
-Public Event ValueChanged(ByVal ByUser As Boolean)
+Public Event ValueChanged()
 
 Private mCaption    As String
 Private mValue      As Boolean
@@ -40,7 +40,7 @@ Private mID         As Long
 Private ThemeColor  As ThemeColorType
 
 Private Sub Class_Initialize()
-    mCaption = "Option"
+    mCaption = "CheckBox"
     mFontName = "ËÎÌו"
     mFontSize = 14
     mStyle = FontStyleRegular
@@ -236,7 +236,7 @@ Public Property Get Value() As Boolean: Value = mValue: End Property
 Public Property Let Value(ByVal bValue As Boolean)
     If mValue = bValue Then Exit Property
     mValue = bValue
-    ChangeValue False
+    ChangeValue
     View.Refresh
 End Property
 
@@ -327,30 +327,19 @@ Public Property Let FontStrikeout(ByVal bStru As Boolean)
     View.Refresh
 End Property
 
-Private Sub ChangeValue(ByVal ByUser As Boolean)
-    View.SendMsgToSameLevel VM_OPTION, mID, 0
-    RaiseEvent ValueChanged(ByUser)
+Private Sub ChangeValue()
+    RaiseEvent ValueChanged
+    View.Refresh
 End Sub
 
 Private Sub View_Click()
     RaiseEvent Click
-    If mValue = False Then
-        mValue = True
-        ChangeValue True
-        View.Refresh
-    End If
+    mValue = Not mValue
+    ChangeValue
 End Sub
 Private Sub View_DblClick(): RaiseEvent DblClick: End Sub
 
 Private Sub View_GotFocus(): RaiseEvent GotFocus: End Sub
-
-Private Sub View_HandleMsg(ByVal nMsg As Long, ByVal wParam As Long, ByVal lParam As Long)
-    If nMsg <> VM_OPTION Then Exit Sub
-    If wParam = mID Or mValue = False Then Exit Sub
-    mValue = False
-    RaiseEvent ValueChanged(False)
-    View.Refresh
-End Sub
 
 Private Sub View_LostFocus(): RaiseEvent LostFocus: End Sub
 
@@ -392,6 +381,7 @@ Private Sub View_Paint(Canvas As Drawing2D.cGraphics)
     Dim strFormat As New cStringFormat
     
     Dim Bound As RECTF
+    Dim T As Single
     
     Fam.FromName mFontName
     Font.FromFamily Fam, mFontSize, mStyle, UnitPixel
@@ -423,9 +413,15 @@ Private Sub View_Paint(Canvas As Drawing2D.cGraphics)
     Canvas.SetSmoothingMode SmoothingModeAntiAlias
     Canvas.Clear ThemeColor.BKColor
     
-    Canvas.DrawEllipse Pen, 4, (View.Height - 1 - 10) / 2, 10, 10
-    If mValue Then
-        Canvas.FillEllipse Brush2.GetBaseBrush, 6, (View.Height - 1 - 6) / 2, 6, 6
+    If Not mValue Then
+        Canvas.DrawRectangle Pen, 4, (View.Height - 1 - 10) / 2, 10, 10
+    Else
+        T = (View.Height - 1 - 12) / 2
+        Pen.Color = cColor.White
+        Canvas.FillRectangle Brush2.GetBaseBrush, 3, T, 12, 12
+        Canvas.DrawLine Pen, 5, T + 6, 8, T + 9
+        Canvas.DrawLine Pen, 8, T + 9, 13, T + 2
     End If
     Canvas.DrawString mCaption, Font, Bound, strFormat, Brush.GetBaseBrush
 End Sub
+

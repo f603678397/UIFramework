@@ -32,7 +32,7 @@ Public Sub Terminate()
     
     For i = 0 To TimerList.GetCount - 1
         Set Timer = TimerList.GetObject(i)
-            Timer.Release
+            If Not Timer Is Nothing Then Timer.Release
         Set Timer = Nothing
     Next
     Set TimerList = Nothing

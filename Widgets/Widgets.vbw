@@ -1,9 +1,11 @@
 cButton = 41, 16, 811, 555, C
-cLabel = 13, 35, 657, 538, C
+cLabel = 13, 35, 657, 538, 
 mGlobal = 327, 86, 1051, 563, C
-cToast = 138, 19, 982, 614, C
+cToast = 165, 15, 995, 598, C
 cWidgetManager = 79, 13, 748, 577, C
-cOption = 59, 27, 738, 502, 
+cOption = 59, 27, 738, 502, C
 cFrame = 69, 43, 727, 517, C
 cProgressBar = 169, 32, 919, 571, C
-cWaiting = 343, 59, 993, 531, C
+cWaiting = 383, 40, 1033, 512, C
+cCheckBox = 175, 52, 1037, 492, C
+cImageView = 256, 51, 1015, 533, 

@@ -39,8 +39,10 @@ Public Function Create(ByVal hWnd As Long) As Boolean
 End Function
 
 Public Sub Release()
+    If mHandle = 0 Then Exit Sub
     KillTimer mhWnd, mHandle
     TimerList.Remove TimerList.Find(Me)
+    mHandle = 0
 End Sub
 
 Friend Sub CallOnTime(): RaiseEvent onTime: End Sub

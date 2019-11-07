@@ -22,11 +22,15 @@ Attribute VB_Exposed = False
 Option Explicit
 Dim Activity                As cActivity
 Dim Layout                  As cLayout
+Dim IM                      As cImageManager
+
 Dim WithEvents btnOk        As cButton
 Attribute btnOk.VB_VarHelpID = -1
 Dim WithEvents btnCancel    As cButton
 Attribute btnCancel.VB_VarHelpID = -1
 Dim Label1                  As cLabel
+Dim WithEvents CheckBox     As cCheckBox
+Attribute CheckBox.VB_VarHelpID = -1
 Dim Frame1                  As cFrame
 Dim WithEvents Option1      As cOption
 Attribute Option1.VB_VarHelpID = -1
@@ -36,26 +40,33 @@ Dim Waiting                 As cWaiting
 Dim WithEvents Timer1       As cTimer
 Attribute Timer1.VB_VarHelpID = -1
 Dim Progress1               As cProgressBar
+Dim ImageView               As cImageView
 
 Private Sub Form_Load()
     cCore.Initialize
 
     Set Activity = cCore.CreateActivity(Me.hWnd)
     Set Layout = Activity.CreateLayout
+    Set IM = cCore.GetImageManager
     
+    IM.LoadImage App.Path & "\res\head.jpg", "head"
+
     cWidgetManager.BindLayout Layout
-    
+
     Set btnOk = cWidgetManager.CreateButton(Layout, 260, 260, 60, 30)
     Set btnCancel = cWidgetManager.CreateButton(Layout, 330, 260, 60, 30)
     
     Set Label1 = cWidgetManager.CreateLabel(Layout, 10, 10, 100, 20)
-    Set Frame1 = cWidgetManager.CreateFrame(Layout, 10, 30, 100, 80)
+    Set CheckBox = cWidgetManager.CreateCheckBox(Layout, 10, 30, 100, 20)
+    Set Frame1 = cWidgetManager.CreateFrame(Layout, 10, 50, 100, 80)
     Set Option1 = cWidgetManager.CreateOption(Frame1, 5, 20, 100, 20)
     Set Option2 = cWidgetManager.CreateOption(Frame1, 5, 50, 100, 20)
     
-    Set Progress1 = cWidgetManager.CreateProgressBar(Layout, 10, 120, 100, 3)
+    Set ImageView = cWidgetManager.CreateImageView(Nothing, 10, 140, 100, 100)
     
-    Set Waiting = cWidgetManager.CreateWaiting(Layout, 10, 135, 50, 50)
+    Set Waiting = cWidgetManager.CreateWaiting(Layout, 10, 265, 20, 20)
+    Set Progress1 = cWidgetManager.CreateProgressBar(Layout, 35, 275, 80, 3)
+    
     Set Timer1 = New cTimer
     Timer1.Create Me.hWnd
     
@@ -64,6 +75,12 @@ Private Sub Form_Load()
         .FontName = "微软雅黑"
         .LineAlignCenter = True
         .IsAccent = True
+    End With
+    
+    With CheckBox
+        .Caption = "主题可选"
+        .Value = True
+        .FontName = "微软雅黑"
     End With
     
     With Frame1
@@ -86,6 +103,8 @@ Private Sub Form_Load()
         .Value = 30
         .SecondValue = 50
     End With
+    
+    ImageView.Src = "head"
     
     With btnOk
         .Caption = "确定"
@@ -112,11 +131,14 @@ End Sub
 
 Private Sub btnOk_Click()
 '
-Progress1.Enabled = Not Progress1.Enabled
 End Sub
 
 Private Sub btnCancel_Click()
     Unload Me
+End Sub
+
+Private Sub CheckBox_ValueChanged()
+    Frame1.Enabled = CheckBox.Value
 End Sub
 
 Private Sub Option1_ValueChanged(ByVal ByUser As Boolean)

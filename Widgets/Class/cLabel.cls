@@ -38,7 +38,7 @@ Private mLineCenter         As Boolean
 Private ThemeColor  As ThemeColorType
 
 Private Sub Class_Initialize()
-    mCaption = "Button"
+    mCaption = "Label"
     mFontName = "ËÎÌו"
     mFontSize = 14
     mStyle = FontStyleRegular
