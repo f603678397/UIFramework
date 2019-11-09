@@ -420,7 +420,7 @@ Private Sub View_Paint(Canvas As Drawing2D.cGraphics)
         Pen.Color = cColor.White
         Canvas.FillRectangle Brush2.GetBaseBrush, 3, T, 12, 12
         Canvas.DrawLine Pen, 5, T + 6, 8, T + 9
-        Canvas.DrawLine Pen, 8, T + 9, 13, T + 2
+        Canvas.DrawLine Pen, 7, T + 10, 13, T + 2
     End If
     Canvas.DrawString mCaption, Font, Bound, strFormat, Brush.GetBaseBrush
 End Sub

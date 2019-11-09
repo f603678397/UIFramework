@@ -44,7 +44,7 @@ Public Sub Terminate()
     Next
     Set DrawableList = Nothing
     
-    IM.Release
+    IM.DisposeAll
     Set IM = Nothing
     Drawing.SHUTDOWN
 End Sub

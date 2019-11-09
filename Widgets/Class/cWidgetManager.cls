@@ -163,3 +163,14 @@ Public Function CreateImageView(Parent As Object, ByVal L As Integer, ByVal T As
     ViewList.Add Img
     Set CreateImageView = Img
 End Function
+
+Public Function CreateVScrollBar(Parent As Object, ByVal L As Integer, ByVal T As Integer, ByVal W As Integer, ByVal H As Integer) As cVScrollBar
+    Dim VScroll As New cVScrollBar
+    If Parent Is Nothing Then
+        VScroll.Create Layout, "VScrollBar", L, T, W, H
+    Else
+        VScroll.Create Parent, "VScrollBar", L, T, W, H
+    End If
+    ViewList.Add VScroll
+    Set CreateVScrollBar = VScroll
+End Function

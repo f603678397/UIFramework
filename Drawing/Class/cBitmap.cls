@@ -24,7 +24,7 @@ Public Property Get Height() As Long: GdipGetImageHeight mHandle, Height: End Pr
 
 Public Property Get PixelFormat() As GpPixelFormat: GdipGetImagePixelFormat mHandle, PixelFormat: End Property
 
-Friend Sub Release(): GdipDisposeImage mHandle: End Sub
+Public Sub Release(): GdipDisposeImage mHandle: mHandle = 0: End Sub
 
 Public Sub FromFile(ByVal FileName As String)
     Release
@@ -49,23 +49,23 @@ End Sub
 
 Public Function Clone() As cBitmap
     Dim Bitmap As New cBitmap
-    Dim h As Long
-    GdipCloneImage mHandle, h
-    Bitmap.Handle = h
+    Dim H As Long
+    GdipCloneImage mHandle, H
+    Bitmap.Handle = H
     Set Clone = Bitmap
 End Function
 
-Public Function CloneArea(ByVal X As Single, ByVal Y As Single, ByVal w As Single, ByVal h As Single) As cBitmap
+Public Function CloneArea(ByVal X As Single, ByVal Y As Single, ByVal w As Single, ByVal H As Single) As cBitmap
     Dim Bitmap As New cBitmap
-    GdipCloneBitmapArea X, Y, w, h, Me.PixelFormat, mHandle, Bitmap.Handle
+    GdipCloneBitmapArea X, Y, w, H, Me.PixelFormat, mHandle, Bitmap.Handle
     Set CloneArea = Bitmap
 End Function
 
 Public Function CreateCacheBitmap(Graphics As cGraphics) As cCachedBitmap
     Dim Cache As cCachedBitmap
-    Dim h As Long
-    GdipCreateCachedBitmap mHandle, Graphics.Handle, h
-    Cache.Handle = h
+    Dim H As Long
+    GdipCreateCachedBitmap mHandle, Graphics.Handle, H
+    Cache.Handle = H
     Set CreateCacheBitmap = Cache
 End Function
 
@@ -155,24 +155,24 @@ End Sub
 
 Public Function ApplyEffectNewBitmap(Effect As cEffect, mRect As RECTL, outRect As RECTL) As cBitmap
     Dim Bitmap As New cBitmap
-    Dim h As Long
-    GdipBitmapCreateApplyEffect mHandle, 1, Effect.Handle, mRect, outRect, h, 0, 0, 0
-    Bitmap.Handle = h
+    Dim H As Long
+    GdipBitmapCreateApplyEffect mHandle, 1, Effect.Handle, mRect, outRect, H, 0, 0, 0
+    Bitmap.Handle = H
     Set ApplyEffectNewBitmap = Bitmap
 End Function
 
 Public Function GetGraphics() As cGraphics
     Dim Graphics As New cGraphics
-    Dim h As Long
-    GdipGetImageGraphicsContext mHandle, h
-    Graphics.Handle = h
+    Dim H As Long
+    GdipGetImageGraphicsContext mHandle, H
+    Graphics.Handle = H
     Set GetGraphics = Graphics
 End Function
 
 Public Function ToImage() As cImage
     Dim Img As New cImage
-    Dim h As Long
-    GdipCloneImage mHandle, h
-    Img.Handle = h
+    Dim H As Long
+    GdipCloneImage mHandle, H
+    Img.Handle = H
     Set ToImage = Img
 End Function

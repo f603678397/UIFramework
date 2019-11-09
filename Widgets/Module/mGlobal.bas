@@ -7,6 +7,7 @@ Public Type ThemeColorType
     BKLightColor            As Long
     BorderColor             As Long
     BorderDisEnableColor    As Long
+    BorderLightColor        As Long
     TextColor               As Long
     AccentColor             As Long
     AccentDarkColor         As Long
@@ -29,6 +30,7 @@ Public Sub SetDarkTheme(ByRef ThemeColor As ThemeColorType)
         .BKLightColor = cColor.FromARGB(255, 85, 85, 85)
         .BorderColor = cColor.FromARGB(255, 110, 110, 110)
         .BorderDisEnableColor = cColor.FromARGB(255, 80, 80, 80)
+        .BorderLightColor = cColor.FromARGB(255, 180, 180, 180)
         .TextColor = cColor.FromARGB(255, 205, 205, 205)
     End With
 End Sub
@@ -41,8 +43,9 @@ Public Sub SetLightTheme(ByRef ThemeColor As ThemeColorType)
         .BKColor = cColor.FromARGB(255, 248, 248, 248)
         .BKDrakColor = cColor.FromARGB(255, 240, 240, 240)
         .BKLightColor = cColor.FromARGB(255, 255, 255, 255)
-        .BorderColor = cColor.FromARGB(255, 200, 200, 200)
-        .BorderDisEnableColor = cColor.FromARGB(255, 205, 205, 205)
+        .BorderColor = cColor.FromARGB(255, 180, 180, 180)
+        .BorderDisEnableColor = cColor.FromARGB(255, 210, 210, 210)
+        .BorderLightColor = cColor.FromARGB(255, 140, 140, 140)
         .TextColor = cColor.FromARGB(255, 50, 50, 50)
     End With
 End Sub

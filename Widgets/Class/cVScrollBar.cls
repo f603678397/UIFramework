@@ -6,7 +6,7 @@ BEGIN
   DataSourceBehavior  = 0  'vbNone
   MTSTransactionMode  = 0  'NotAnMTSObject
 END
-Attribute VB_Name = "cProgressBar"
+Attribute VB_Name = "cVScrollBar"
 Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = True
 Attribute VB_PredeclaredId = False
@@ -25,20 +25,39 @@ Public Event GotFocus()
 Public Event LostFocus()
 Public Event Click()
 Public Event DblClick()
-Public Event ProgressChanged()
+Public Event Scrolled()
+
+Private bDown           As Boolean
+Private bHover          As Boolean
 
 Private mValue          As Long
-Private mSecondValue    As Long
 Private mMax            As Long
 
 Private ThemeColor  As ThemeColorType
 
+Private Enum HoverFlag
+    HF_None
+    HF_UP
+    HF_MID
+    HF_DOWN
+End Enum
+
+Private Const MinWidth  As Single = 18
+Private Const MinHeigth As Single = 36
+
+Private mHF         As HoverFlag
+Private BarSize     As Single
+Private BarTop      As Single
+Private LastY       As Integer
+
 Private Sub Class_Initialize()
-    mMax = 100
+    mMax = 10
     SetTheme Preset
 End Sub
 
 Public Sub Create(Parent As Object, ByVal sName As String, ByVal nLeft As Integer, ByVal nTop As Integer, ByVal nWidth As Integer, ByVal nHeight As Integer)
+    nWidth = IIf(nWidth < MinWidth, MinWidth, nWidth)
+    nHeight = IIf(nHeight < MinHeigth, MinHeigth, nHeight)
     Set View = Parent.CreateView(nLeft, nTop, nWidth, nHeight)
     View.Name = sName
 End Sub
@@ -52,6 +71,9 @@ Public Sub BindView(DstView As cView)
     Set View = Nothing
     Set View = DstView
     
+    bHover = False
+    bDown = False
+    
     V.Refresh
     View.Refresh
 End Sub
@@ -63,7 +85,6 @@ End Function
 '=========================================================================================
 '隐藏函数
 Public Sub SetAttr(ByVal AttrName As String, ByVal Value As String)
-Attribute SetAttr.VB_MemberFlags = "40"
     Select Case LCase(AttrName)
     '-----------------------------------------
         Case LCase("Name")
@@ -85,8 +106,6 @@ Attribute SetAttr.VB_MemberFlags = "40"
     '-----------------------------------------
         Case LCase("Value")
             Me.Value = CLng(Value)
-        Case LCase("SecondValue")
-            Me.SecondValue = CLng(Value)
         Case LCase("Max")
             Me.Max = CLng(Value)
         Case LCase("BackColor")
@@ -95,11 +114,10 @@ Attribute SetAttr.VB_MemberFlags = "40"
             Me.ForeColor = CLng(Value)
         Case LCase("AccentColor")
             Me.AccentColor = CLng(Value)
-        Case LCase("BorderColor")
-            Me.BorderColor = CLng(Value)
     '-----------------------------------------
     End Select
 End Sub
+
 
 '=========================================================================================
 '通用代码
@@ -121,12 +139,14 @@ End Property
 
 Public Property Get Width() As Integer: Width = View.Width: End Property
 Public Property Let Width(ByVal nWidth As Integer)
+    nWidth = IIf(nWidth < MinWidth, MinWidth, nWidth)
     If View.Width = nWidth Then Exit Property
     View.Width = nWidth
 End Property
 
 Public Property Get Height() As Integer: Height = View.Height: End Property
 Public Property Let Height(ByVal nHeight As Integer)
+    nHeight = IIf(nHeight < MinHeigth, MinHeigth, nHeight)
     If View.Height = nHeight Then Exit Property
     View.Height = nHeight
 End Property
@@ -192,8 +212,6 @@ Public Sub SetTheme(NewTheme As PresetThemeEnum)
         Case PresetThemeEnum.LightTheme
             SetLightTheme ThemeColor
     End Select
-    ThemeColor.BorderColor = cColor.Transparent
-    ThemeColor.BorderDisEnableColor = cColor.Transparent
 End Sub
 
 '=========================================================================================
@@ -206,30 +224,14 @@ Public Property Let AccentColor(ByVal nColor As Long)
     View.Refresh
 End Property
 
-Public Property Get BorderColor() As Long: BorderColor = ThemeColor.BorderColor: End Property
-Public Property Let BorderColor(ByVal nColor As Long)
-    If nColor = ThemeColor.BorderColor Then Exit Property
-    
-    ThemeColor.BorderColor = nColor
-    
-    View.Refresh
-End Property
-
 Public Property Get Value() As Long: Value = mValue: End Property
 Public Property Let Value(ByVal nValue As Long)
+    nValue = IIf(nValue < 0, 0, IIf(nValue > mMax, mMax, nValue))
     If mValue = nValue Then Exit Property
     mValue = nValue
-    RaiseEvent ProgressChanged
+    RaiseEvent Scrolled
     View.Refresh
 End Property
-
-Public Property Get SecondValue() As Long: SecondValue = mSecondValue: End Property
-Public Property Let SecondValue(ByVal nValue As Long)
-    If mSecondValue = nValue Then Exit Property
-    mSecondValue = nValue
-    View.Refresh
-End Property
-
 
 Public Property Get Max() As Long: Max = mMax: End Property
 Public Property Let Max(ByVal nMax As Long)
@@ -245,38 +247,189 @@ Private Sub View_DblClick(): RaiseEvent DblClick: End Sub
 Private Sub View_GotFocus(): RaiseEvent GotFocus: End Sub
 Private Sub View_LostFocus(): RaiseEvent LostFocus: End Sub
 
-Private Sub View_MouseHover(): RaiseEvent MouseHover: End Sub
-Private Sub View_MouseLeave(): RaiseEvent MouseLeave: End Sub
+Private Sub View_MouseHover()
+    RaiseEvent MouseHover
+    bHover = True
+    View.Refresh
+End Sub
 
-Private Sub View_MouseDown(ByVal Button As Integer, ByVal Shift As Integer, ByVal X As Integer, ByVal Y As Integer): RaiseEvent MouseDown(Button, Shift, X, Y): End Sub
-Private Sub View_MouseMove(ByVal Button As Integer, ByVal Shift As Integer, ByVal X As Integer, ByVal Y As Integer): RaiseEvent MouseMove(Button, Shift, X, Y): End Sub
-Private Sub View_MouseUp(ByVal Button As Integer, ByVal Shift As Integer, ByVal X As Integer, ByVal Y As Integer): RaiseEvent MouseUp(Button, Shift, X, Y): End Sub
+Private Sub View_MouseLeave()
+    RaiseEvent MouseLeave
+    mHF = HF_None
+    bHover = False
+    View.Refresh
+End Sub
+
+Private Sub View_MouseDown(ByVal Button As Integer, ByVal Shift As Integer, ByVal X As Integer, ByVal Y As Integer)
+    Dim Offset As Integer
+    RaiseEvent MouseDown(Button, Shift, X, Y)
+    bDown = True
+
+    If Y < 18 Then
+        mHF = HF_UP
+    ElseIf Y > View.Height - 19 Then
+        mHF = HF_DOWN
+    ElseIf Y > BarTop And Y <= BarTop + BarSize Then
+        mHF = HF_MID
+    Else
+        mHF = HF_None
+    End If
+        
+    Select Case mHF
+        Case HoverFlag.HF_UP
+            If mValue > 0 Then
+                mValue = mValue - 1
+                RaiseEvent Scrolled
+                View.Refresh
+            End If
+        Case HoverFlag.HF_MID
+            LastY = Y - BarTop
+            View.Refresh
+        Case HoverFlag.HF_DOWN
+            If mValue < mMax Then
+                mValue = mValue + 1
+                RaiseEvent Scrolled
+                View.Refresh
+            End If
+        Case HoverFlag.HF_None
+            Offset = mMax * 0.1
+            If Offset = 0 Then Offset = 1
+            
+            If Y < BarTop Then
+                If mValue > 0 Then
+                    mValue = mValue - Offset
+                    If mValue < 0 Then mValue = 0
+                    RaiseEvent Scrolled
+                    View.Refresh
+                End If
+            ElseIf Y > BarTop + BarSize Then
+                If mValue < mMax Then
+                    mValue = mValue + Offset
+                    If mValue > mMax Then mValue = mMax
+                    RaiseEvent Scrolled
+                    View.Refresh
+                End If
+            End If
+    End Select
+End Sub
+
+Private Sub View_MouseMove(ByVal Button As Integer, ByVal Shift As Integer, ByVal X As Integer, ByVal Y As Integer)
+    Dim nHF As HoverFlag
+    Dim OffsetY As Single
+    Dim nValue As Long
+    RaiseEvent MouseMove(Button, Shift, X, Y)
+    
+    If bDown Then
+        If mHF = HF_MID Then
+            OffsetY = Y - 18 - LastY
+            nValue = (OffsetY / (View.Height - 36 - BarSize)) * mMax
+            
+            nValue = IIf(nValue < 0, 0, IIf(nValue > mMax, mMax, nValue))
+            If mValue <> nValue Then
+                mValue = nValue
+                RaiseEvent Scrolled
+                View.Refresh
+            End If
+        End If
+    Else
+        If Y < 18 Then
+            nHF = HF_UP
+        ElseIf Y > View.Height - 19 Then
+            nHF = HF_DOWN
+        ElseIf Y > BarTop And Y <= BarTop + BarSize Then
+            nHF = HF_MID
+        Else
+            nHF = HF_None
+        End If
+        
+        If mHF <> nHF Then
+            mHF = nHF
+            View.Refresh
+        End If
+    End If
+End Sub
+
+Private Sub View_MouseUp(ByVal Button As Integer, ByVal Shift As Integer, ByVal X As Integer, ByVal Y As Integer)
+    RaiseEvent MouseUp(Button, Shift, X, Y)
+    bDown = False
+    View.Refresh
+End Sub
+
+Private Sub View_MouseWheel(ByVal Forward As Boolean)
+    Dim Offset As Integer
+    Offset = mMax * 0.05
+    If Offset = 0 Then Offset = 1
+    mHF = HF_None
+    
+    If Forward Then
+        Me.Value = Me.Value - Offset
+    Else
+        Me.Value = Me.Value + Offset
+    End If
+End Sub
 
 Private Sub View_Paint(Canvas As Drawing2D.cGraphics)
-    Dim Pen As New cPen
-    Dim Brush1 As New cSolidBrush
+    Dim Brush As New cSolidBrush
     Dim Brush2 As New cSolidBrush
-    
-    Dim P1 As Single, P2 As Single
-    Dim bgColor As Long
-    
-    P1 = CSng(mValue) / mMax
-    P2 = CSng(mSecondValue) / mMax
+    Dim Path As New cPath
+    Dim OffsetL As Single
     
     If View.Enabled Then
-        Pen.Color = ThemeColor.BorderColor
-        Brush1.Color = ThemeColor.AccentColor
-        Brush2.Color = cColor.SetAlpha(Brush1.Color, -0.6)
-        bgColor = ThemeColor.BKColor
+        If bHover Then
+            Brush.Color = ThemeColor.BorderLightColor
+        Else
+            Brush.Color = ThemeColor.BorderColor
+        End If
     Else
-        Pen.Color = ThemeColor.BorderDisEnableColor
-        Brush1.Color = cColor.SetBrightness(ThemeColor.BKDrakColor, -0.2)
-        Brush2.Color = cColor.SetAlpha(Brush1.Color, -0.6)
-        bgColor = ThemeColor.BKDrakColor
+        Brush.Color = ThemeColor.BorderDisEnableColor
     End If
     
-    Canvas.Clear bgColor
-    Canvas.DrawRectangle Pen, 0, 0, View.Width - 1, View.Height - 1
-    Canvas.FillRectangle Brush2.GetBaseBrush, 0, 0, (View.Width - 1) * P2, View.Height
-    Canvas.FillRectangle Brush1.GetBaseBrush, 0, 0, (View.Width - 1) * P1, View.Height
+    If bDown Then
+        Brush2.Color = ThemeColor.AccentDarkColor
+    Else
+        Brush2.Color = ThemeColor.AccentColor
+    End If
+    
+    OffsetL = (View.Width - 18) / 2
+    BarSize = (View.Height - 36) / mMax
+    BarSize = IIf(BarSize < 15, 15, BarSize)
+    BarTop = 18 + (View.Height - 36 - BarSize) * (mValue / mMax)
+    
+    If bHover Then
+        Canvas.Clear ThemeColor.BKDrakColor
+    End If
+    
+    '上三角
+    Path.AddLine OffsetL + 2, 12, OffsetL + 8, 5
+    Path.AddLine OffsetL + 8, 5, OffsetL + 15, 12
+    Path.CloseFigure
+    
+    If mHF = HF_UP Then
+        Canvas.fillPath Brush2.GetBaseBrush, Path
+    Else
+        Canvas.fillPath Brush.GetBaseBrush, Path
+    End If
+    
+    Path.Reset
+    '下三角
+    Path.AddLine OffsetL + 3, View.Height - 18 + 5, OffsetL + 8, View.Height - 18 + 11
+    Path.AddLine OffsetL + 8, View.Height - 18 + 11, OffsetL + 14, View.Height - 18 + 5
+    Path.CloseFigure
+    
+    If mHF = HF_DOWN Then
+        Canvas.fillPath Brush2.GetBaseBrush, Path
+    Else
+        Canvas.fillPath Brush.GetBaseBrush, Path
+    End If
+    
+    '控制条
+    If View.Height > 54 Then
+        If mHF = HF_MID Then
+            Canvas.FillRectangle Brush2.GetBaseBrush, OffsetL + 3, BarTop, 11, BarSize
+        Else
+            Canvas.FillRectangle Brush.GetBaseBrush, OffsetL + 3, BarTop, 11, BarSize
+        End If
+    Else
+        BarSize = 0
+    End If
 End Sub

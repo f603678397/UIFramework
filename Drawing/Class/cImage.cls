@@ -26,7 +26,7 @@ Public Property Get Flag() As Long: GdipGetImageFlags mHandle, Flag: End Propert
 
 Public Property Get PixelFormat() As GpPixelFormat: GdipGetImagePixelFormat mHandle, PixelFormat: End Property
 
-Friend Sub Release(): GdipDisposeImage mHandle: End Sub
+Public Sub Release(): GdipDisposeImage mHandle: mHandle = 0: End Sub
 
 Public Sub FromFile(ByVal FileName As String)
     GdipLoadImageFromFile StrPtr(FileName), mHandle
@@ -34,9 +34,9 @@ End Sub
 
 Public Function Clone() As cImage
     Dim Img As New cImage
-    Dim h As Long
-    GdipCloneImage mHandle, h
-    Img.Handle = h
+    Dim H As Long
+    GdipCloneImage mHandle, H
+    Img.Handle = H
     Set Clone = Img
 End Function
 
@@ -83,10 +83,10 @@ Public Function GetBounds(Optional Unit As GpUnit) As RECTF
 End Function
 
 Public Function GetDimension() As SIZEF
-    Dim w As Single, h As Single
-    GdipGetImageDimension mHandle, w, h
+    Dim w As Single, H As Single
+    GdipGetImageDimension mHandle, w, H
     GetDimension.cx = w
-    GetDimension.cy = h
+    GetDimension.cy = H
 End Function
 
 Public Function GetType() As Image_Type
@@ -99,9 +99,9 @@ End Function
 
 Public Function GetThumbnail(ByVal Width As Long, ByVal Height As Long) As cImage
     Dim Img As New cImage
-    Dim h As Long
-    GdipGetImageThumbnail mHandle, Width, Height, h, 0, 0
-    Img.Handle = h
+    Dim H As Long
+    GdipGetImageThumbnail mHandle, Width, Height, H, 0, 0
+    Img.Handle = H
     Set GetThumbnail = Img
 End Function
 
@@ -140,8 +140,8 @@ End Sub
 
 Public Function ToBitmap() As cBitmap
     Dim Bmp As New cBitmap
-    Dim h As Long
-    GdipCloneImage mHandle, h
-    Bmp.Handle = h
+    Dim H As Long
+    GdipCloneImage mHandle, H
+    Bmp.Handle = H
     Set ToBitmap = Bmp
 End Function

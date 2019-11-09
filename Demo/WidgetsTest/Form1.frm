@@ -41,6 +41,7 @@ Dim WithEvents Timer1       As cTimer
 Attribute Timer1.VB_VarHelpID = -1
 Dim Progress1               As cProgressBar
 Dim ImageView               As cImageView
+Dim VScroll                 As cVScrollBar
 
 Private Sub Form_Load()
     cCore.Initialize
@@ -62,10 +63,12 @@ Private Sub Form_Load()
     Set Option1 = cWidgetManager.CreateOption(Frame1, 5, 20, 100, 20)
     Set Option2 = cWidgetManager.CreateOption(Frame1, 5, 50, 100, 20)
     
-    Set ImageView = cWidgetManager.CreateImageView(Nothing, 10, 140, 100, 100)
+    Set ImageView = cWidgetManager.CreateImageView(Layout, 10, 140, 100, 100)
     
     Set Waiting = cWidgetManager.CreateWaiting(Layout, 10, 265, 20, 20)
     Set Progress1 = cWidgetManager.CreateProgressBar(Layout, 35, 275, 80, 3)
+    
+    Set VScroll = cWidgetManager.CreateVScrollBar(Layout, 372, 10, 18, 240)
     
     Set Timer1 = New cTimer
     Timer1.Create Me.hWnd
@@ -106,6 +109,11 @@ Private Sub Form_Load()
     
     ImageView.Src = "head"
     
+    With VScroll
+        .Max = 100
+        .Value = 0
+    End With
+    
     With btnOk
         .Caption = "È·¶¨"
         .FontName = "Î¢ÈíÑÅºÚ"
@@ -139,6 +147,7 @@ End Sub
 
 Private Sub CheckBox_ValueChanged()
     Frame1.Enabled = CheckBox.Value
+    VScroll.Enabled = CheckBox.Value
 End Sub
 
 Private Sub Option1_ValueChanged(ByVal ByUser As Boolean)
