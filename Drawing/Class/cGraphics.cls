@@ -17,7 +17,7 @@ Private mHandle As Long
 Private Sub Class_Terminate(): Release: End Sub
 
 Public Property Get Handle() As Long: Handle = mHandle: End Property
-Friend Property Let Handle(ByVal nHandle As Long): mHandle = nHandle: End Property
+Friend Property Let Handle(ByVal nHandle As Long): mHandle = nHandle: SetPageUnit GlobalUnit: End Property
 
 Public Sub Release()
     GdipDeleteGraphics mHandle
@@ -300,7 +300,7 @@ Public Sub PrintString(ByVal sText As String, Layout As RECTF, Optional nColor A
     Dim mFormat As Long
     Dim Brush As Long
     GdipCreateFontFamilyFromName sFontName, 0, Fam
-    GdipCreateFont Fam, nSize, FontStyleRegular, UnitPixel, mFont
+    GdipCreateFont Fam, nSize, FontStyleRegular, GlobalUnit, mFont
     GdipCreateStringFormat 0, 0, mFormat
     GdipSetStringFormatAlign mFormat, StringAlignmentNear
     GdipCreateSolidFill nColor, Brush
@@ -437,7 +437,7 @@ Public Sub FillPie(Brush As cBrush, ByVal X As Single, ByVal Y As Single, ByVal 
     GdipFillPie mHandle, Brush.Handle, X, Y, Width, Height, startAngle, sweepAngle
 End Sub
 
-Public Sub fillPath(Brush As cBrush, Path As cPath)
+Public Sub FillPath(Brush As cBrush, Path As cPath)
     GdipFillPath mHandle, Brush.Handle, Path.Handle
 End Sub
 
@@ -460,18 +460,18 @@ End Sub
 Public Sub DrawImageRectRect(Img As cImage, dstRect As RECTF, srcRect As RECTF, imgAttr As cImageAttributes)
     Dim H As Long
     If Not imgAttr Is Nothing Then H = imgAttr.Handle
-    GdipDrawImageRectRect mHandle, Img.Handle, dstRect.Left, dstRect.Top, dstRect.Right, dstRect.Bottom, srcRect.Left, srcRect.Top, srcRect.Right, srcRect.Bottom, UnitPixel, H, 0, 0
+    GdipDrawImageRectRect mHandle, Img.Handle, dstRect.Left, dstRect.Top, dstRect.Right, dstRect.Bottom, srcRect.Left, srcRect.Top, srcRect.Right, srcRect.Bottom, GlobalUnit, H, 0, 0
 End Sub
 
 Public Sub DrawImagePointRect(Img As cImage, ByVal X As Single, ByVal Y As Single, srcRect As RECTF)
-    GdipDrawImagePointRect mHandle, Img.Handle, X, Y, srcRect.Left, srcRect.Top, srcRect.Right, srcRect.Bottom, UnitPixel
+    GdipDrawImagePointRect mHandle, Img.Handle, X, Y, srcRect.Left, srcRect.Top, srcRect.Right, srcRect.Bottom, GlobalUnit
 End Sub
 
 Public Sub DrawImagePointsRect(Img As cImage, pts() As POINTF, ByVal SrcX As Single, ByVal SrcY As Single, ByVal srcWidth As Single, ByVal srcHeight As Single)
     Dim Count As Long
     If (Not pts) = -1 Then Exit Sub
     Count = UBound(pts) - LBound(pts) + 1
-    GdipDrawImagePointsRect mHandle, Img.Handle, pts(LBound(pts)), Count, SrcX, SrcY, srcWidth, srcHeight, UnitPixel
+    GdipDrawImagePointsRect mHandle, Img.Handle, pts(LBound(pts)), Count, SrcX, SrcY, srcWidth, srcHeight, GlobalUnit
 End Sub
 
 Public Sub DrawImagePoints(Img As cImage, pts() As POINTF)

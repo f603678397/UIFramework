@@ -21,6 +21,7 @@ Public Sub Init()
     
     uIn.GdiplusVersion = 1
     GdiplusStartup Token, uIn
+    GlobalUnit = UnitPixel
 End Sub
 
 Public Sub Shutdown()
@@ -36,22 +37,30 @@ Public Sub Free(ByVal ptr As Long)
     GdipFree ptr
 End Sub
 
+Public Sub SetUnit(ByVal nUnit As GpUnit)
+    GlobalUnit = nUnit
+End Sub
+
+Public Function GetUnit() As GpUnit
+    GetUnit = GlobalUnit
+End Function
+
 Public Function CreateGraphicsFromHWND(ByVal Hwnd As Long) As cGraphics
     Dim Graphics As New cGraphics
-    Dim h As Long
+    Dim H As Long
     
-    GdipCreateFromHWND Hwnd, h
-    Graphics.Handle = h
+    GdipCreateFromHWND Hwnd, H
+    Graphics.Handle = H
     
     Set CreateGraphicsFromHWND = Graphics
 End Function
 
 Public Function CreateGraphicsFromHDC(ByVal hdc As Long) As cGraphics
     Dim Graphics As New cGraphics
-    Dim h As Long
+    Dim H As Long
     
-    GdipCreateFromHDC hdc, h
-    Graphics.Handle = h
+    GdipCreateFromHDC hdc, H
+    Graphics.Handle = H
     Set CreateGraphicsFromHDC = Graphics
 End Function
 

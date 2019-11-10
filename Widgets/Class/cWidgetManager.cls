@@ -174,3 +174,14 @@ Public Function CreateVScrollBar(Parent As Object, ByVal L As Integer, ByVal T A
     ViewList.Add VScroll
     Set CreateVScrollBar = VScroll
 End Function
+
+Public Function CreateHScrollBar(Parent As Object, ByVal L As Integer, ByVal T As Integer, ByVal W As Integer, ByVal H As Integer) As cHScrollBar
+    Dim HScroll As New cHScrollBar
+    If Parent Is Nothing Then
+        HScroll.Create Layout, "HScrollBar", L, T, W, H
+    Else
+        HScroll.Create Parent, "HScrollBar", L, T, W, H
+    End If
+    ViewList.Add HScroll
+    Set CreateHScrollBar = HScroll
+End Function

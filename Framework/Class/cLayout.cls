@@ -17,6 +17,7 @@ Private Bitmap          As cBitmap
 Private ViewList        As New cObjectList
 Private HoverView       As cView
 Private FocusView       As cView
+Private CaptureView     As cView
 Private Graphics        As cGraphics
 Private Activity        As cActivity
 
@@ -100,6 +101,8 @@ Friend Function HandleMessage(ByVal uMsg As Long, ByVal wParam As Long, ByVal lP
     ElseIf uMsg = WM_MOUSEHOVER Then
         RaiseEvent MouseHover
     ElseIf uMsg = WM_MOUSELEAVE Then
+        SetHoverView Nothing
+        SetCaptureView Nothing
         RaiseEvent MouseLeave
     ElseIf uMsg = WM_KEYDOWN Or uMsg = WM_KEYUP Then
         OnKeyEvent uMsg, wParam, lParam
@@ -119,7 +122,7 @@ Friend Sub SetHoverView(View As cView)
             HoverView.RaiseMouseLeave
         End If
         Set HoverView = View
-        HoverView.RaiseMouseHover
+        If Not HoverView Is Nothing Then HoverView.RaiseMouseHover
     End If
 End Sub
 
@@ -129,8 +132,12 @@ Friend Sub SetFocusView(View As cView)
             FocusView.RaiseLostFocus
         End If
         Set FocusView = View
-        FocusView.RaiseGotFocus
+        If Not FocusView Is Nothing Then FocusView.RaiseGotFocus
     End If
+End Sub
+
+Friend Sub SetCaptureView(View As cView)
+    Set CaptureView = View
 End Sub
 
 Public Sub ReDrawAllView()
@@ -221,6 +228,19 @@ Private Sub OnMouseEvent(ByVal uMsg As Long, ByVal wParam As Long, ByVal lParam 
     End If
     
     If uMsg = WM_MOUSEMOVE Then
+        If Not CaptureView Is Nothing Then
+            If CaptureView.Visible And CaptureView.Enabled Then
+                Set View = CaptureView.GetParent
+                Do While Not View Is Nothing
+                    X = X - View.Left
+                    Y = Y - View.Top
+                    Set View = View.GetParent
+                Loop
+                CaptureView.RaiseMouseMove Button, Shift, X - CaptureView.Left, Y - CaptureView.Top
+                Exit Sub
+            End If
+        End If
+    
         For i = ViewList.GetCount - 1 To 0 Step -1
             Set View = ViewList.GetObject(i)
                 If View.Visible Then
@@ -253,6 +273,8 @@ Private Sub OnMouseEvent(ByVal uMsg As Long, ByVal wParam As Long, ByVal lParam 
             If FocusView.Enabled Then FocusView.RaiseLostFocus
             Set FocusView = Nothing
         End If
+        SetHoverView Nothing
+        SetCaptureView Nothing
         RaiseEvent MouseDown(Button, Shift, X, Y)
     ElseIf uMsg = WM_LBUTTONUP Or uMsg = WM_RBUTTONUP Or uMsg = WM_MBUTTONUP Then
         If Not FocusView Is Nothing Then
@@ -274,10 +296,6 @@ Private Sub OnMouseEvent(ByVal uMsg As Long, ByVal wParam As Long, ByVal lParam 
         Else
             RaiseEvent MouseWheel(IIf(wParam > 0, True, False))
         End If
-    ElseIf uMsg = WM_MOUSEHOVER Then
-        RaiseEvent MouseHover
-    ElseIf uMsg = WM_MOUSELEAVE Then
-        RaiseEvent MouseLeave
     End If
 End Sub
 

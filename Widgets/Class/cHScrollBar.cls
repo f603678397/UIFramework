@@ -6,7 +6,7 @@ BEGIN
   DataSourceBehavior  = 0  'vbNone
   MTSTransactionMode  = 0  'NotAnMTSObject
 END
-Attribute VB_Name = "cVScrollBar"
+Attribute VB_Name = "cHScrollBar"
 Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = True
 Attribute VB_PredeclaredId = False
@@ -42,13 +42,13 @@ Private Enum HoverFlag
     HF_DOWN
 End Enum
 
-Private Const MinWidth  As Single = 18
-Private Const MinHeigth As Single = 36
+Private Const MinWidth  As Single = 36
+Private Const MinHeigth As Single = 18
 
 Private mHF         As HoverFlag
 Private BarSize     As Single
-Private BarTop      As Single
-Private LastY       As Integer
+Private BarLeft      As Single
+Private LastX       As Integer
 
 Private Sub Class_Initialize()
     mMax = 10
@@ -265,11 +265,11 @@ Private Sub View_MouseDown(ByVal Button As Integer, ByVal Shift As Integer, ByVa
     RaiseEvent MouseDown(Button, Shift, X, Y)
     bDown = True
 
-    If Y < 18 Then
+    If X < 18 Then
         mHF = HF_UP
-    ElseIf Y > View.Height - 19 Then
+    ElseIf X > View.Width - 19 Then
         mHF = HF_DOWN
-    ElseIf Y > BarTop And Y <= BarTop + BarSize Then
+    ElseIf X > BarLeft And X <= BarLeft + BarSize Then
         mHF = HF_MID
     Else
         mHF = HF_None
@@ -283,7 +283,7 @@ Private Sub View_MouseDown(ByVal Button As Integer, ByVal Shift As Integer, ByVa
                 View.Refresh
             End If
         Case HoverFlag.HF_MID
-            LastY = Y - BarTop
+            LastX = X - BarLeft
             View.Refresh
         Case HoverFlag.HF_DOWN
             If mValue < mMax Then
@@ -292,18 +292,18 @@ Private Sub View_MouseDown(ByVal Button As Integer, ByVal Shift As Integer, ByVa
                 View.Refresh
             End If
         Case HoverFlag.HF_None
-            If View.Height <= 54 Then Exit Sub
+            If View.Width <= 54 Then Exit Sub
             Offset = mMax * 0.1
             If Offset = 0 Then Offset = 1
             
-            If Y < BarTop Then
+            If X < BarLeft Then
                 If mValue > 0 Then
                     mValue = mValue - Offset
                     If mValue < 0 Then mValue = 0
                     RaiseEvent Scrolled
                     View.Refresh
                 End If
-            ElseIf Y > BarTop + BarSize Then
+            ElseIf X > BarLeft + BarSize Then
                 If mValue < mMax Then
                     mValue = mValue + Offset
                     If mValue > mMax Then mValue = mMax
@@ -316,14 +316,14 @@ End Sub
 
 Private Sub View_MouseMove(ByVal Button As Integer, ByVal Shift As Integer, ByVal X As Integer, ByVal Y As Integer)
     Dim nHF As HoverFlag
-    Dim OffsetY As Single
+    Dim OffsetX As Single
     Dim nValue As Long
     RaiseEvent MouseMove(Button, Shift, X, Y)
     
     If bDown Then
         If mHF = HF_MID Then
-            OffsetY = Y - 18 - LastY
-            nValue = (OffsetY / (View.Height - 36 - BarSize)) * mMax
+            OffsetX = X - 18 - LastX
+            nValue = (OffsetX / (View.Width - 36 - BarSize)) * mMax
             
             nValue = IIf(nValue < 0, 0, IIf(nValue > mMax, mMax, nValue))
             If mValue <> nValue Then
@@ -333,11 +333,11 @@ Private Sub View_MouseMove(ByVal Button As Integer, ByVal Shift As Integer, ByVa
             End If
         End If
     Else
-        If Y < 18 Then
+        If X < 18 Then
             nHF = HF_UP
-        ElseIf Y > View.Height - 19 Then
+        ElseIf X > View.Width - 19 Then
             nHF = HF_DOWN
-        ElseIf Y > BarTop And Y <= BarTop + BarSize Then
+        ElseIf X > BarLeft And X <= BarLeft + BarSize Then
             nHF = HF_MID
         Else
             nHF = HF_None
@@ -373,7 +373,7 @@ Private Sub View_Paint(Canvas As Drawing2D.cGraphics)
     Dim Brush As New cSolidBrush
     Dim Brush2 As New cSolidBrush
     Dim Path As New cPath
-    Dim OffsetL As Single
+    Dim OffsetT As Single
     
     If View.Enabled Then
         If bHover Then
@@ -391,18 +391,18 @@ Private Sub View_Paint(Canvas As Drawing2D.cGraphics)
         Brush2.Color = ThemeColor.AccentColor
     End If
     
-    OffsetL = (View.Width - 18) / 2
-    BarSize = (View.Height - 36) / mMax
+    OffsetT = (View.Height - 18) / 2
+    BarSize = (View.Width - 36) / mMax
     BarSize = IIf(BarSize < 15, 15, BarSize)
-    BarTop = 18 + (View.Height - 36 - BarSize) * (mValue / mMax)
+    BarLeft = 18 + (View.Width - 36 - BarSize) * (mValue / mMax)
     
     If bHover Then
         Canvas.Clear ThemeColor.BKDrakColor
     End If
     
-    '上三角
-    Path.AddLine OffsetL + 2, 12, OffsetL + 8, 5
-    Path.AddLine OffsetL + 8, 5, OffsetL + 15, 12
+    '左三角
+    Path.AddLine 12, OffsetT + 2, 5, OffsetT + 8
+    Path.AddLine 5, OffsetT + 8, 12, OffsetT + 15
     Path.CloseFigure
     
     If mHF = HF_UP Then
@@ -412,9 +412,9 @@ Private Sub View_Paint(Canvas As Drawing2D.cGraphics)
     End If
     
     Path.Reset
-    '下三角
-    Path.AddLine OffsetL + 3, View.Height - 18 + 5, OffsetL + 8, View.Height - 18 + 11
-    Path.AddLine OffsetL + 8, View.Height - 18 + 11, OffsetL + 14, View.Height - 18 + 5
+    '右三角
+    Path.AddLine View.Width - 18 + 5, OffsetT + 3, View.Width - 18 + 11, OffsetT + 8
+    Path.AddLine View.Width - 18 + 11, OffsetT + 8, View.Width - 18 + 5, OffsetT + 14
     Path.CloseFigure
     
     If mHF = HF_DOWN Then
@@ -424,13 +424,14 @@ Private Sub View_Paint(Canvas As Drawing2D.cGraphics)
     End If
     
     '控制条
-    If View.Height > 54 Then
+    If View.Width > 54 Then
         If mHF = HF_MID Then
-            Canvas.FillRectangle Brush2.GetBaseBrush, OffsetL + 3, BarTop, 11, BarSize
+            Canvas.FillRectangle Brush2.GetBaseBrush, BarLeft, OffsetT + 3, BarSize, 11
         Else
-            Canvas.FillRectangle Brush.GetBaseBrush, OffsetL + 3, BarTop, 11, BarSize
+            Canvas.FillRectangle Brush.GetBaseBrush, BarLeft, OffsetT + 3, BarSize, 11
         End If
     Else
         BarSize = 0
     End If
 End Sub
+

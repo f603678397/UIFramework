@@ -46,21 +46,21 @@ Public Property Let EndCap(ByRef emCap As LineCap): GdipSetPenEndCap mHandle, em
 Public Property Get MiterLimit() As Single: GdipGetPenMiterLimit mHandle, MiterLimit: End Property
 Public Property Let MiterLimit(ByVal fLimit As Single): GdipSetPenMiterLimit mHandle, fLimit: End Property
 
-Friend Sub Create(): GdipCreatePen1 ARGB(255, 0, 0, 0), 1, UnitPixel, mHandle: End Sub
+Friend Sub Create(): GdipCreatePen1 ARGB(255, 0, 0, 0), 1, GlobalUnit, mHandle: End Sub
 Friend Sub Release(): GdipDeletePen mHandle: mHandle = 0: End Sub
 
 Public Function Clone() As cPen
     Dim Pen As New cPen
-    Dim h As Long
+    Dim H As Long
     Pen.Release
-    GdipClonePen mHandle, h
-    Pen.Handle = h
+    GdipClonePen mHandle, H
+    Pen.Handle = H
     Set Clone = Pen
 End Function
 
 Public Sub FromBrush(Brush As cBrush)
     Release
-    GdipCreatePen2 Brush.Handle, 1, UnitPixel, mHandle
+    GdipCreatePen2 Brush.Handle, 1, GlobalUnit, mHandle
 End Sub
 
 Public Sub SetBrush(Brush As cBrush)
@@ -69,9 +69,9 @@ End Sub
 
 Public Function GetBrush() As cBrush
     Dim Brush As New cBrush
-    Dim h As Long
-    GdipGetPenBrushFill mHandle, h
-    Brush.Handle = h
+    Dim H As Long
+    GdipGetPenBrushFill mHandle, H
+    Brush.Handle = H
     Set GetBrush = Brush
 End Function
 
@@ -119,10 +119,10 @@ End Sub
 
 Public Function GetCustomStartCap() As cCustomLineCap
     Dim Cap As New cCustomLineCap
-    Dim h As Long
+    Dim H As Long
     Cap.Release
-    GdipGetPenCustomStartCap mHandle, h
-    Cap.Handle = h
+    GdipGetPenCustomStartCap mHandle, H
+    Cap.Handle = H
     Set GetCustomStartCap = Cap
 End Function
 
@@ -132,10 +132,10 @@ End Sub
 
 Public Function GetCustomEndCap() As cCustomLineCap
     Dim Cap As New cCustomLineCap
-    Dim h As Long
+    Dim H As Long
     Cap.Release
-    GdipGetPenCustomEndCap mHandle, h
-    Cap.Handle = h
+    GdipGetPenCustomEndCap mHandle, H
+    Cap.Handle = H
     Set GetCustomEndCap = Cap
 End Function
 
@@ -149,10 +149,10 @@ End Sub
 
 Public Function GetTransform() As cMatrix
     Dim Matrix As New cMatrix
-    Dim h As Long
+    Dim H As Long
     Matrix.Release
-    GdipGetPenTransform mHandle, h
-    Matrix.Handle = h
+    GdipGetPenTransform mHandle, H
+    Matrix.Handle = H
     Set GetTransform = Matrix
 End Function
 

@@ -9,9 +9,8 @@ Begin VB.Form Form1
    LinkTopic       =   "Form1"
    MaxButton       =   0   'False
    MinButton       =   0   'False
-   ScaleHeight     =   300
-   ScaleMode       =   3  'Pixel
-   ScaleWidth      =   400
+   ScaleHeight     =   4500
+   ScaleWidth      =   6000
    StartUpPosition =   2  'ÆÁÄ»ÖÐÐÄ
 End
 Attribute VB_Name = "Form1"
@@ -21,7 +20,7 @@ Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = False
 Option Explicit
 Dim Activity                As cActivity
-Dim Layout                  As cLayout
+Dim Layout                   As cLayout
 Dim IM                      As cImageManager
 
 Dim WithEvents btnOk        As cButton
@@ -42,6 +41,7 @@ Attribute Timer1.VB_VarHelpID = -1
 Dim Progress1               As cProgressBar
 Dim ImageView               As cImageView
 Dim VScroll                 As cVScrollBar
+Dim HScroll                 As cHScrollBar
 
 Private Sub Form_Load()
     cCore.Initialize
@@ -68,7 +68,8 @@ Private Sub Form_Load()
     Set Waiting = cWidgetManager.CreateWaiting(Layout, 10, 265, 20, 20)
     Set Progress1 = cWidgetManager.CreateProgressBar(Layout, 35, 275, 80, 3)
     
-    Set VScroll = cWidgetManager.CreateVScrollBar(Layout, 372, 10, 18, 240)
+    Set VScroll = cWidgetManager.CreateVScrollBar(Layout, 372, 10, 18, 220)
+    Set HScroll = cWidgetManager.CreateHScrollBar(Layout, 120, 230, 250, 18)
     
     Set Timer1 = New cTimer
     Timer1.Create Me.hWnd

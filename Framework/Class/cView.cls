@@ -33,7 +33,7 @@ Private mPaddingBottom  As Integer
 Private ViewList        As New cObjectList
 Private Layout          As cLayout
 Private isHover         As Boolean
-Private mIsFocus         As Boolean
+Private mIsFocus        As Boolean
 Private mBKColor        As Long
 Private ReDrawRect      As RECTI
 Private FirstDraw       As Boolean
@@ -261,6 +261,7 @@ Friend Sub RaiseMouseDown(ByVal Button As Integer, ByVal Shift As Integer, ByVal
         Set View = Nothing
     Next
     Layout.SetFocusView Me
+    Layout.SetCaptureView Me
     RaiseEvent MouseDown(Button, Shift, X, Y)
 End Sub
 
@@ -268,6 +269,8 @@ Friend Sub RaiseMouseUp(ByVal Button As Integer, ByVal Shift As Integer, ByVal X
     Dim mX As Integer, mY As Integer
     Dim CurrTime As Long
     Static LastTime As Long
+    
+    Layout.SetCaptureView Nothing
     
     mX = X - mLeft: mY = Y - mTop
     RaiseEvent MouseUp(Button, Shift, mX, mY)
