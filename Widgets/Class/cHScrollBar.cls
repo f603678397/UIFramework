@@ -401,8 +401,8 @@ Private Sub View_Paint(Canvas As Drawing2D.cGraphics)
     End If
     
     '×óÈý½Ç
-    Path.AddLine 12, OffsetT + 2, 5, OffsetT + 8
-    Path.AddLine 5, OffsetT + 8, 12, OffsetT + 15
+    Path.AddLine 12, OffsetT + 2, 6, OffsetT + 8
+    Path.AddLine 6, OffsetT + 8, 12, OffsetT + 14
     Path.CloseFigure
     
     If mHF = HF_UP Then
@@ -413,7 +413,7 @@ Private Sub View_Paint(Canvas As Drawing2D.cGraphics)
     
     Path.Reset
     'ÓÒÈý½Ç
-    Path.AddLine View.Width - 18 + 5, OffsetT + 3, View.Width - 18 + 11, OffsetT + 8
+    Path.AddLine View.Width - 18 + 5, OffsetT + 2, View.Width - 18 + 11, OffsetT + 8
     Path.AddLine View.Width - 18 + 11, OffsetT + 8, View.Width - 18 + 5, OffsetT + 14
     Path.CloseFigure
     

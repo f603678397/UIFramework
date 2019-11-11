@@ -110,10 +110,8 @@ Private Sub Form_Load()
     
     ImageView.Src = "head"
     
-    With VScroll
-        .Max = 100
-        .Value = 0
-    End With
+    VScroll.Max = 100
+    HScroll.Max = 100
     
     With btnOk
         .Caption = "È·¶¨"

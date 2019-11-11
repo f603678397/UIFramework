@@ -10,4 +10,4 @@ cWaiting = 383, 40, 1033, 512, C
 cCheckBox = 175, 52, 1037, 492, C
 cImageView = 256, 51, 1015, 533, C
 cVScrollBar = 86, 69, 845, 531, 
-cHScrollBar = 80, 58, 942, 498, C
+cHScrollBar = 80, 58, 942, 498, Z
