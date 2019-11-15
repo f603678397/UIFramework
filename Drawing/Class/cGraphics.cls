@@ -324,21 +324,26 @@ Public Function MeasureDriverString(ByVal pStr As Long, Font As cFont, Brush As 
     GdipMeasureDriverString mHandle, pStr, -1, Font.Handle, Pos, Flags, Matrix.Handle, MeasureDriverString
 End Function
 
-Public Function MeasureCharacterRanges(ByVal sText As String, Font As cFont, Layout As RECTF, strFormat As cStringFormat, ByVal Count As Long) As cRegion()
+Public Function MeasureCharacterRanges(ByVal sText As String, Font As cFont, Layout As RECTF, strFormat As cStringFormat) As cRegion()
     Dim Rgn() As Long
     Dim objRgn() As cRegion
-    ReDim Rgn(Count - 1) As Long
-    ReDim objRgn(Count - 1) As cRegion
-    
-    GdipMeasureCharacterRanges mHandle, StrPtr(sText), -1, Font.Handle, Layout, strFormat.Handle, Count, Rgn(0)
-    
+    Dim RgnCount As Long
     Dim i As Integer
     
-    For i = 0 To Count - 1
+    RgnCount = strFormat.GetMeasurableCharacterRangeCount
+    
+    ReDim Rgn(RgnCount - 1) As Long
+    ReDim objRgn(RgnCount - 1) As cRegion
+
+    For i = 0 To RgnCount - 1
+        GdipCreateRegion Rgn(i)
         Set objRgn(i) = New cRegion
         objRgn(i).Release
         objRgn(i).Handle = Rgn(i)
     Next
+
+    GdipMeasureCharacterRanges mHandle, StrPtr(sText), -1, Font.Handle, Layout, strFormat.Handle, RgnCount, Rgn(0)
+    
     MeasureCharacterRanges = objRgn
 End Function
 
@@ -437,7 +442,7 @@ Public Sub FillPie(Brush As cBrush, ByVal X As Single, ByVal Y As Single, ByVal 
     GdipFillPie mHandle, Brush.Handle, X, Y, Width, Height, startAngle, sweepAngle
 End Sub
 
-Public Sub FillPath(Brush As cBrush, Path As cPath)
+Public Sub fillPath(Brush As cBrush, Path As cPath)
     GdipFillPath mHandle, Brush.Handle, Path.Handle
 End Sub
 

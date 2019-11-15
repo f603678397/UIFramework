@@ -1,4 +1,4 @@
-cDrawing = 130, 65, 992, 505, 
+cDrawing = 130, 65, 992, 505, C
 cType = 104, 104, 966, 544, C
 cEnum = 130, 130, 992, 570, C
 cEncoder = 0, 0, 0, 0, C
@@ -18,7 +18,7 @@ cRegion = 52, 52, 914, 492, C
 cPathBrush = 26, 26, 888, 466, C
 cFontFamily = 104, 104, 966, 544, C
 cFont = 0, 0, 862, 440, C
-cStringFormat = 182, 182, 1044, 622, C
+cStringFormat = 159, 82, 1021, 522, C
 cBitmap = 74, 26, 936, 466, C
 cEffect = 0, 0, 0, 0, C
 cCachedBitmap = 0, 0, 0, 0, C
