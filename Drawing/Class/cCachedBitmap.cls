@@ -19,4 +19,8 @@ Private Sub Class_Terminate(): Release: End Sub
 Public Property Get Handle() As Long: Handle = mHandle: End Property
 Friend Property Let Handle(ByVal nHandle As Long): mHandle = nHandle: End Property
 
-Friend Sub Release(): GdipDeleteCachedBitmap mHandle: End Sub
+Friend Sub Release()
+    If mHandle = 0 Or Token = 0 Then Exit Sub
+    GdipDeleteCachedBitmap mHandle
+    mHandle = 0
+End Sub

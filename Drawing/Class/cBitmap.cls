@@ -24,7 +24,11 @@ Public Property Get Height() As Long: GdipGetImageHeight mHandle, Height: End Pr
 
 Public Property Get PixelFormat() As GpPixelFormat: GdipGetImagePixelFormat mHandle, PixelFormat: End Property
 
-Public Sub Release(): GdipDisposeImage mHandle: mHandle = 0: End Sub
+Public Sub Release()
+    If mHandle = 0 Or Token = 0 Then Exit Sub
+    GdipDisposeImage mHandle
+    mHandle = 0
+End Sub
 
 Public Sub FromFile(ByVal FileName As String)
     Release

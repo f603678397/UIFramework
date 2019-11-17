@@ -21,7 +21,11 @@ Public Property Get Handle() As Long: Handle = mHandle: End Property
 Friend Property Let Handle(ByVal nHandle As Long): mHandle = nHandle: End Property
 
 Friend Sub Create(): GdipCreateRegion mHandle: End Sub
-Friend Sub Release(): GdipDeleteRegion mHandle: mHandle = 0: End Sub
+Friend Sub Release()
+    If mHandle = 0 Or Token = 0 Then Exit Sub
+    GdipDeleteRegion mHandle
+    mHandle = 0
+End Sub
 
 Public Sub FromPath(Path As cPath)
     Release
@@ -46,10 +50,10 @@ End Sub
 
 Public Function Clone() As cRegion
     Dim Rgn As cRegion
-    Dim h As Long
+    Dim H As Long
     Rgn.Release
-    GdipCloneRegion mHandle, h
-    Rgn.Handle = h
+    GdipCloneRegion mHandle, H
+    Rgn.Handle = H
     Set Clone = Rgn
 End Function
 
@@ -81,18 +85,18 @@ End Function
 
 Public Function IsPointVisible(ByVal X As Single, ByVal Y As Single, Graphics As cGraphics) As Boolean
     Dim Result As Long
-    Dim h As Long
+    Dim H As Long
     
-    If Not Graphics Is Nothing Then h = Graphics.Handle
-    GdipIsVisibleRegionPoint mHandle, X, Y, h, Result
+    If Not Graphics Is Nothing Then H = Graphics.Handle
+    GdipIsVisibleRegionPoint mHandle, X, Y, H, Result
     IsPointVisible = Result
 End Function
 
 Public Function IsRectVisible(ByVal X As Single, ByVal Y As Single, ByVal Width As Single, ByVal Height As Single, Graphics As cGraphics) As Boolean
     Dim Result As Long
-    Dim h As Long
-    If Not Graphics Is Nothing Then h = Graphics.Handle
-    GdipIsVisibleRegionRect mHandle, X, Y, Width, Height, h, Result
+    Dim H As Long
+    If Not Graphics Is Nothing Then H = Graphics.Handle
+    GdipIsVisibleRegionRect mHandle, X, Y, Width, Height, H, Result
     IsRectVisible = Result
 End Function
 

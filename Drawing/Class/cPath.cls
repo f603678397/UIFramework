@@ -24,7 +24,11 @@ Public Property Get BrushMode() As FillMode: GdipGetPathFillMode mHandle, BrushM
 Public Property Let BrushMode(emMode As FillMode): GdipSetPathFillMode mHandle, emMode: End Property
 
 Friend Sub Create(): GdipCreatePath FillModeAlternate, mHandle: End Sub
-Friend Sub Release(): GdipDeletePath mHandle: mHandle = 0: End Sub
+Friend Sub Release()
+    If mHandle = 0 Or Token = 0 Then Exit Sub
+    GdipDeletePath mHandle
+    mHandle = 0
+End Sub
 
 Public Function Clone() As cPath
     Dim Path As New cPath

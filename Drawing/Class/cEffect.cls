@@ -20,7 +20,11 @@ Public Property Get Handle() As Long: Handle = mHandle: End Property
 Friend Property Let Handle(ByVal nHandle As Long): mHandle = nHandle: End Property
 
 Public Sub Create(nType As GdipEffectType): Release: GdipCreateEffect2 nType, mHandle: End Sub
-Friend Sub Release(): GdipDeleteEffect mHandle: End Sub
+Friend Sub Release()
+    If mHandle = 0 Or Token = 0 Then Exit Sub
+    GdipDeleteEffect mHandle
+    mHandle = 0
+End Sub
 
 Public Property Get ParameterSize() As Long: GdipGetEffectParameterSize mHandle, ParameterSize: End Property
 

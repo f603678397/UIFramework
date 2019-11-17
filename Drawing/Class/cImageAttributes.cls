@@ -25,15 +25,17 @@ Friend Sub Create()
 End Sub
 
 Friend Sub Release()
+    If mHandle = 0 Or Token = 0 Then Exit Sub
     GdipDisposeImageAttributes mHandle
+    mHandle = 0
 End Sub
 
 Public Function Clone() As cImageAttributes
     Dim Attr As New cImageAttributes
-    Dim h As Long
+    Dim H As Long
     Attr.Release
-    GdipCloneImageAttributes mHandle, h
-    Attr.Handle = h
+    GdipCloneImageAttributes mHandle, H
+    Attr.Handle = H
     Set Clone = Attr
 End Function
 

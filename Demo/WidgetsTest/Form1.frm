@@ -20,7 +20,7 @@ Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = False
 Option Explicit
 Dim Activity                As cActivity
-Dim Layout                   As cLayout
+Dim Layout                  As cLayout
 Dim IM                      As cImageManager
 
 Dim WithEvents btnOk        As cButton
@@ -105,7 +105,7 @@ Private Sub Form_Load()
     
     With Progress1
         .Value = 30
-        .SecondValue = 50
+        .SecondValue = 0
     End With
     
     ImageView.Src = "head"
@@ -128,7 +128,7 @@ Private Sub Form_Load()
     
     cToast.SetShadown(True).SetFontName("Î¢ÈíÑÅºÚ").SetDuration (1000)
     
-    Timer1.Interval = 50
+    Timer1.Interval = 33
 End Sub
 
 Private Sub Form_Unload(Cancel As Integer)
@@ -167,7 +167,5 @@ End Sub
 
 Private Sub Timer1_onTime()
     Progress1.Value = Progress1.Value + 1
-    Progress1.SecondValue = Progress1.SecondValue + 1
     If Progress1.Value > Progress1.Max Then Progress1.Value = 0
-    If Progress1.SecondValue > Progress1.Max Then Progress1.SecondValue = 0
 End Sub

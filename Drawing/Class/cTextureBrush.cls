@@ -23,7 +23,9 @@ Public Property Get FillWrapMode() As WrapMode: GdipGetTextureWrapMode mHandle, 
 Public Property Let FillWrapMode(Mode As WrapMode): GdipSetTextureWrapMode mHandle, Mode: End Property
 
 Friend Sub Release()
+    If mHandle = 0 Or Token = 0 Then Exit Sub
     GdipDeleteBrush mHandle
+    mHandle = 0
 End Sub
 
 Public Sub FromBitmap(Bitmap As cBitmap, Flip As WrapMode)

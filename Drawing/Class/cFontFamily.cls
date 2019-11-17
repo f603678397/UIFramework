@@ -20,6 +20,7 @@ Public Property Get Handle() As Long: Handle = mHandle: End Property
 Friend Property Let Handle(ByVal nHandle As Long): mHandle = nHandle: End Property
 
 Friend Sub Release()
+    If mHandle = 0 Or Token = 0 Then Exit Sub
     GdipDeleteFontFamily mHandle
     mHandle = 0
 End Sub
@@ -30,9 +31,9 @@ End Sub
 
 Public Function Clone() As cFontFamily
     Dim Fam As New cFontFamily
-    Dim h As Long
-    GdipCloneFontFamily mHandle, h
-    Fam.Handle = h
+    Dim H As Long
+    GdipCloneFontFamily mHandle, H
+    Fam.Handle = H
     Set Clone = Fam
 End Function
 

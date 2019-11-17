@@ -47,7 +47,11 @@ Public Property Get MiterLimit() As Single: GdipGetPenMiterLimit mHandle, MiterL
 Public Property Let MiterLimit(ByVal fLimit As Single): GdipSetPenMiterLimit mHandle, fLimit: End Property
 
 Friend Sub Create(): GdipCreatePen1 ARGB(255, 0, 0, 0), 1, GlobalUnit, mHandle: End Sub
-Friend Sub Release(): GdipDeletePen mHandle: mHandle = 0: End Sub
+Friend Sub Release()
+    If mHandle = 0 Or Token = 0 Then Exit Sub
+    GdipDeletePen mHandle
+    mHandle = 0
+End Sub
 
 Public Function Clone() As cPen
     Dim Pen As New cPen

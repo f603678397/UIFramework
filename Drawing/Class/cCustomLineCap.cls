@@ -30,7 +30,9 @@ Public Property Get WidthScale() As Single: GdipGetCustomLineCapWidthScale mHand
 Public Property Let WidthSclae(ByVal fScale As Single): GdipSetCustomLineCapWidthScale mHandle, fScale: End Property
 
 Friend Sub Create()
+    If mHandle = 0 Or Token = 0 Then Exit Sub
     GdipCreateCustomLineCap 0, 0, LineCapCustom, 1, mHandle
+    mHandle = 0
 End Sub
 
 Friend Sub Release()
@@ -40,10 +42,10 @@ End Sub
 
 Public Function Clone() As cCustomLineCap
     Dim Cap As New cCustomLineCap
-    Dim h As Long
+    Dim H As Long
     Cap.Release
-    GdipCloneCustomLineCap mHandle, h
-    Cap.Handle = h
+    GdipCloneCustomLineCap mHandle, H
+    Cap.Handle = H
     Set Clone = Cap
 End Function
 

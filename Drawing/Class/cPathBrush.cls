@@ -71,6 +71,7 @@ Public Property Get PresetBlendCount() As Long
 End Property
 
 Friend Sub Release()
+    If mHandle = 0 Or Token = 0 Then Exit Sub
     GdipDeleteBrush mHandle
     mHandle = 0
 End Sub

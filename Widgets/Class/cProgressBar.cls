@@ -191,6 +191,8 @@ Public Sub SetTheme(NewTheme As PresetThemeEnum)
             SetDarkTheme ThemeColor
         Case PresetThemeEnum.LightTheme
             SetLightTheme ThemeColor
+            ThemeColor.BKColor = cColor.FromARGB(255, 210, 210, 210)
+            ThemeColor.BKDrakColor = cColor.FromARGB(255, 220, 220, 220)
     End Select
     ThemeColor.BorderColor = cColor.Transparent
     ThemeColor.BorderDisEnableColor = cColor.Transparent

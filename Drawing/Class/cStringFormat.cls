@@ -25,7 +25,9 @@ Friend Sub Create()
 End Sub
 
 Friend Sub Release()
+    If mHandle = 0 Or Token = 0 Then Exit Sub
     GdipDeleteStringFormat mHandle
+    mHandle = 0
 End Sub
 
 Public Sub GenericDefault()
@@ -40,10 +42,10 @@ End Sub
 
 Public Function Clone() As cStringFormat
     Dim sf As New cStringFormat
-    Dim h As Long
+    Dim H As Long
     sf.Release
-    GdipCloneStringFormat mHandle, h
-    sf.Handle = h
+    GdipCloneStringFormat mHandle, H
+    sf.Handle = H
     Set Clone = sf
 End Function
 

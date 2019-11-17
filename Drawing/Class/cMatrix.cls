@@ -21,7 +21,11 @@ Public Property Get Handle() As Long: Handle = mHandle: End Property
 Friend Property Let Handle(ByVal nHandle As Long): mHandle = nHandle: End Property
 
 Friend Sub Create(): GdipCreateMatrix mHandle: End Sub
-Friend Sub Release(): GdipDeleteMatrix mHandle: mHandle = 0: End Sub
+Friend Sub Release()
+    If mHandle = 0 Or Token = 0 Then Exit Sub
+    GdipDeleteMatrix mHandle
+    mHandle = 0
+End Sub
 
 Public Sub SetElements(m11 As Single, m12 As Single, m21 As Single, m22 As Single, dx As Single, dy As Single)
     GdipSetMatrixElements mHandle, m11, m12, m21, m22, dx, dy
@@ -29,10 +33,10 @@ End Sub
 
 Public Function Clone() As cMatrix
     Dim Matrix As New cMatrix
-    Dim h As Long
+    Dim H As Long
     Matrix.Release
-    GdipCloneMatrix mHandle, h
-    Matrix.Handle = h
+    GdipCloneMatrix mHandle, H
+    Matrix.Handle = H
     Set Clone = Matrix
 End Function
 

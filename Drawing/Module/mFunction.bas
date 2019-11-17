@@ -4,6 +4,7 @@ Public Declare Sub CopyMemory Lib "kernel32" Alias "RtlMoveMemory" (Destination 
 Public Declare Function BitBlt Lib "gdi32" (ByVal hDestDC As Long, ByVal X As Long, ByVal Y As Long, ByVal nWidth As Long, ByVal nHeight As Long, ByVal hSrcDC As Long, ByVal xSrc As Long, ByVal ySrc As Long, ByVal dwRop As Long) As Long
 Public Declare Function CLSIDFromString Lib "ole32.dll" (ByVal lpszProgID As Long, pCLSID As CLSID) As Long
 
+Public Token As Long
 Public GlobalUnit As GpUnit
 
 Public Sub GdipCreateEffect2(ByVal EffectType As GdipEffectType, Effect As Long)

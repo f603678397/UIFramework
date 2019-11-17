@@ -12,7 +12,6 @@ Attribute VB_Creatable = True
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = True
 Option Explicit
-Dim Token As Long
 
 Public Sub Init()
     If Token <> 0 Then Exit Sub

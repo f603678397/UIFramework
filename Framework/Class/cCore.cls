@@ -22,28 +22,28 @@ Public Sub Terminate()
     Dim Activity    As cActivity
     Dim Timer       As cTimer
     Dim Drawable    As cDrawable
-    
+
     For i = 0 To ActivityList.GetCount - 1
         Set Activity = ActivityList.GetObject(i)
             Activity.Release
         Set Activity = Nothing
     Next
     Set ActivityList = Nothing
-    
+
     For i = 0 To TimerList.GetCount - 1
         Set Timer = TimerList.GetObject(i)
             If Not Timer Is Nothing Then Timer.Release
         Set Timer = Nothing
     Next
     Set TimerList = Nothing
-    
+
     For i = 0 To DrawableList.GetCount - 1
         Set Drawable = DrawableList.GetObject(i)
             Drawable.Release
         Set Drawable = Nothing
     Next
     Set DrawableList = Nothing
-    
+
     IM.DisposeAll
     Set IM = Nothing
     Drawing.SHUTDOWN
