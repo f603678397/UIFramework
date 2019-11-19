@@ -6,7 +6,7 @@ BEGIN
   DataSourceBehavior  = 0  'vbNone
   MTSTransactionMode  = 0  'NotAnMTSObject
 END
-Attribute VB_Name = "cProgressBar"
+Attribute VB_Name = "cSeekBar"
 Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = True
 Attribute VB_PredeclaredId = False
@@ -25,11 +25,11 @@ Public Event GotFocus()
 Public Event LostFocus()
 Public Event Click()
 Public Event DblClick()
-Public Event ProgressChanged(ByVal isSecond As Boolean)
+Public Event ProgressChanged(ByVal byUser As Boolean)
 
 Private mValue          As Long
-Private mSecondValue    As Long
 Private mMax            As Long
+Private bDown           As Boolean
 
 Private ThemeColor  As ThemeColorType
 
@@ -51,6 +51,8 @@ Public Sub BindView(DstView As cView)
     Set V = View
     Set View = Nothing
     Set View = DstView
+    
+    bDown = False
     
     V.Refresh
     View.Refresh
@@ -85,8 +87,6 @@ Attribute SetAttr.VB_MemberFlags = "40"
     '-----------------------------------------
         Case LCase("Value")
             Me.Value = CLng(Value)
-        Case LCase("SecondValue")
-            Me.SecondValue = CLng(Value)
         Case LCase("Max")
             Me.Max = CLng(Value)
         Case LCase("BackColor")
@@ -100,6 +100,7 @@ Attribute SetAttr.VB_MemberFlags = "40"
     '-----------------------------------------
     End Select
 End Sub
+
 
 '=========================================================================================
 'Í¨ÓÃ´úÂë
@@ -219,20 +220,11 @@ End Property
 
 Public Property Get Value() As Long: Value = mValue: End Property
 Public Property Let Value(ByVal nValue As Long)
-    If mValue = nValue Then Exit Property
+    If mValue = nValue Or bDown Then Exit Property
     mValue = nValue
     RaiseEvent ProgressChanged(False)
     View.Refresh
 End Property
-
-Public Property Get SecondValue() As Long: SecondValue = mSecondValue: End Property
-Public Property Let SecondValue(ByVal nValue As Long)
-    If mSecondValue = nValue Then Exit Property
-    mSecondValue = nValue
-    RaiseEvent ProgressChanged(True)
-    View.Refresh
-End Property
-
 
 Public Property Get Max() As Long: Max = mMax: End Property
 Public Property Let Max(ByVal nMax As Long)
@@ -251,35 +243,31 @@ Private Sub View_LostFocus(): RaiseEvent LostFocus: End Sub
 Private Sub View_MouseHover(): RaiseEvent MouseHover: End Sub
 Private Sub View_MouseLeave(): RaiseEvent MouseLeave: End Sub
 
-Private Sub View_MouseDown(ByVal Button As Integer, ByVal Shift As Integer, ByVal X As Integer, ByVal Y As Integer): RaiseEvent MouseDown(Button, Shift, X, Y): End Sub
-Private Sub View_MouseMove(ByVal Button As Integer, ByVal Shift As Integer, ByVal X As Integer, ByVal Y As Integer): RaiseEvent MouseMove(Button, Shift, X, Y): End Sub
-Private Sub View_MouseUp(ByVal Button As Integer, ByVal Shift As Integer, ByVal X As Integer, ByVal Y As Integer): RaiseEvent MouseUp(Button, Shift, X, Y): End Sub
+Private Sub View_MouseDown(ByVal Button As Integer, ByVal Shift As Integer, ByVal X As Integer, ByVal Y As Integer)
+    RaiseEvent MouseDown(Button, Shift, X, Y)
+    If Button = vbLeftButton Then
+        bDown = True
+        View.Refresh
+    End If
+End Sub
+
+Private Sub View_MouseMove(ByVal Button As Integer, ByVal Shift As Integer, ByVal X As Integer, ByVal Y As Integer)
+    RaiseEvent MouseMove(Button, Shift, X, Y)
+    If bDown Then
+        
+        View.Refresh
+    End If
+End Sub
+
+Private Sub View_MouseUp(ByVal Button As Integer, ByVal Shift As Integer, ByVal X As Integer, ByVal Y As Integer)
+    RaiseEvent MouseUp(Button, Shift, X, Y)
+    If bDown Then
+        bDown = False
+        View.Refresh
+    End If
+End Sub
 
 Private Sub View_Paint(Canvas As Drawing2D.cGraphics)
-    Dim Pen As New cPen
-    Dim Brush1 As New cSolidBrush
-    Dim Brush2 As New cSolidBrush
-    
-    Dim P1 As Single, P2 As Single
-    Dim bgColor As Long
-    
-    P1 = CSng(mValue) / mMax
-    P2 = CSng(mSecondValue) / mMax
-    
-    If View.Enabled Then
-        Pen.Color = ThemeColor.BorderColor
-        Brush1.Color = ThemeColor.AccentColor
-        Brush2.Color = cColor.SetAlpha(Brush1.Color, -0.6)
-        bgColor = ThemeColor.BKColor
-    Else
-        Pen.Color = ThemeColor.BorderDisEnableColor
-        Brush1.Color = cColor.SetBrightness(ThemeColor.BKDrakColor, -0.2)
-        Brush2.Color = cColor.SetAlpha(Brush1.Color, -0.6)
-        bgColor = ThemeColor.BKDrakColor
-    End If
-    
-    Canvas.Clear bgColor
-    Canvas.DrawRectangle Pen, 0, 0, View.Width - 1, View.Height - 1
-    Canvas.FillRectangle Brush2.GetBaseBrush, 0, 0, (View.Width - 1) * P2, View.Height
-    Canvas.FillRectangle Brush1.GetBaseBrush, 0, 0, (View.Width - 1) * P1, View.Height
+
 End Sub
+
