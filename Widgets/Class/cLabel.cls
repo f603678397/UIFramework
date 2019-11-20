@@ -319,7 +319,7 @@ Public Property Let AccentColor(ByVal nColor As Long)
     If ThemeColor.AccentColor = nColor Then Exit Property
     ThemeColor.AccentColor = nColor
     ThemeColor.AccentDarkColor = cColor.SetBrightness(nColor, -0.2)
-    ThemeColor.AccentLightColor = cColor.SetBrightness(nColor, 0.15)
+    ThemeColor.AccentLightColor = cColor.SetBrightness(nColor, 0.2)
     View.Refresh
 End Property
 

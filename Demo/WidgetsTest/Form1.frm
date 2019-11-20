@@ -42,6 +42,7 @@ Dim Progress1               As cProgressBar
 Dim ImageView               As cImageView
 Dim VScroll                 As cVScrollBar
 Dim HScroll                 As cHScrollBar
+Dim SeekBar                 As cSeekBar
 
 Private Sub Form_Load()
     cCore.Initialize
@@ -50,8 +51,8 @@ Private Sub Form_Load()
     Set Layout = Activity.CreateLayout
     Set IM = cCore.GetImageManager
     
-    IM.LoadImage App.Path & "\res\head.jpg", "head"
-
+    IM.LoadAllImage App.Path & "\res\"
+    
     cWidgetManager.BindLayout Layout
 
     Set btnOk = cWidgetManager.CreateButton(Layout, 260, 260, 60, 30)
@@ -63,14 +64,15 @@ Private Sub Form_Load()
     Set Option1 = cWidgetManager.CreateOption(Frame1, 5, 20, 100, 20)
     Set Option2 = cWidgetManager.CreateOption(Frame1, 5, 50, 100, 20)
     
-    Set ImageView = cWidgetManager.CreateImageView(Layout, 10, 140, 100, 100)
+    Set ImageView = cWidgetManager.CreateImageView(Layout, 10, 140, 20, 20)
+    Set SeekBar = cWidgetManager.CreateSeekBar(Layout, 35, 140, 80, 20)
     
     Set Waiting = cWidgetManager.CreateWaiting(Layout, 10, 265, 20, 20)
     Set Progress1 = cWidgetManager.CreateProgressBar(Layout, 35, 275, 80, 3)
     
     Set VScroll = cWidgetManager.CreateVScrollBar(Layout, 372, 10, 18, 220)
-    Set HScroll = cWidgetManager.CreateHScrollBar(Layout, 120, 230, 250, 18)
-    
+    Set HScroll = cWidgetManager.CreateHScrollBar(Layout, 10, 230, 360, 18)
+
     Set Timer1 = New cTimer
     Timer1.Create Me.hWnd
     
@@ -108,10 +110,12 @@ Private Sub Form_Load()
         .SecondValue = 0
     End With
     
-    ImageView.Src = "head"
+    ImageView.Src = "sun_light"
     
-    VScroll.Max = 100
-    HScroll.Max = 100
+    VScroll.Max = 50
+    HScroll.Max = 50
+    
+    SeekBar.Value = 50
     
     With btnOk
         .Caption = "确定"
@@ -146,11 +150,11 @@ End Sub
 
 Private Sub CheckBox_ValueChanged()
     Frame1.Enabled = CheckBox.Value
-    VScroll.Enabled = CheckBox.Value
 End Sub
 
 Private Sub Option1_ValueChanged(ByVal ByUser As Boolean)
     If Not Option1.Value Or Not ByUser Then Exit Sub
+    ImageView.Src = "sun_light"
     cWidgetManager.SetPresetTheme DrakTheme
     cToast.SetTheme DrakTheme
     cToast.MakeText Layout, "已切换为暗色主题", TF_POS_TOP Or TF_WIDTH_MIN
@@ -159,6 +163,7 @@ End Sub
 
 Private Sub Option2_ValueChanged(ByVal ByUser As Boolean)
     If Not Option2.Value Or Not ByUser Then Exit Sub
+    ImageView.Src = "sun_dark"
     cWidgetManager.SetPresetTheme LightTheme
     cToast.SetTheme LightTheme
     cToast.MakeText Layout, "已切换为浅色主题", TF_POS_TOP Or TF_WIDTH_MIN

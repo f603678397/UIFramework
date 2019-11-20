@@ -25,11 +25,12 @@ Public Event GotFocus()
 Public Event LostFocus()
 Public Event Click()
 Public Event DblClick()
-Public Event ProgressChanged(ByVal byUser As Boolean)
+Public Event ProgressChanged(ByVal ByUser As Boolean)
 
 Private mValue          As Long
 Private mMax            As Long
 Private bDown           As Boolean
+Private bHover          As Boolean
 
 Private ThemeColor  As ThemeColorType
 
@@ -205,7 +206,7 @@ Public Property Let AccentColor(ByVal nColor As Long)
     If ThemeColor.AccentColor = nColor Then Exit Property
     ThemeColor.AccentColor = nColor
     ThemeColor.AccentDarkColor = cColor.SetBrightness(nColor, -0.2)
-    ThemeColor.AccentLightColor = cColor.SetBrightness(nColor, 0.15)
+    ThemeColor.AccentLightColor = cColor.SetBrightness(nColor, 0.2)
     View.Refresh
 End Property
 
@@ -240,21 +241,38 @@ Private Sub View_DblClick(): RaiseEvent DblClick: End Sub
 Private Sub View_GotFocus(): RaiseEvent GotFocus: End Sub
 Private Sub View_LostFocus(): RaiseEvent LostFocus: End Sub
 
-Private Sub View_MouseHover(): RaiseEvent MouseHover: End Sub
-Private Sub View_MouseLeave(): RaiseEvent MouseLeave: End Sub
+Private Sub View_MouseHover()
+    RaiseEvent MouseHover
+    bHover = True
+    View.Refresh
+End Sub
+Private Sub View_MouseLeave()
+    RaiseEvent MouseLeave
+    bHover = False
+    View.Refresh
+End Sub
 
 Private Sub View_MouseDown(ByVal Button As Integer, ByVal Shift As Integer, ByVal X As Integer, ByVal Y As Integer)
+    Dim P As Single
     RaiseEvent MouseDown(Button, Shift, X, Y)
     If Button = vbLeftButton Then
         bDown = True
+        P = CSng(X) / View.Width
+        P = IIf(P < 0, 0, IIf(P > 1, 1, P))
+        mValue = mMax * P
+        RaiseEvent ProgressChanged(True)
         View.Refresh
     End If
 End Sub
 
 Private Sub View_MouseMove(ByVal Button As Integer, ByVal Shift As Integer, ByVal X As Integer, ByVal Y As Integer)
+    Dim P As Single
     RaiseEvent MouseMove(Button, Shift, X, Y)
     If bDown Then
-        
+        P = CSng(X) / View.Width
+        P = IIf(P < 0, 0, IIf(P > 1, 1, P))
+        mValue = mMax * P
+        RaiseEvent ProgressChanged(True)
         View.Refresh
     End If
 End Sub
@@ -268,6 +286,45 @@ Private Sub View_MouseUp(ByVal Button As Integer, ByVal Shift As Integer, ByVal 
 End Sub
 
 Private Sub View_Paint(Canvas As Drawing2D.cGraphics)
-
+    Dim Pen1    As New cPen
+    Dim Pen2    As New cPen
+    Dim Brush   As New cSolidBrush
+    
+    Dim P As Single
+    Dim L As Single, T As Single
+    
+    P = CSng(mValue) / mMax
+    L = (View.Width - 9) * P + 4
+    T = (View.Height - 3) / 2
+    
+    If View.Enabled Then
+        If bHover Then
+            If bDown Then
+                Pen1.Color = ThemeColor.AccentDarkColor
+            Else
+                Pen1.Color = ThemeColor.AccentLightColor
+            End If
+        Else
+            Pen1.Color = ThemeColor.AccentColor
+        End If
+        Pen2.Color = ThemeColor.BKColor
+    Else
+        Pen1.Color = ThemeColor.BKDrakColor
+        Pen2.Color = ThemeColor.BKColor
+    End If
+    Brush.Color = Pen1.Color
+    Pen1.Width = 2
+    Pen2.Width = 2
+    
+    Canvas.SetSmoothingMode SmoothingModeNone
+    Canvas.DrawLine Pen2, 4, T, View.Width - 5, T
+    Canvas.DrawLine Pen1, 4, T, L, T
+    
+    Canvas.SetSmoothingMode SmoothingModeAntiAlias
+    If bHover Then
+        Canvas.FillEllipse Brush.GetBaseBrush, L - 4.5, T - 4.5, 9, 9
+    Else
+        Canvas.FillEllipse Brush.GetBaseBrush, L - 3.5, T - 3.5, 7, 7
+    End If
 End Sub
 

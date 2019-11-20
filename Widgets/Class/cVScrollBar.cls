@@ -25,7 +25,7 @@ Public Event GotFocus()
 Public Event LostFocus()
 Public Event Click()
 Public Event DblClick()
-Public Event Scrolled()
+Public Event Scrolled(ByVal Offset As Long)
 
 Private bDown           As Boolean
 Private bHover          As Boolean
@@ -220,7 +220,7 @@ Public Property Let AccentColor(ByVal nColor As Long)
     If ThemeColor.AccentColor = nColor Then Exit Property
     ThemeColor.AccentColor = nColor
     ThemeColor.AccentDarkColor = cColor.SetBrightness(nColor, -0.2)
-    ThemeColor.AccentLightColor = cColor.SetBrightness(nColor, 0.15)
+    ThemeColor.AccentLightColor = cColor.SetBrightness(nColor, 0.2)
     View.Refresh
 End Property
 
@@ -228,8 +228,8 @@ Public Property Get Value() As Long: Value = mValue: End Property
 Public Property Let Value(ByVal nValue As Long)
     nValue = IIf(nValue < 0, 0, IIf(nValue > mMax, mMax, nValue))
     If mValue = nValue Then Exit Property
+    RaiseEvent Scrolled(nValue - mValue)
     mValue = nValue
-    RaiseEvent Scrolled
     View.Refresh
 End Property
 
@@ -279,7 +279,7 @@ Private Sub View_MouseDown(ByVal Button As Integer, ByVal Shift As Integer, ByVa
         Case HoverFlag.HF_UP
             If mValue > 0 Then
                 mValue = mValue - 1
-                RaiseEvent Scrolled
+                RaiseEvent Scrolled(-1)
                 View.Refresh
             End If
         Case HoverFlag.HF_MID
@@ -288,7 +288,7 @@ Private Sub View_MouseDown(ByVal Button As Integer, ByVal Shift As Integer, ByVa
         Case HoverFlag.HF_DOWN
             If mValue < mMax Then
                 mValue = mValue + 1
-                RaiseEvent Scrolled
+                RaiseEvent Scrolled(1)
                 View.Refresh
             End If
         Case HoverFlag.HF_None
@@ -300,14 +300,14 @@ Private Sub View_MouseDown(ByVal Button As Integer, ByVal Shift As Integer, ByVa
                 If mValue > 0 Then
                     mValue = mValue - Offset
                     If mValue < 0 Then mValue = 0
-                    RaiseEvent Scrolled
+                    RaiseEvent Scrolled(-Offset)
                     View.Refresh
                 End If
             ElseIf Y > BarTop + BarSize Then
                 If mValue < mMax Then
                     mValue = mValue + Offset
                     If mValue > mMax Then mValue = mMax
-                    RaiseEvent Scrolled
+                    RaiseEvent Scrolled(Offset)
                     View.Refresh
                 End If
             End If
@@ -318,17 +318,20 @@ Private Sub View_MouseMove(ByVal Button As Integer, ByVal Shift As Integer, ByVa
     Dim nHF As HoverFlag
     Dim OffsetY As Single
     Dim nValue As Long
+    Dim n As Long
     RaiseEvent MouseMove(Button, Shift, X, Y)
     
     If bDown Then
         If mHF = HF_MID Then
             OffsetY = Y - 18 - LastY
-            nValue = (OffsetY / (View.Height - 36 - BarSize)) * mMax
+            n = View.Height - 36 - BarSize
+            n = IIf(n <= 0, 1, n)
+            nValue = (OffsetY / n) * mMax
             
             nValue = IIf(nValue < 0, 0, IIf(nValue > mMax, mMax, nValue))
             If mValue <> nValue Then
+                RaiseEvent Scrolled(nValue - mValue)
                 mValue = nValue
-                RaiseEvent Scrolled
                 View.Refresh
             End If
         End If

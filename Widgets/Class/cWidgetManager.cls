@@ -185,3 +185,14 @@ Public Function CreateHScrollBar(Parent As Object, ByVal L As Integer, ByVal T A
     ViewList.Add HScroll
     Set CreateHScrollBar = HScroll
 End Function
+
+Public Function CreateSeekBar(Parent As Object, ByVal L As Integer, ByVal T As Integer, ByVal W As Integer, ByVal H As Integer) As cSeekBar
+    Dim SeekBar As New cSeekBar
+    If Parent Is Nothing Then
+        SeekBar.Create Layout, "SeekBar", L, T, W, H
+    Else
+        SeekBar.Create Parent, "SeekBar", L, T, W, H
+    End If
+    ViewList.Add SeekBar
+    Set CreateSeekBar = SeekBar
+End Function
