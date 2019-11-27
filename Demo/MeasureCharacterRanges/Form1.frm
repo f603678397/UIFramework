@@ -81,7 +81,7 @@ Private Sub Command2_Click()
         RF(i) = Rgn(i).GetBounds(Graphics)
     Next
     
-    Me.Caption = UBound(RF) + 1 & " " & RF(10).Left & " " & RF(10).Top
+    'Me.Caption = UBound(RF) + 1 & " " & RF(10).Left & " " & RF(10).Top
     
     Graphics.Clear cColor.White
     Graphics.SetTextRenderingHint TextRenderingHintClearTypeGridFit
@@ -93,7 +93,7 @@ Private Sub Form_Load()
     cDrawing.Init
     Set Graphics = cDrawing.CreateGraphicsFromHDC(Me.hDC)
     
-    sText = "一二三四五六七八九十" & vbCrLf & "一二三四五六七八九十" & vbCrLf
+    sText = vbLf
 End Sub
 
 Private Sub Form_Unload(Cancel As Integer)

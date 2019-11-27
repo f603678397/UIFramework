@@ -32,11 +32,13 @@ Public Event KeyUp(ByVal KeyCode As Integer)
 Public Event TextChanged()
 
 Private mText       As String
+Private OutText     As String
 Private mFontName   As String
 Private mFontSize   As Single
 Private mStyle      As FontStyle
 Private mAccent     As Boolean
 Private mAutoWrap   As Boolean
+Private mSingle     As Boolean
 
 Private bFocus      As Boolean
 Private bDown       As Boolean
@@ -60,6 +62,7 @@ Private Sub Class_Initialize()
     mFontSize = 14
     mStyle = FontStyleRegular
     bChanged = True
+    mAutoWrap = True
     
     MI_IBEAM = LoadCursorWL(ByVal 0&, IDC_IBEAM)
     
@@ -370,6 +373,19 @@ Public Property Let AutoWrap(ByVal bAuto As Boolean)
     View.Refresh
 End Property
 
+Public Property Get SingleLine() As Boolean: SingleLine = mSingle: End Property
+Public Property Let SingleLine(ByVal bSingle As Boolean)
+    If bSingle = mSingle Then Exit Property
+    
+    mSingle = bSingle
+    mAutoWrap = Not mSingle
+    
+    If mSingle Then mText = Replace(mText, vbCrLf, "")
+    
+    View.Refresh
+End Property
+
+
 Private Sub View_Click(): RaiseEvent Click: End Sub
 Private Sub View_DblClick(): RaiseEvent DblClick: End Sub
 
@@ -379,8 +395,54 @@ Private Sub View_GotFocus()
     View.Refresh
 End Sub
 
+Private Sub View_KeyDown(ByVal KeyCode As Integer)
+    Select Case KeyCode
+        Case vbKeyLeft
+            If CharIndex > 0 Then CharIndex = CharIndex - 1
+            View.Refresh
+        Case vbKeyRight
+            If CharIndex < CharRange.GetCount - 1 Then CharIndex = CharIndex + 1
+            View.Refresh
+    End Select
+End Sub
+
 Private Sub View_KeyPress(ByVal KeyAscii As Long)
-'
+    Dim sChar   As String
+    Dim sText   As String
+    Dim s1      As String
+    Dim s2      As String
+    
+    Select Case KeyAscii
+        Case vbKeyBack
+            If CharIndex > 0 And CharIndex <= Len(OutText) Then
+                s1 = left$(OutText, CharIndex - 1)
+                s2 = Right$(OutText, Len(OutText) - CharIndex)
+                sText = s1 & s2
+                CharIndex = CharIndex - 1
+            ElseIf CharIndex > Len(OutText) Then
+                sText = left$(OutText, Len(OutText) - 1)
+                CharIndex = CharIndex - 1
+            End If
+        Case vbKeyReturn
+            sChar = vbLf
+            If CharIndex <= Len(OutText) Then
+                s1 = left$(OutText, CharIndex)
+                s2 = Right$(OutText, Len(OutText) - CharIndex)
+                sText = s1 & sChar & s2
+                CharIndex = CharIndex + 1
+            End If
+        Case Else
+            sChar = Chr$(KeyAscii)
+            If CharIndex <= Len(OutText) Then
+                s1 = left$(OutText, CharIndex)
+                s2 = Right$(OutText, Len(OutText) - CharIndex)
+                sText = s1 & sChar & s2
+                CharIndex = CharIndex + 1
+            End If
+    End Select
+    
+    sText = Replace(sText, vbLf, vbCrLf)
+    Me.Text = sText
 End Sub
 
 Private Sub View_LostFocus()
@@ -397,14 +459,13 @@ Private Sub View_MouseLeave()
 End Sub
 
 Private Sub View_MouseDown(ByVal Button As Integer, ByVal Shift As Integer, ByVal X As Integer, ByVal Y As Integer)
-    Dim Bound As Drawing2D.RECTF
-    Dim W As Single
-    Dim i As Long
-    
     RaiseEvent MouseDown(Button, Shift, X, Y)
     bDown = True
-
-    View.Refresh
+    
+    If X >= 2 And X <= View.Width - 4 And Y >= 2 And Y <= View.Height - 4 Then
+        GetCharIndex X, Y
+        View.Refresh
+    End If
 End Sub
 
 Private Sub View_MouseMove(ByVal Button As Integer, ByVal Shift As Integer, ByVal X As Integer, ByVal Y As Integer)
@@ -441,7 +502,19 @@ Private Sub View_Paint(Canvas As Drawing2D.cGraphics)
         DrawText Brush.GetBaseBrush
     End If
     
+    GetInputPosition
+    
+    Canvas.SetClip 2, 2, View.Width - 4, View.Width - 4, CombineModeReplace
     Canvas.DrawImage Bitmap.ToImage, 2 + OffsetX, 2 + OffsetY
+    
+    If bFocus Then
+        With InputPos
+            Canvas.DrawLine txtPen, .left + OffsetX, .Top + OffsetY, .left + OffsetX, .Top + .Bottom + OffsetY
+            SetCompositionWindowPosition .left + OffsetX, .Top + OffsetY
+        End With
+    End If
+    Canvas.ResetClip
+    
     Canvas.DrawRectangle Pen, 0, 0, View.Width - 1, View.Height - 1
 End Sub
 
@@ -449,62 +522,129 @@ Private Sub DrawText(Brush As cBrush)
     Dim Fam             As New cFontFamily
     Dim Font            As New cFont
     Dim strFormat       As New cStringFormat
+    Dim ts(0 To 3)      As Single
     
     Dim Canvas          As cGraphics
-    Dim BmpHeight       As Long
+    Dim BmpSize         As Drawing2D.RECTF
     
     Dim sText           As String
-    Dim Bound           As Drawing2D.RECTF
+    Dim i               As Long
     
     Dim nFirst          As Long
     Dim nLen            As Long
     Dim txtLen          As Long
+    Dim sChar           As String
+    Dim CharRect        As Drawing2D.RECTF
     
     sText = Replace(mText, vbCrLf, vbLf)
+    
+    For i = 0 To UBound(ts)
+        ts(i) = 50
+    Next
     
     Fam.FromName mFontName
     Font.FromFamily Fam, mFontSize, mStyle, UnitPixel
     strFormat.Flags = StringFormatFlagsNoClip Or StringFormatFlagsMeasureTrailingSpaces
     If Not mAutoWrap Then strFormat.Flags = strFormat.Flags Or StringFormatFlagsNoWrap
+    strFormat.SetTabStops 0, ts
     
-    BmpHeight = GetBitmapHeight(Bitmap.GetGraphics, Font, strFormat)
-    Bitmap.CreateEmptyBitmap View.Width - 4, BmpHeight
+    Bitmap.CreateEmptyBitmap View.Width - 4, MAX_INT
+    BmpSize = GetBitmapSize(sText, Bitmap.GetGraphics, Font, strFormat)
+    Bitmap.CreateEmptyBitmap BmpSize.Right, BmpSize.Right
     Set Canvas = Bitmap.GetGraphics
     
-    Bound = NewRectF(0, 0, Bitmap.Width, Bitmap.Height)
-
-    txtLen = Len(mText)
+    txtLen = Len(sText)
     CharRange.Clear
-    
-    If txtLen < 33 Then
-        nLen = txtLen
-        GetCharRange nFirst, nLen, Canvas, Font, strFormat, Bound
+    If txtLen = 0 Then
+        CharRange.Add NewRectF(2, 2, 1, mFontSize)
     Else
-        Do
-            GetCharRange nFirst, nLen, Canvas, Font, strFormat, Bound
-            nFirst = nFirst + nLen
-            If txtLen - nFirst > 32 Then
-                nLen = 32
-            Else
-                nLen = txtLen - nFirst
-            End If
-        Loop While nFirst < txtLen
+        If txtLen < 33 Then
+            nLen = txtLen
+            GetCharRange sText, nFirst, nLen, Canvas, Font, strFormat, BmpSize
+        Else
+            Do
+                If txtLen - nFirst > 32 Then
+                    nLen = 32
+                Else
+                    nLen = txtLen - nFirst
+                End If
+                
+                GetCharRange sText, nFirst, nLen, Canvas, Font, strFormat, BmpSize
+                nFirst = nFirst + nLen
+            Loop While nFirst < txtLen
+        End If
+        
+        sChar = Right$(sText, 1)
+        CharRect = CharRange.GetValue(CharRange.GetCount - 1)
+        
+        If sChar = vbLf Then
+            CharRect.Top = CharRect.Top + CharRect.Bottom
+            CharRect.left = 2
+        Else
+            CharRect.left = CharRect.left + CharRect.Right
+        End If
+        CharRect.Right = 1
+        CharRange.Add CharRect
     End If
     
-    Canvas.DrawString mText, Font, Bound, strFormat, Brush
+    Canvas.DrawString sText, Font, BmpSize, strFormat, Brush
+    OutText = sText
+    bChanged = False
 End Sub
 
-Private Function GetBitmapHeight(ByVal sText As String, Canvas As Drawing2D.cGraphics, Font As cFont, strFormat As cStringFormat) As Long
+Private Function GetBitmapSize(ByVal sText As String, Canvas As Drawing2D.cGraphics, Font As cFont, strFormat As cStringFormat) As Drawing2D.RECTF
     Dim Bound       As Drawing2D.RECTF
     
-    Bound.Right = View.Width - 4
+    If mAutoWrap Then Bound.Right = View.Width - 4
     
     Bound = Canvas.MeasureString(sText, Font, Bound, strFormat)
-    GetBitmapHeight = Bound.Bottom
+    Bound.Bottom = Bound.Bottom + 5
+    GetBitmapSize = Bound
 End Function
+
+Private Sub GetCharIndex(ByVal X As Long, ByVal Y As Long)
+    Dim i           As Long
+    Dim CharRect    As Drawing2D.RECTF
+    Dim bFindLine   As Boolean
+    
+    X = X + OffsetX
+    Y = Y + OffsetY
+    
+    For i = 0 To CharRange.GetCount - 2
+        CharRect = CharRange.GetValue(i)
+        With CharRect
+            If Y >= .Top And Y <= .Top + .Bottom Then
+                CharIndex = i
+                bFindLine = True
+                If X >= .left And X <= .left + .Right Then
+                    If X - .left < .Right / 2 Then
+                        CharIndex = i
+                    Else
+                        If mID$(OutText, i - 1, 1) = vbLf Then
+                            CharIndex = i
+                        Else
+                            CharIndex = i + 1
+                        End If
+                    End If
+                    Exit Sub
+                End If
+            End If
+        End With
+    Next
+    
+    If Not bFindLine Then CharIndex = CharRange.GetCount - 1
+End Sub
 
 Private Function GetInputPosition()
     InputPos = CharRange.GetValue(CharIndex)
+    
+    If InputPos.left + InputPos.Right + OffsetX > View.Width - 4 Then
+        OffsetX = OffsetX - ((InputPos.left + InputPos.Right + OffsetX) - (View.Width - 4))
+    End If
+    
+    If InputPos.left + OffsetX < 2 Then
+        OffsetX = OffsetX + 2 - (InputPos.left + OffsetX)
+    End If
 End Function
 
 Private Sub SetCompositionWindowPosition(ByVal X As Integer, ByVal Y As Integer)
@@ -527,7 +667,7 @@ Private Sub SetCompositionWindowPosition(ByVal X As Integer, ByVal Y As Integer)
     ImmReleaseContext hWnd, HIMC
 End Sub
 
-Private Sub GetCharRange(ByVal nFirst As Long, ByVal nLen As Long, Canvas As Drawing2D.cGraphics, Font As cFont, strFormat As cStringFormat, Bound As Drawing2D.RECTF)
+Private Sub GetCharRange(ByVal sText As String, ByVal nFirst As Long, ByVal nLen As Long, Canvas As Drawing2D.cGraphics, Font As cFont, strFormat As cStringFormat, Bound As Drawing2D.RECTF)
     Dim Range() As Drawing2D.CharacterRange
     Dim Rgn() As cRegion
     Dim sChar As String
@@ -545,17 +685,22 @@ Private Sub GetCharRange(ByVal nFirst As Long, ByVal nLen As Long, Canvas As Dra
     Next
     
     strFormat.SetMeasurableCharacterRanges Range
-    Rgn = Canvas.MeasureCharacterRanges(mText, Font, Bound, strFormat)
+    Rgn = Canvas.MeasureCharacterRanges(sText, Font, Bound, strFormat)
     
     For i = 0 To UBound(Rgn)
-        sChar = mID$(mText, i + 1, 1)
+        sChar = mID$(sText, i + 1, 1)
         
         Select Case sChar
             Case vbLf
-            
+                CharRect = Rgn(i).GetBounds(Canvas)
+                CharRect.Right = 1
             Case Else
                 CharRect = Rgn(i).GetBounds(Canvas)
         End Select
+        With CharRect
+            .left = .left + 2
+            .Top = .Top + 2
+        End With
         CharRange.Add CharRect
     Next
 End Sub

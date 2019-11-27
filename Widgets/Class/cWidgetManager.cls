@@ -207,3 +207,14 @@ Public Function CreateTextBox(Parent As Object, ByVal L As Integer, ByVal T As I
     ViewList.Add TextBox
     Set CreateTextBox = TextBox
 End Function
+
+Public Function CreateEditBox(Parent As Object, ByVal L As Integer, ByVal T As Integer, ByVal W As Integer, ByVal H As Integer) As cEditBox
+    Dim EditBox As New cEditBox
+    If Parent Is Nothing Then
+        EditBox.Create Layout, "EditBox", L, T, W, H
+    Else
+        EditBox.Create Parent, "EditBox", L, T, W, H
+    End If
+    ViewList.Add EditBox
+    Set CreateEditBox = EditBox
+End Function

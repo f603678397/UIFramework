@@ -300,6 +300,18 @@ Private Sub OnMouseEvent(ByVal uMsg As Long, ByVal wParam As Long, ByVal lParam 
 End Sub
 
 Public Sub OnKeyEvent(ByVal uMsg As Long, ByVal wParam As Long, ByVal lParam As Long)
+    Dim State As Long
+    Dim Shift As Long
+    
+    State = GetAsyncKeyState(VK_SHIFT)
+    If (State And &H8000) = &H8000 Then Shift = vbKeyShift
+    
+    State = GetAsyncKeyState(VK_CONTROL)
+    If (State And &H8000) = &H8000 Then Shift = Shift Or vbKeyShift
+    
+    State = GetAsyncKeyState
+    
+    
     If Not FocusView Is Nothing Then
         If FocusView.Enabled Then
             If uMsg = WM_KEYDOWN Then FocusView.RaiseKeyDown wParam

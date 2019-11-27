@@ -46,6 +46,7 @@ Dim VScroll                 As cVScrollBar
 Dim HScroll                 As cHScrollBar
 Dim SeekBar                 As cSeekBar
 Dim TextBox                 As cTextBox
+Dim EditBox                 As cEditBox
 
 Private Sub Form_Load()
     cCore.Initialize
@@ -76,7 +77,11 @@ Private Sub Form_Load()
     
     Set VScroll = cWidgetManager.CreateVScrollBar(Layout, 372, 10, 18, 220)
     Set HScroll = cWidgetManager.CreateHScrollBar(Layout, 10, 230, 360, 18)
-
+    
+    Set EditBox = cWidgetManager.CreateEditBox(Layout, 120, 30, 100, 100)
+    EditBox.Text = "1234" & vbTab & "5678"
+    EditBox.AutoWrap = False
+    
     Set Timer1 = New cTimer
     Timer1.Create Me.hWnd
     
