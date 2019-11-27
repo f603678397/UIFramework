@@ -1,8 +1,6 @@
 Type=Exe
 Reference=*\G{00020430-0000-0000-C000-000000000046}#2.0#0#C:\Windows\SysWOW64\stdole2.tlb#OLE Automation
-Reference=*\G{0A09FB0F-54FC-48E8-8118-9711EFFB3E0E}#14.0#0#..\..\Build\Drawing2D.dll#Drawing Library Power by GDIPlus 1.1
-Reference=*\G{3FD5BF1D-47CD-4BE8-892C-45759B19F3B9}#e2.0#0#..\..\Build\Framework.dll#UI Framework library 
-Reference=*\G{762BE6F2-C693-467B-8E40-ED21FB6EFC0B}#1.0#0#..\..\Build\Widgets.dll#Widgets For UIFramework
+Reference=*\G{0A09FB0F-54FC-48E8-8118-9711EFFB3E0E}#21.0#0#..\..\Build\Drawing2D.dll#Drawing Library Power by GDIPlus 1.1
 Form=Form1.frm
 Startup="Form1"
 ExeName32="¹¤³Ì1.exe"

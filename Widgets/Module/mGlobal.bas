@@ -14,7 +14,9 @@ Public Type ThemeColorType
     AccentLightColor        As Long
 End Type
 
-Public Const PI As Single = 3.1415926
+Public Const PI         As Single = 3.1415926
+Public Const MAX_LONG   As Long = 2147483647
+Public Const MAX_INT    As Integer = 32767
 
 Public ViewList         As New cObjectList
 

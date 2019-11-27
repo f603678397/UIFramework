@@ -9,6 +9,7 @@ Begin VB.Form Form1
    LinkTopic       =   "Form1"
    MaxButton       =   0   'False
    MinButton       =   0   'False
+   MousePointer    =   99  'Custom
    ScaleHeight     =   4500
    ScaleWidth      =   6000
    StartUpPosition =   2  '屏幕中心
@@ -20,7 +21,8 @@ Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = False
 Option Explicit
 Dim Activity                As cActivity
-Dim Layout                  As cLayout
+Dim WithEvents Layout       As cLayout
+Attribute Layout.VB_VarHelpID = -1
 Dim IM                      As cImageManager
 
 Dim WithEvents btnOk        As cButton
@@ -43,6 +45,7 @@ Dim ImageView               As cImageView
 Dim VScroll                 As cVScrollBar
 Dim HScroll                 As cHScrollBar
 Dim SeekBar                 As cSeekBar
+Dim TextBox                 As cTextBox
 
 Private Sub Form_Load()
     cCore.Initialize
@@ -66,6 +69,7 @@ Private Sub Form_Load()
     
     Set ImageView = cWidgetManager.CreateImageView(Layout, 10, 140, 20, 20)
     Set SeekBar = cWidgetManager.CreateSeekBar(Layout, 35, 140, 80, 20)
+    Set TextBox = cWidgetManager.CreateTextBox(Layout, 10, 170, 100, 50)
     
     Set Waiting = cWidgetManager.CreateWaiting(Layout, 10, 265, 20, 20)
     Set Progress1 = cWidgetManager.CreateProgressBar(Layout, 35, 275, 80, 3)
@@ -111,11 +115,13 @@ Private Sub Form_Load()
     End With
     
     ImageView.Src = "sun_light"
+    SeekBar.Value = 50
+    
+    TextBox.FontSize = 12
+    TextBox.Text = ""
     
     VScroll.Max = 50
     HScroll.Max = 50
-    
-    SeekBar.Value = 50
     
     With btnOk
         .Caption = "确定"

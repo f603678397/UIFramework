@@ -196,3 +196,14 @@ Public Function CreateSeekBar(Parent As Object, ByVal L As Integer, ByVal T As I
     ViewList.Add SeekBar
     Set CreateSeekBar = SeekBar
 End Function
+
+Public Function CreateTextBox(Parent As Object, ByVal L As Integer, ByVal T As Integer, ByVal W As Integer, ByVal H As Integer) As cTextBox
+    Dim TextBox As New cTextBox
+    If Parent Is Nothing Then
+        TextBox.Create Layout, "TextBox", L, T, W, H
+    Else
+        TextBox.Create Parent, "TextBox", L, T, W, H
+    End If
+    ViewList.Add TextBox
+    Set CreateTextBox = TextBox
+End Function

@@ -73,6 +73,24 @@ Public Property Let Left(ByVal nLeft As Integer)
     Notify True
 End Property
 
+Public Property Get AbsLeft() As Integer
+    Dim V As cView
+    Set V = Me
+    Do
+        AbsLeft = AbsLeft + V.Left
+        Set V = V.GetParent
+    Loop While Not V Is Nothing
+End Property
+
+Public Property Get AbsTop() As Integer
+    Dim V As cView
+    Set V = Me
+    Do
+        AbsTop = AbsTop + V.Top
+        Set V = V.GetParent
+    Loop While Not V Is Nothing
+End Property
+
 Public Property Get Top() As Integer: Top = mTop: End Property
 Public Property Let Top(ByVal nTop As Integer)
     If nTop = mTop Then Exit Property
