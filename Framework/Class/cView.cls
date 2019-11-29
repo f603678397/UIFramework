@@ -47,8 +47,8 @@ Public Event MouseHover()
 Public Event MouseLeave()
 Public Event Click()
 Public Event DblClick()
-Public Event KeyDown(ByVal KeyCode As Integer)
-Public Event KeyUp(ByVal KeyCode As Integer)
+Public Event KeyDown(ByVal KeyCode As Integer, ByVal Shift As Integer)
+Public Event KeyUp(ByVal KeyCode As Integer, ByVal Shift As Integer)
 Public Event KeyPress(ByVal KeyAscii As Long)
 Public Event GotFocus()
 Public Event LostFocus()
@@ -307,8 +307,8 @@ End Sub
 
 Friend Sub RaiseMouseWheel(ByVal Forward As Boolean): RaiseEvent MouseWheel(Forward): End Sub
 
-Friend Sub RaiseKeyUp(ByVal KeyCode As Integer): RaiseEvent KeyUp(KeyCode): End Sub
-Friend Sub RaiseKeyDown(ByVal KeyCode As Integer): RaiseEvent KeyDown(KeyCode): End Sub
+Friend Sub RaiseKeyUp(ByVal KeyCode As Integer, ByVal Shift As Integer): RaiseEvent KeyUp(KeyCode, Shift): End Sub
+Friend Sub RaiseKeyDown(ByVal KeyCode As Integer, ByVal Shift As Integer): RaiseEvent KeyDown(KeyCode, Shift): End Sub
 
 Friend Sub RaiseChar(ByVal Ascii As Long): RaiseEvent KeyPress(Ascii): End Sub
 

@@ -30,8 +30,8 @@ Public Event MouseUp(ByVal Button As Integer, ByVal Shift As Integer, ByVal X As
 Public Event MouseWheel(ByVal Forward As Boolean)
 Public Event MouseHover()
 Public Event MouseLeave()
-Public Event KeyDown(ByVal KeyCode As Integer)
-Public Event KeyUp(ByVal KeyCode As Integer)
+Public Event KeyDown(ByVal KeyCode As Integer, ByVal Shift As Integer)
+Public Event KeyUp(ByVal KeyCode As Integer, ByVal Shift As Integer)
 Public Event Resize()
 
 Private Sub Class_Terminate(): Release: End Sub
@@ -304,22 +304,22 @@ Public Sub OnKeyEvent(ByVal uMsg As Long, ByVal wParam As Long, ByVal lParam As 
     Dim Shift As Long
     
     State = GetAsyncKeyState(VK_SHIFT)
-    If (State And &H8000) = &H8000 Then Shift = vbKeyShift
+    If (State And &H8000) = &H8000 Then Shift = 1
     
     State = GetAsyncKeyState(VK_CONTROL)
-    If (State And &H8000) = &H8000 Then Shift = Shift Or vbKeyShift
+    If (State And &H8000) = &H8000 Then Shift = Shift Or 2
     
-    State = GetAsyncKeyState
-    
+    State = GetAsyncKeyState(VK_MENU)
+    If (State And &H8000) = &H8000 Then Shift = Shift Or 4
     
     If Not FocusView Is Nothing Then
         If FocusView.Enabled Then
-            If uMsg = WM_KEYDOWN Then FocusView.RaiseKeyDown wParam
-            If uMsg = WM_KEYUP Then FocusView.RaiseKeyUp wParam
+            If uMsg = WM_KEYDOWN Then FocusView.RaiseKeyDown wParam, Shift
+            If uMsg = WM_KEYUP Then FocusView.RaiseKeyUp wParam, Shift
         End If
     Else
-        If uMsg = WM_KEYDOWN Then RaiseEvent KeyDown(wParam)
-        If uMsg = WM_KEYUP Then RaiseEvent KeyUp(wParam)
+        If uMsg = WM_KEYDOWN Then RaiseEvent KeyDown(wParam, Shift)
+        If uMsg = WM_KEYUP Then RaiseEvent KeyUp(wParam, Shift)
     End If
 End Sub
 
