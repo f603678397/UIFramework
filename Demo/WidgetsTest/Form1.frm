@@ -45,12 +45,7 @@ Dim ImageView               As cImageView
 Dim VScroll                 As cVScrollBar
 Dim HScroll                 As cHScrollBar
 Dim SeekBar                 As cSeekBar
-Dim WithEvents EditBox                 As cEditBox
-Attribute EditBox.VB_VarHelpID = -1
-
-Private Sub EditBox_KeyDown(ByVal KeyCode As Integer, ByVal Shift As Integer)
-    Debug.Print KeyCode, Shift
-End Sub
+Dim EditBox                 As cEditBox
 
 Private Sub Form_Load()
     cCore.Initialize
@@ -74,14 +69,16 @@ Private Sub Form_Load()
     
     Set ImageView = cWidgetManager.CreateImageView(Layout, 10, 140, 20, 20)
     Set SeekBar = cWidgetManager.CreateSeekBar(Layout, 35, 140, 80, 20)
-    Set EditBox = cWidgetManager.CreateEditBox(Layout, 10, 170, 100, 50)
     
     Set Waiting = cWidgetManager.CreateWaiting(Layout, 10, 265, 20, 20)
     Set Progress1 = cWidgetManager.CreateProgressBar(Layout, 35, 275, 80, 3)
     
     Set VScroll = cWidgetManager.CreateVScrollBar(Layout, 372, 10, 18, 220)
     Set HScroll = cWidgetManager.CreateHScrollBar(Layout, 10, 230, 360, 18)
-
+    
+    Set EditBox = cWidgetManager.CreateEditBox(Layout, 120, 30, 100, 100)
+    EditBox.Text = "This is an EditBox"
+    
     Set Timer1 = New cTimer
     Timer1.Create Me.hWnd
     
@@ -121,12 +118,7 @@ Private Sub Form_Load()
     
     ImageView.Src = "sun_light"
     SeekBar.Value = 50
-    
-    With EditBox
-        .AutoWrap = False
-        .FontName = "Î¢ÈíÑÅºÚ"
-    End With
-    
+        
     VScroll.Max = 50
     HScroll.Max = 50
     
@@ -155,7 +147,6 @@ End Sub
 
 Private Sub btnOk_Click()
 '
-EditBox.SelText = "1234"
 End Sub
 
 Private Sub btnCancel_Click()
@@ -164,7 +155,6 @@ End Sub
 
 Private Sub CheckBox_ValueChanged()
     Frame1.Enabled = CheckBox.Value
-    EditBox.Enabled = CheckBox.Value
 End Sub
 
 Private Sub Option1_ValueChanged(ByVal ByUser As Boolean)

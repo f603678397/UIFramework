@@ -75,7 +75,7 @@ Private Sub Class_Initialize()
     
     SetTheme Preset
     
-    ThemeColor.BKColor = cColor.White
+    'ThemeColor.BKColor = cColor.White
 End Sub
 
 Public Sub Create(Parent As Object, ByVal sCaption As String, ByVal nLeft As Integer, ByVal nTop As Integer, ByVal nWidth As Integer, ByVal nHeight As Integer)
@@ -251,7 +251,8 @@ Public Sub SetTheme(NewTheme As PresetThemeEnum)
         Case PresetThemeEnum.LightTheme
             SetLightTheme ThemeColor
     End Select
-    ThemeColor.TextColor = cColor.Black
+    'ThemeColor.TextColor = cColor.Black
+    bChanged = True
 End Sub
 
 '=========================================================================================
@@ -545,6 +546,19 @@ Private Sub View_KeyPress(ByVal KeyAscii As Long)
                 Me.SelText = vbCrLf
                 Exit Sub
             End If
+        Case vbKeyTab
+            If CharLast = -1 Then
+                sChar = vbTab
+                If CharIndex <= Len(OutText) Then
+                    s1 = left$(OutText, CharIndex)
+                    s2 = Right$(OutText, Len(OutText) - CharIndex)
+                    sText = s1 & sChar & s2
+                    CharIndex = CharIndex + 1
+                End If
+            Else
+                Me.SelText = vbTab
+                Exit Sub
+            End If
         Case Else
             If KeyAscii >= 0 And KeyAscii < 32 Then
                 Exit Sub
@@ -587,7 +601,7 @@ Private Sub View_MouseDown(ByVal Button As Integer, ByVal Shift As Integer, ByVa
     bDown = True
     CharLast = -1
     
-    If X >= 2 And X <= View.Width - 4 And Y >= 2 And Y <= View.Height - 4 Then
+    If X > 2 And X < View.Width - 4 And Y > 2 And Y < View.Height - 4 Then
         CharIndex = GetCharIndex(X, Y)
         DownIndex = CharIndex
         bChanged = True
@@ -599,7 +613,7 @@ Private Sub View_MouseMove(ByVal Button As Integer, ByVal Shift As Integer, ByVa
     Dim Index As Long
     RaiseEvent MouseMove(Button, Shift, X, Y)
     
-    If bDown Then
+    If bDown And X > 2 And X < View.Width - 4 And Y > 2 And Y < View.Height - 4 Then
         Index = GetCharIndex(X, Y)
         If Index = CharRange.GetCount - 1 Then Index = CharRange.GetCount - 2
         If Index < DownIndex Then
@@ -657,7 +671,7 @@ Private Sub View_Paint(Canvas As Drawing2D.cGraphics)
             Pen.Color = ThemeColor.BorderColor
         End If
         Brush.Color = ThemeColor.TextColor
-        txtPen.Color = cColor.Black
+        txtPen.Color = ThemeColor.TextColor
         BKColor = ThemeColor.BKColor
     Else
         Pen.Color = ThemeColor.BorderDisEnableColor

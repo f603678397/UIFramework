@@ -93,7 +93,7 @@ Private Sub Form_Load()
     cDrawing.Init
     Set Graphics = cDrawing.CreateGraphicsFromHDC(Me.hDC)
     
-    sText = vbLf
+    sText = "0000000"
 End Sub
 
 Private Sub Form_Unload(Cancel As Integer)
