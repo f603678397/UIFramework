@@ -182,6 +182,18 @@ Public Property Let Stretch(ByVal bStretch As Boolean)
     View.Refresh
 End Property
 
+Public Sub SetBitmap(Bitmap As cBitmap)
+    Set Img = Bitmap.ToImage
+End Sub
+
+Public Sub SetImage(Image As cImage)
+    Set Img = Image
+End Sub
+
+Public Sub SetDrawable(Drawable As cDrawable)
+    Set Img = Drawable.GetImage
+End Sub
+
 Private Sub View_Click(): RaiseEvent Click: End Sub
 Private Sub View_DblClick(): RaiseEvent DblClick: End Sub
 

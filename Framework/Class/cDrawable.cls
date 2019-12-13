@@ -92,8 +92,12 @@ Public Function LoadFromXML(ByVal xmlPath As String) As Boolean
     LoadFromXML = True
 End Function
 
-Public Function ToImage() As cImage
-    Set ToImage = Bitmap.ToImage
+Public Function GetImage() As cImage
+    Set GetImage = Bitmap.ToImage
+End Function
+
+Public Function GetBitmap() As cBitmap
+    Set GetBitmap = Bitmap.Clone
 End Function
 
 Private Sub CreateCanvas(Node As IXMLDOMNode)
