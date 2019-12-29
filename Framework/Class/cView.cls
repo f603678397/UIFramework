@@ -295,7 +295,7 @@ Friend Sub RaiseMouseUp(ByVal Button As Integer, ByVal Shift As Integer, ByVal X
     
     If mX >= 0 And mX <= mWidth And mY >= 0 And mY <= mHeight Then
         CurrTime = GetTickCount
-        If CurrTime - LastTime < GetDoubleClickTime Then
+        If Abs(CurrTime - LastTime) < GetDoubleClickTime Then
             RaiseEvent DblClick
             LastTime = 0
         Else

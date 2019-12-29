@@ -25,6 +25,12 @@ Public Enum ViewMessageEnum
     VM_OPTION = 1
 End Enum
 
+Public Enum ItemState
+    IS_NORMAL
+    IS_HOVER
+    IS_DOWN
+End Enum
+
 Private Sub Class_Terminate(): Release: End Sub
 
 Private Sub Release()
@@ -199,17 +205,6 @@ Public Function CreateSeekBar(Parent As Object, ByVal L As Integer, ByVal T As I
     Set CreateSeekBar = SeekBar
 End Function
 
-'Public Function CreateTextBox(Parent As Object, ByVal L As Integer, ByVal T As Integer, ByVal W As Integer, ByVal H As Integer) As cTextBox
-'    Dim TextBox As New cTextBox
-'    If Parent Is Nothing Then
-'        TextBox.Create Layout, "TextBox", L, T, W, H
-'    Else
-'        TextBox.Create Parent, "TextBox", L, T, W, H
-'    End If
-'    ViewList.Add TextBox
-'    Set CreateTextBox = TextBox
-'End Function
-
 Public Function CreateEditBox(Parent As Object, ByVal L As Integer, ByVal T As Integer, ByVal W As Integer, ByVal H As Integer) As cEditBox
     Dim EditBox As New cEditBox
     If Parent Is Nothing Then
@@ -219,4 +214,15 @@ Public Function CreateEditBox(Parent As Object, ByVal L As Integer, ByVal T As I
     End If
     ViewList.Add EditBox
     Set CreateEditBox = EditBox
+End Function
+
+Public Function CreateListView(Parent As Object, ByVal L As Integer, ByVal T As Integer, ByVal W As Integer, ByVal H As Integer) As cListView
+    Dim ListView As New cListView
+    If Parent Is Nothing Then
+        ListView.Create Layout, "EditBox", L, T, W, H
+    Else
+        ListView.Create Parent, "EditBox", L, T, W, H
+    End If
+    ViewList.Add ListView
+    Set CreateListView = ListView
 End Function

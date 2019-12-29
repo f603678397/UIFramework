@@ -175,12 +175,14 @@ End Property
 Public Property Get Width() As Integer: Width = View.Width: End Property
 Public Property Let Width(ByVal nWidth As Integer)
     If View.Width = nWidth Then Exit Property
+    bChanged = True
     View.Width = nWidth
 End Property
 
 Public Property Get Height() As Integer: Height = View.Height: End Property
 Public Property Let Height(ByVal nHeight As Integer)
     If View.Height = nHeight Then Exit Property
+    bChanged = True
     View.Height = nHeight
 End Property
 
@@ -220,6 +222,7 @@ Public Sub Move(ByVal nLeft As Integer, Optional nTop, Optional nWidth, Optional
     W = IIf(IsMissing(nWidth), View.Width, CInt(nWidth))
     H = IIf(IsMissing(nHeight), View.Height, CInt(nHeight))
     
+    bChanged = True
     View.Move nLeft, T, W, H
 End Sub
 
@@ -638,18 +641,18 @@ Private Sub View_MouseWheel(ByVal Forward As Boolean)
     If Bitmap.Height < View.Height - 4 Then Exit Sub
     
     If Forward Then
-        If OffsetY > 0 Then
-            OffsetY = 0
-        ElseIf OffsetY < 0 Then
+        If OffsetY < 0 Then
             OffsetY = OffsetY + 5
+            If OffsetY > 0 Then OffsetY = 0
         Else
             Exit Sub
         End If
     Else
-        If (View.Height - 4) - OffsetY > Bitmap.Height Then
-            OffsetY = View.Height - 4 - Bitmap.Height
-        ElseIf (View.Height - 4) - OffsetY < Bitmap.Height Then
+        If (View.Height - 4) - OffsetY < Bitmap.Height Then
             OffsetY = OffsetY - 5
+            If (View.Height - 4) - OffsetY > Bitmap.Height Then
+                OffsetY = View.Height - 4 - Bitmap.Height
+            End If
         Else
             Exit Sub
         End If
