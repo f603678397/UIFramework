@@ -27,6 +27,7 @@ Public Event LostFocus()
 Public Event Click()
 Public Event DblClick()
 Public Event ItemClick(ByVal ItemIndex As Long)
+Public Event ItemDblClick(ByVal ItemIndex As Long)
 
 Private Adapter         As cListAdapter
 Private ItemBitmap      As New cObjectList
@@ -36,10 +37,12 @@ Private ItemHeight      As Integer
 Private OffsetY         As Single
 Private bDown           As Boolean
 Private LastIndex       As Long
+Private mSelIndex        As Long
 
 Private Sub Class_Initialize()
     ItemHeight = 15
     LastIndex = -1
+    mSelIndex = -1
     SetTheme Preset
 End Sub
 
@@ -58,6 +61,7 @@ Public Sub BindView(DstView As cView)
     Set View = DstView
     bDown = False
     LastIndex = -1
+    mSelIndex = -1
     
     V.Refresh
     View.Refresh
@@ -201,6 +205,22 @@ Public Property Let BorderColor(ByVal nColor As Long)
     View.Refresh
 End Property
 
+Public Property Get SelItemIndex() As Long: SelItemIndex = mSelIndex: End Property
+Public Property Let SelItemIndex(ByVal nIndex As Long)
+    If Adapter Is Nothing Then
+        mSelIndex = -1
+        Exit Property
+    End If
+    
+    If nIndex = mSelIndex Then Exit Property
+    If nIndex < 0 Or nIndex > Adapter.GetCount - 1 Then Exit Property
+    
+    
+    RefreshItem mSelIndex, IS_NORMAL
+    RefreshItem nIndex, IS_DOWN
+    mSelIndex = nIndex
+End Property
+
 Public Function GetItemHeight() As Long: GetItemHeight = ItemHeight: End Function
 Public Sub SetItemHeight(ByVal nHeight As Integer)
     If ItemHeight = nHeight Then Exit Sub
@@ -294,8 +314,53 @@ Private Function GetItemIndex(ByVal Y As Integer) As Long
     GetItemIndex = -1
 End Function
 
+Private Sub View_KeyDown(ByVal KeyCode As Integer, ByVal Shift As Integer)
+    If Adapter Is Nothing Then Exit Sub
+    
+    Select Case KeyCode
+        Case vbKeyUp
+            If mSelIndex > 0 Then
+                Me.SelItemIndex = mSelIndex - 1
+            End If
+        Case vbKeyDown
+            If mSelIndex < Adapter.GetCount - 1 Then
+                Me.SelItemIndex = mSelIndex + 1
+            End If
+    End Select
+End Sub
+
+Private Sub View_KeyPress(ByVal KeyAscii As Long)
+    If Adapter Is Nothing Then Exit Sub
+    
+    Select Case KeyAscii
+        Case vbKeyReturn
+            RaiseEvent ItemClick(mSelIndex)
+        Case vbKeySpace
+            RaiseEvent ItemClick(mSelIndex)
+    End Select
+End Sub
+
+Private Sub View_MouseHover()
+    RaiseEvent MouseHover
+End Sub
+
+Private Sub View_MouseLeave()
+    RaiseEvent MouseLeave
+    
+    If LastIndex > -1 Then
+        If LastIndex = mSelIndex Then
+            RefreshItem LastIndex, IS_DOWN
+        Else
+            RefreshItem LastIndex, IS_NORMAL
+        End If
+        LastIndex = -1
+    End If
+End Sub
+
 Private Sub View_MouseDown(ByVal Button As Integer, ByVal Shift As Integer, ByVal X As Integer, ByVal Y As Integer)
     Dim ItemIndex As Long
+    
+    RaiseEvent MouseDown(Button, Shift, X, Y)
     
     ItemIndex = GetItemIndex(Y)
     
@@ -306,20 +371,19 @@ Private Sub View_MouseDown(ByVal Button As Integer, ByVal Shift As Integer, ByVa
     End If
 End Sub
 
-Private Sub View_MouseLeave()
-    If LastIndex > -1 Then
-        RefreshItem LastIndex, IS_NORMAL
-        LastIndex = -1
-    End If
-End Sub
-
 Private Sub View_MouseMove(ByVal Button As Integer, ByVal Shift As Integer, ByVal X As Integer, ByVal Y As Integer)
     Dim ItemIndex As Long
+    
+    RaiseEvent MouseMove(Button, Shift, X, Y)
     
     If Not bDown Then
         ItemIndex = GetItemIndex(Y)
         If ItemIndex > -1 And ItemIndex <> LastIndex Then
-            RefreshItem LastIndex, IS_NORMAL
+            If LastIndex = mSelIndex Then
+                RefreshItem LastIndex, IS_DOWN
+            Else
+                RefreshItem LastIndex, IS_NORMAL
+            End If
             RefreshItem ItemIndex, IS_HOVER
             LastIndex = ItemIndex
         End If
@@ -327,11 +391,35 @@ Private Sub View_MouseMove(ByVal Button As Integer, ByVal Shift As Integer, ByVa
 End Sub
 
 Private Sub View_MouseUp(ByVal Button As Integer, ByVal Shift As Integer, ByVal X As Integer, ByVal Y As Integer)
-    If bDown Then
+    Static LastTime As Long
+    Static nIndex   As Long
+    Dim CurrTime    As Long
+    
+    RaiseEvent MouseUp(Button, Shift, X, Y)
+    
+    If LastIndex > -1 Then
+        CurrTime = GetTickCount
         RefreshItem LastIndex, IS_HOVER
-        RaiseEvent ItemClick(LastIndex)
-        bDown = False
+        
+        If Button = vbLeftButton Then
+            If mSelIndex <> LastIndex Then
+                RefreshItem mSelIndex, IS_NORMAL
+                mSelIndex = LastIndex
+            End If
+            
+            If nIndex <> LastIndex Then LastTime = 0
+            
+            If Abs(CurrTime - LastTime) < GetDoubleClickTime Then
+                RaiseEvent ItemDblClick(LastIndex)
+                LastTime = 0
+            Else
+                RaiseEvent ItemClick(LastIndex)
+                LastTime = CurrTime
+                nIndex = LastIndex
+            End If
+        End If
     End If
+    bDown = False
 End Sub
 
 Private Sub View_MouseWheel(ByVal Forward As Boolean)

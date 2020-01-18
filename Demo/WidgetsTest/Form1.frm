@@ -48,6 +48,7 @@ Dim SeekBar                 As cSeekBar
 Dim EditBox                 As cEditBox
 Attribute EditBox.VB_VarHelpID = -1
 Public WithEvents ListView             As cListView
+Attribute ListView.VB_VarHelpID = -1
 
 Dim Adapter                 As New ListAdapter
 
@@ -168,6 +169,14 @@ End Sub
 Private Sub CheckBox_ValueChanged()
     Frame1.Enabled = CheckBox.Value
     EditBox.Enabled = CheckBox.Value
+End Sub
+
+Private Sub ListView_ItemClick(ByVal ItemIndex As Long)
+    Debug.Print "Item Click Index is " & ItemIndex
+End Sub
+
+Private Sub ListView_ItemDblClick(ByVal ItemIndex As Long)
+    Debug.Print "Item Double Click Index is " & ItemIndex
 End Sub
 
 Private Sub Option1_ValueChanged(ByVal ByUser As Boolean)

@@ -633,7 +633,7 @@ Private Sub View_MouseMove(ByVal Button As Integer, ByVal Shift As Integer, ByVa
 End Sub
 
 Private Sub View_MouseUp(ByVal Button As Integer, ByVal Shift As Integer, ByVal X As Integer, ByVal Y As Integer)
-    RaiseEvent MouseDown(Button, Shift, X, Y)
+    RaiseEvent MouseUp(Button, Shift, X, Y)
     bDown = False
 End Sub
 
@@ -782,27 +782,21 @@ Private Sub DrawText(Brush As cBrush, ByVal BKColor As Long)
     Canvas.SetTextRenderingHint TextRenderingHintClearTypeGridFit
     Canvas.DrawString sText, Font, BmpSize, strFormat, Brush
     
+    Canvas.SetClip 0, 0, 0, 0, CombineModeReplace
     If CharLast > -1 And View.Enabled Then
-        selBrush.Color = ThemeColor.AccentColor
         SelTextBrush.Color = cColor.White
         For i = CharIndex To CharLast
             CharRect = CharRange.GetValue(i)
             CharRect.left = CharRect.left - 2
             CharRect.Top = CharRect.Top - 2
             
-            Canvas.FillRectangle selBrush.GetBaseBrush, CharRect.left, CharRect.Top, CharRect.Right, CharRect.Bottom
+            Canvas.SetClip CharRect.left, CharRect.Top, CharRect.Right, CharRect.Bottom, CombineModeUnion
         Next
         
-        For i = CharIndex To CharLast
-            CharRect = CharRange.GetValue(i)
-            CharRect.left = CharRect.left - 2
-            CharRect.Top = CharRect.Top - 2
-            
-            If i < CharRange.GetCount - 1 Then
-                Canvas.DrawString mID$(sText, i + 1, 1), Font, CharRect, strFormat, SelTextBrush.GetBaseBrush
-            End If
-        Next
+        Canvas.Clear ThemeColor.AccentColor
+        Canvas.DrawString sText, Font, BmpSize, strFormat, SelTextBrush.GetBaseBrush
     End If
+    Canvas.ResetClip
     
     OutText = sText
     bChanged = False
