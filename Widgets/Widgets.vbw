@@ -1,6 +1,6 @@
 cButton = 23, 26, 793, 565, C
 cLabel = 13, 35, 657, 538, C
-mGlobal = 324, 34, 1048, 511, C
+mGlobal = 121, 39, 845, 516, 
 cToast = 165, 15, 995, 598, C
 cWidgetManager = 79, 13, 957, 577, C
 cOption = 59, 27, 738, 502, C
