@@ -1,3 +1,8 @@
+*.frm linguist-language=Visual Basic
+*.bas linguist-language=Visual Basic
+*.cls linguist-language=Visual Basic
+*.vbp linguist-language=Visual Basic
+
 # Auto detect text files and perform LF normalization
 * text=auto
 
