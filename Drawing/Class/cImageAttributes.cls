@@ -103,14 +103,14 @@ Public Function GetAdjustedPalette(ByVal nType As ColorAdjustType) As ColorPalet
     GdipGetImageAttributesAdjustedPalette mHandle, GetAdjustedPalette, nType
 End Function
 
-Public Sub SetOpacity(ByVal Opacity As Single, Optional ByVal nType As ColorAdjustType = ColorAdjustTypeBitmap)
+Public Sub SetOpacity(ByVal Opacity As Single, Optional ByVal nType As ColorAdjustType = ColorAdjustTypeDefault)
     Dim CM As Drawing2D.ColorMatrix
     With CM
         .M(0, 0) = 1
-        .M(0, 0) = 1
-        .M(0, 0) = 1
-        .M(0, 0) = Opacity
-        .M(0, 0) = 1
+        .M(1, 1) = 1
+        .M(2, 2) = 1
+        .M(3, 3) = Opacity
+        .M(4, 4) = 1
     End With
-    GdipSetImageAttributesColorMatrix mHandle, nType, TRUEVALUE, CM, ByVal 0&, ColorMatrixFlagsDefault
+    GdipSetImageAttributesColorMatrix mHandle, nType, TRUEVALUE, CM, ByVal 0&, nType
 End Sub

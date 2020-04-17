@@ -1,6 +1,6 @@
 cButton = 23, 26, 793, 565, C
 cLabel = 13, 35, 657, 538, C
-mGlobal = 121, 39, 845, 516, 
+mGlobal = 121, 39, 845, 516, C
 cToast = 165, 15, 995, 598, C
 cWidgetManager = 79, 13, 957, 577, C
 cOption = 59, 27, 738, 502, C
@@ -13,5 +13,5 @@ cVScrollBar = 64, 65, 823, 527, C
 cHScrollBar = 85, 39, 947, 479, C
 cSeekBar = 174, 26, 1002, 532, C
 cEditBox = 40, 14, 922, 553, C
-cListView = 115, 30, 806, 595, 
+cListView = 115, 30, 806, 595, C
 cListAdapter = 355, 77, 1027, 555, C
