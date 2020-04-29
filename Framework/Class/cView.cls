@@ -435,8 +435,17 @@ Friend Sub ReDraw()
     
     If bShowViewEdge Then
         Set Pen = New cPen
-        Pen.Color = cColor.Fuchsia
+        Pen.Color = cColor.Pink
         Graphics.DrawRectangle Pen, 0, 0, mWidth - 1, mHeight - 1
+        
+        Pen.Color = cColor.Fuchsia
+        Pen.Width = 3
+        Graphics.SetClip 0, 0, 5, 5, CombineModeReplace
+        Graphics.SetClip mWidth - 5, 0, 5, 5, CombineModeUnion
+        Graphics.SetClip 0, mHeight - 5, 5, 5, CombineModeUnion
+        Graphics.SetClip mWidth - 5, mHeight - 5, 5, 5, CombineModeUnion
+        Graphics.DrawRectangle Pen, 0, 0, mWidth - 1, mHeight - 1
+        Graphics.ResetClip
     End If
     FirstDraw = True
 End Sub
