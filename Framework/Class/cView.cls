@@ -428,8 +428,16 @@ Friend Sub RefreshRect(ByVal L As Integer, ByVal T As Integer, ByVal W As Intege
 End Sub
 
 Friend Sub ReDraw()
+    Dim Pen As cPen
+    
     Graphics.Clear mBKColor
     RaiseEvent Paint(Graphics)
+    
+    If bShowViewEdge Then
+        Set Pen = New cPen
+        Pen.Color = cColor.Fuchsia
+        Graphics.DrawRectangle Pen, 0, 0, mWidth - 1, mHeight - 1
+    End If
     FirstDraw = True
 End Sub
 

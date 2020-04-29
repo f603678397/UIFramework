@@ -77,3 +77,7 @@ Public Function GetImageManager() As cImageManager: Set GetImageManager = IM: En
 Public Sub ShowRedrawRgn(ByVal bShow As Boolean)
     bShowRedrawRgn = bShow
 End Sub
+
+Public Sub ShowViewEdge(ByVal bShow As Boolean)
+    bShowViewEdge = bShow
+End Sub

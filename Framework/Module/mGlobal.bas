@@ -8,7 +8,8 @@ Public IM                   As New cImageManager
 Public DrawableList         As New cObjectList
 
 ' Debug 开关
-Public bShowRedrawRgn       As Boolean
+Public bShowRedrawRgn       As Boolean      '显示重绘区域
+Public bShowViewEdge        As Boolean      '显示View边界
 
 Public Type RECTI
     Left    As Integer

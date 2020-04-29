@@ -198,7 +198,7 @@ Friend Sub RefreshRect(ByVal L As Integer, ByVal T As Integer, ByVal W As Intege
     Graphics.Clear mBKColor
     For i = 0 To ViewList.GetCount - 1
         Set View = ViewList.GetObject(i)
-            If View.CheckInRect(L, T, W, H) Then
+            If View.CheckInRect(L, T, W, H) And View.Visible Then
                 View.RefreshRect L - View.Left, T - View.Top, W, H
                 CM.m(3, 3) = View.Opacity
                 Attr.SetColorMatrix CM, ColorAdjustTypeBitmap
