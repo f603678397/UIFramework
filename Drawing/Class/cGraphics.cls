@@ -109,6 +109,14 @@ Public Sub SetClip(ByVal X As Single, ByVal Y As Single, ByVal Width As Single, 
     GdipSetClipRect mHandle, X, Y, Width, Height, Mode
 End Sub
 
+Public Sub SetClipPath(Path As cPath, ByVal Mode As CombineMode)
+    GdipSetClipPath mHandle, Path.Handle, Mode
+End Sub
+
+Public Sub SetClipRegion(region As cRegion, ByVal Mode As CombineMode)
+    GdipSetClipRegion mHandle, region.Handle, Mode
+End Sub
+
 Public Sub ResetClip()
     GdipResetClip mHandle
 End Sub
@@ -186,8 +194,9 @@ Public Sub EndContainer(ByVal state As Long)
     GdipEndContainer mHandle, state
 End Sub
 
-Public Function GetNearestColor() As Long
-    GdipGetNearestColor mHandle, GetNearestColor
+Public Function GetNearestColor(ByVal nColor As Long) As Long
+    GdipGetNearestColor mHandle, nColor
+    GetNearestColor = nColor
 End Function
 
 Public Sub Clear(Optional ByVal nColor As Long = &HFFFFFF)
