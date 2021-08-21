@@ -310,7 +310,7 @@ Public Sub PrintString(ByVal sText As String, Layout As RECTF, Optional nColor A
     Dim mFont As Long
     Dim mFormat As Long
     Dim Brush As Long
-    GdipCreateFontFamilyFromName sFontName, 0, Fam
+    GdipCreateFontFamilyFromName StrPtr(sFontName), 0, Fam
     GdipCreateFont Fam, nSize, FontStyleRegular, GlobalUnit, mFont
     GdipCreateStringFormat 0, 0, mFormat
     GdipSetStringFormatAlign mFormat, StringAlignmentNear
