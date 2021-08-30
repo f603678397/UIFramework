@@ -197,6 +197,14 @@ Public Sub SetPresetBlend(Blend() As Long, Position() As Single)
     GdipSetPathGradientPresetBlend mHandle, Blend(LBound(Blend)), Position(LBound(Position)), Count
 End Sub
 
+Public Sub SetSurroundColorsWithCount(Colors() As Long)
+    Dim Count As Long
+    If (Not Colors) = -1 Then Exit Sub
+    
+    Count = UBound(Colors) - LBound(Colors) + 1
+    GdipSetPathGradientSurroundColorsWithCount mHandle, Colors(LBound(Colors)), Count
+End Sub
+
 Public Sub SetBellShape(ByVal fFoucs As Single, ByVal fScale As Single)
     GdipSetPathGradientSigmaBlend mHandle, fFoucs, fScale
 End Sub

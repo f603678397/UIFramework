@@ -44,7 +44,7 @@ Public Property Get ForeColor() As Long
     GdipGetHatchForegroundColor mHandle, ForeColor
 End Property
 
-Public Property Let ForColor(ByVal nColor As Long)
+Public Property Let ForeColor(ByVal nColor As Long)
     Release
     mForeColor = nColor
     GdipCreateHatchBrush mStyle, mForeColor, mBackColor, mHandle
