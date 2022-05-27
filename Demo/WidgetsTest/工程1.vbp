@@ -1,13 +1,13 @@
 Type=Exe
-Reference=*\G{00020430-0000-0000-C000-000000000046}#2.0#0#C:\Windows\SysWOW64\stdole2.tlb#OLE Automation
+Reference=*\G{00020430-0000-0000-C000-000000000046}#2.0#0#..\..\..\..\..\..\..\Windows\SysWOW64\stdole2.tlb#OLE Automation
 Reference=*\G{0A09FB0F-54FC-48E8-8118-9711EFFB3E0E}#14.0#0#..\..\Build\Drawing2D.dll#Drawing Library Power by GDIPlus 1.1
-Reference=*\G{762BE6F2-C693-467B-8E40-ED21FB6EFC0B}#69.0#0#..\..\Build\Widgets.dll#Widgets For UIFramework
-Reference=*\G{3FD5BF1D-47CD-4BE8-892C-45759B19F3B9}#f2.0#0#..\..\Build\Framework.dll#UI Framework library 
+Reference=*\G{AE31142C-D3E0-44C0-9E0B-F6837C22BF2A}#15.0#0#..\..\Build\Framework.dll#UI Framework library 
+Reference=*\G{72CE2D42-D2DC-48F1-B984-413D423C5DA9}#56.0#0#..\..\Build\Widgets.dll#Widgets For UIFramework
 Form=Form1.frm
 Class=ListAdapter; ListAdapter.cls
 Startup="Form1"
 ExeName32="工程1.exe"
-Path32="C:\Users\Administrator\Desktop"
+Path32="..\..\..\..\..\..\Administrator\Desktop"
 Command32=""
 Name="工程1"
 HelpContextID="0"
