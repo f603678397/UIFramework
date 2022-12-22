@@ -344,14 +344,14 @@ Public Sub OnCharEvent(ByVal uMsg As Long, ByVal wParam As Long, ByVal lParam As
     End If
 End Sub
 
-Public Function CreateView(ByVal L As Integer, ByVal T As Integer, ByVal W As Integer, ByVal H As Integer)
+Public Function CreateView(ByVal L As Integer, ByVal T As Integer, ByVal W As Integer, ByVal H As Integer) As cView
     Dim View As New cView
     View.Create Me, Nothing, L, T, W, H
     ViewList.Add View
     Set CreateView = View
 End Function
 
-Public Function GetView(ByVal Index As Long): Set GetView = ViewList.GetObject(Index): End Function
+Public Function GetView(ByVal Index As Long) As cView: Set GetView = ViewList.GetObject(Index): End Function
 
 Public Sub RemoveView(View As cView): f_RemoveView View: Refresh: End Sub
 Friend Sub f_RemoveView(View As cView)

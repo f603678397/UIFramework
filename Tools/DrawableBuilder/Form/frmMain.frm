@@ -2,16 +2,16 @@ VERSION 5.00
 Begin VB.Form frmMain 
    BorderStyle     =   0  'None
    Caption         =   "Drawable Builder"
-   ClientHeight    =   9060
+   ClientHeight    =   9000
    ClientLeft      =   0
    ClientTop       =   0
-   ClientWidth     =   14100
+   ClientWidth     =   13500
    LinkTopic       =   "Form1"
    MaxButton       =   0   'False
    MinButton       =   0   'False
-   ScaleHeight     =   604
+   ScaleHeight     =   600
    ScaleMode       =   3  'Pixel
-   ScaleWidth      =   940
+   ScaleWidth      =   900
    StartUpPosition =   2  'ÆÁÄ»ÖÐÐÄ
 End
 Attribute VB_Name = "frmMain"
@@ -32,6 +32,8 @@ Attribute btnMax.VB_VarHelpID = -1
 Dim WithEvents btnMin       As cView
 Attribute btnMin.VB_VarHelpID = -1
 Dim WorkArea                As cView
+
+Dim HelloUI                 As New cHelloUI
 
 Private Sub btnClose_Click()
     Unload Me
@@ -124,6 +126,9 @@ Private Sub Form_Load()
     Set btnMin = TitleBar.CreateView(TitleBar.Width - 75, 0, 25, 20)
     Set btnMax = TitleBar.CreateView(TitleBar.Width - 50, 0, 25, 20)
     Set btnClose = TitleBar.CreateView(TitleBar.Width - 25, 0, 25, 20)
+    
+    HelloUI.Create WorkArea, WorkArea.Width, WorkArea.Height
+    
     
     Activity.SetLayout Layout
 End Sub

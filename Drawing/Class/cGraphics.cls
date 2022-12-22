@@ -453,7 +453,7 @@ Public Sub FillPie(Brush As cBrush, ByVal X As Single, ByVal Y As Single, ByVal 
     GdipFillPie mHandle, Brush.Handle, X, Y, Width, Height, startAngle, sweepAngle
 End Sub
 
-Public Sub fillPath(Brush As cBrush, Path As cPath)
+Public Sub FillPath(Brush As cBrush, Path As cPath)
     GdipFillPath mHandle, Brush.Handle, Path.Handle
 End Sub
 
@@ -470,29 +470,73 @@ Public Sub DrawImage(Img As cImage, ByVal X As Single, ByVal Y As Single)
 End Sub
 
 Public Sub DrawImageRect(Img As cImage, ByVal X As Single, ByVal Y As Single, ByVal Width As Single, ByVal Height As Single)
-    GdipDrawImageRect mHandle, Img.Handle, X, Y, Width, Height
+    p_DrawImageRect Img.Handle, X, Y, Width, Height
 End Sub
 
 Public Sub DrawImageRectRect(Img As cImage, dstRect As RECTF, srcRect As RECTF, imgAttr As cImageAttributes)
-    Dim H As Long
-    If Not imgAttr Is Nothing Then H = imgAttr.Handle
-    GdipDrawImageRectRect mHandle, Img.Handle, dstRect.Left, dstRect.Top, dstRect.Right, dstRect.Bottom, srcRect.Left, srcRect.Top, srcRect.Right, srcRect.Bottom, GlobalUnit, H, 0, 0
+    p_DrawImageRectRect Img.Handle, dstRect, srcRect, imgAttr
 End Sub
 
 Public Sub DrawImagePointRect(Img As cImage, ByVal X As Single, ByVal Y As Single, srcRect As RECTF)
-    GdipDrawImagePointRect mHandle, Img.Handle, X, Y, srcRect.Left, srcRect.Top, srcRect.Right, srcRect.Bottom, GlobalUnit
+    p_DrawImagePointRect Img.Handle, X, Y, srcRect
 End Sub
 
 Public Sub DrawImagePointsRect(Img As cImage, pts() As POINTF, ByVal SrcX As Single, ByVal SrcY As Single, ByVal srcWidth As Single, ByVal srcHeight As Single)
-    Dim Count As Long
-    If (Not pts) = -1 Then Exit Sub
-    Count = UBound(pts) - LBound(pts) + 1
-    GdipDrawImagePointsRect mHandle, Img.Handle, pts(LBound(pts)), Count, SrcX, SrcY, srcWidth, srcHeight, GlobalUnit
+    p_DrawImagePointsRect Img.Handle, pts, SrcX, SrcY, srcWidth, srcHeight
 End Sub
 
 Public Sub DrawImagePoints(Img As cImage, pts() As POINTF)
+    p_DrawImagePoints Img.Handle, pts
+End Sub
+
+Public Sub DrawBitmap(Img As cBitmap, ByVal X As Single, ByVal Y As Single)
+     GdipDrawImage mHandle, Img.Handle, X, Y
+End Sub
+
+Public Sub DrawBitmapRect(Img As cBitmap, ByVal X As Single, ByVal Y As Single, ByVal Width As Single, ByVal Height As Single)
+    p_DrawImageRect Img.Handle, X, Y, Width, Height
+End Sub
+
+Public Sub DrawBitmapRectRect(Img As cBitmap, dstRect As RECTF, srcRect As RECTF, imgAttr As cImageAttributes)
+    p_DrawImageRectRect Img.Handle, dstRect, srcRect, imgAttr
+End Sub
+
+Public Sub DrawBitmapPointRect(Img As cBitmap, ByVal X As Single, ByVal Y As Single, srcRect As RECTF)
+    p_DrawImagePointRect Img.Handle, X, Y, srcRect
+End Sub
+
+Public Sub DrawBitmapPointsRect(Img As cBitmap, pts() As POINTF, ByVal SrcX As Single, ByVal SrcY As Single, ByVal srcWidth As Single, ByVal srcHeight As Single)
+    p_DrawImagePointsRect Img.Handle, pts, SrcX, SrcY, srcWidth, srcHeight
+End Sub
+
+Public Sub DrawBitmapPoints(Img As cBitmap, pts() As POINTF)
+    p_DrawImagePoints Img.Handle, pts
+End Sub
+
+Private Sub p_DrawImageRect(Img As Long, ByVal X As Single, ByVal Y As Single, ByVal Width As Single, ByVal Height As Single)
+    GdipDrawImageRect mHandle, Img, X, Y, Width, Height
+End Sub
+
+Private Sub p_DrawImageRectRect(Img As Long, dstRect As RECTF, srcRect As RECTF, imgAttr As cImageAttributes)
+    Dim H As Long
+    If Not imgAttr Is Nothing Then H = imgAttr.Handle
+    GdipDrawImageRectRect mHandle, Img, dstRect.Left, dstRect.Top, dstRect.Right, dstRect.Bottom, srcRect.Left, srcRect.Top, srcRect.Right, srcRect.Bottom, GlobalUnit, H, 0, 0
+End Sub
+
+Private Sub p_DrawImagePointRect(Img As Long, ByVal X As Single, ByVal Y As Single, srcRect As RECTF)
+    GdipDrawImagePointRect mHandle, Img, X, Y, srcRect.Left, srcRect.Top, srcRect.Right, srcRect.Bottom, GlobalUnit
+End Sub
+
+Private Sub p_DrawImagePointsRect(Img As Long, pts() As POINTF, ByVal SrcX As Single, ByVal SrcY As Single, ByVal srcWidth As Single, ByVal srcHeight As Single)
     Dim Count As Long
     If (Not pts) = -1 Then Exit Sub
     Count = UBound(pts) - LBound(pts) + 1
-    GdipDrawImagePoints mHandle, Img.Handle, pts(LBound(pts)), Count
+    GdipDrawImagePointsRect mHandle, Img, pts(LBound(pts)), Count, SrcX, SrcY, srcWidth, srcHeight, GlobalUnit
+End Sub
+
+Private Sub p_DrawImagePoints(Img As Long, pts() As POINTF)
+    Dim Count As Long
+    If (Not pts) = -1 Then Exit Sub
+    Count = UBound(pts) - LBound(pts) + 1
+    GdipDrawImagePoints mHandle, Img, pts(LBound(pts)), Count
 End Sub

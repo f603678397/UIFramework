@@ -58,5 +58,5 @@ Private Sub Timer1_onTime()
 End Sub
 
 Private Sub View_Paint(Canvas As Drawing2D.cGraphics)
-    Canvas.DrawImage Drawable.ToImage, 0, 0
+    Canvas.DrawImage Drawable.GetImage, 0, 0
 End Sub

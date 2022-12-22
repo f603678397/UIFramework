@@ -571,7 +571,7 @@ Public Sub Move(ByVal L As Integer, Optional ByVal T, Optional ByVal W, Optional
     Notify bMove
 End Sub
 
-Public Function CreateView(ByVal L As Integer, ByVal T As Integer, ByVal W As Integer, ByVal H As Integer)
+Public Function CreateView(ByVal L As Integer, ByVal T As Integer, ByVal W As Integer, ByVal H As Integer) As cView
     Dim View As New cView
     View.Create Layout, Me, L, T, W, H
     ViewList.Add View
@@ -602,7 +602,7 @@ Public Sub AddView(View As cView)
     Layout.Refresh
 End Sub
 
-Public Function GetView(ByVal Index As Long): Set GetView = ViewList.GetObject(Index): End Function
+Public Function GetView(ByVal Index As Long) As cView: Set GetView = ViewList.GetObject(Index): End Function
 
 Public Sub RemoveView(View As cView): f_RemoveView View: Notify: End Sub
 Friend Sub f_RemoveView(View As cView)

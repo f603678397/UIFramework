@@ -1,7 +1,7 @@
 Type=OleDll
-Reference=*\G{00020430-0000-0000-C000-000000000046}#2.0#0#..\..\..\..\..\..\Windows\SysWOW64\stdole2.tlb#OLE Automation
-Reference=*\G{F5078F18-C551-11D3-89B9-0000F81FE221}#6.0#0#..\..\..\..\..\..\Windows\SysWOW64\msxml6.dll#Microsoft XML, v6.0
-Reference=*\G{13FC9823-115E-4CB2-9A02-881895942E28}#1.646#0#..\TLB\Win32Api.tlb#Win32API之vb6头文件 2018-9-9添加修正更新 made by 棉花糖 
+Reference=*\G{00020430-0000-0000-C000-000000000046}#2.0#0#C:\Windows\SysWOW64\stdole2.tlb#OLE Automation
+Reference=*\G{F5078F18-C551-11D3-89B9-0000F81FE221}#6.0#0#C:\Windows\SysWOW64\msxml6.dll#Microsoft XML, v6.0
+Reference=*\G{13FC9823-115E-4CB2-9A02-881895942E28}#1.646#0#..\..\..\TLB\Win32Api.tlb#Win32API之vb6头文件 2018-9-9添加修正更新 made by 棉花糖 
 Reference=*\G{0A09FB0F-54FC-48E8-8118-9711EFFB3E0E}#14.0#0#..\Build\Drawing2D.dll#Drawing Library Power by GDIPlus 1.1
 Class=cCore; Class\cCore.cls
 Module=mGlobal; Module\mGlobal.bas
